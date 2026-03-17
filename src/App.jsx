@@ -1,47 +1,83 @@
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
-// Add page imports here
+
+import AppLayout from '@/components/layout/AppLayout';
+import Onboarding from '@/pages/Onboarding';
+import NannyOnboarding from '@/pages/NannyOnboarding';
+import Home from '@/pages/Home';
+import FindNannies from '@/pages/FindNannies';
+import NannyDetail from '@/pages/NannyDetail';
+import BookNanny from '@/pages/BookNanny';
+import MyBookings from '@/pages/MyBookings';
+import NannyBookings from '@/pages/NannyBookings';
+import Messages from '@/pages/Messages';
+import FamilySettings from '@/pages/FamilySettings';
+import NannyProfile from '@/pages/NannyProfile';
+import LeaveReview from '@/pages/LeaveReview';
+import Earnings from '@/pages/Earnings';
+import SafetyCenter from '@/pages/SafetyCenter';
+import AdminDashboard from '@/pages/AdminDashboard';
+import AdminApplications from '@/pages/AdminApplications';
+import AdminBookings from '@/pages/AdminBookings';
+import AdminReports from '@/pages/AdminReports';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
 
-  // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
+      <div className="fixed inset-0 flex items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-3"></div>
+          <p className="text-sm text-muted-foreground font-body">Loading CozyCare...</p>
+        </div>
       </div>
     );
   }
 
-  // Handle authentication errors
   if (authError) {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
     } else if (authError.type === 'auth_required') {
-      // Redirect to login automatically
       navigateToLogin();
       return null;
     }
   }
 
-  // Render the main app
   return (
     <Routes>
-      {/* Add your page Route elements here */}
+      <Route path="/" element={<Navigate to="/Home" replace />} />
+      <Route path="/Onboarding" element={<Onboarding />} />
+      <Route path="/NannyOnboarding" element={<NannyOnboarding />} />
+      <Route element={<AppLayout />}>
+        <Route path="/Home" element={<Home />} />
+        <Route path="/FindNannies" element={<FindNannies />} />
+        <Route path="/NannyDetail" element={<NannyDetail />} />
+        <Route path="/BookNanny" element={<BookNanny />} />
+        <Route path="/MyBookings" element={<MyBookings />} />
+        <Route path="/NannyBookings" element={<NannyBookings />} />
+        <Route path="/Messages" element={<Messages />} />
+        <Route path="/FamilySettings" element={<FamilySettings />} />
+        <Route path="/NannyProfile" element={<NannyProfile />} />
+        <Route path="/LeaveReview" element={<LeaveReview />} />
+        <Route path="/Earnings" element={<Earnings />} />
+        <Route path="/SafetyCenter" element={<SafetyCenter />} />
+        <Route path="/AdminDashboard" element={<AdminDashboard />} />
+        <Route path="/AdminApplications" element={<AdminApplications />} />
+        <Route path="/AdminBookings" element={<AdminBookings />} />
+        <Route path="/AdminReports" element={<AdminReports />} />
+      </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
 };
 
-
 function App() {
-
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
