@@ -1,19 +1,24 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   MapPin, Clock, Award, MessageCircle, Calendar, ArrowLeft,
-  Play, Shield, Star, Heart, Globe, BookOpen
+  Play, Shield, Star, Heart, Globe, BookOpen, CheckCircle2, Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { TrustBadgeRow } from '@/components/shared/TrustBadge';
 import StarRating from '@/components/shared/StarRating';
-import PageHeader from '@/components/shared/PageHeader';
+
+const BADGE_META = {
+  id_verified: { label: 'ID Verified', icon: CheckCircle2, color: 'text-emerald-600 bg-emerald-50' },
+  background_check: { label: 'Background Check', icon: Shield, color: 'text-blue-600 bg-blue-50' },
+  reference_checked: { label: 'References Checked', icon: CheckCircle2, color: 'text-violet-600 bg-violet-50' },
+  video_verified: { label: 'Video Intro', icon: Play, color: 'text-orange-600 bg-orange-50' },
+  certifications_verified: { label: 'Certified', icon: Award, color: 'text-primary bg-rose-light' },
+};
 
 export default function NannyDetail() {
   const params = new URLSearchParams(window.location.search);
@@ -56,195 +61,300 @@ export default function NannyDetail() {
   };
 
   if (isLoading) {
-    return <div className="h-96 flex items-center justify-center"><div className="w-8 h-8 border-4 border-muted border-t-primary rounded-full animate-spin" /></div>;
+    return (
+      <div className="h-96 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-muted border-t-primary rounded-full animate-spin" />
+      </div>
+    );
   }
 
-  if (!nanny) return <div className="text-center py-16 text-muted-foreground">Nanny not found</div>;
+  if (!nanny) return <div className="text-center py-16 text-muted-foreground">Caregiver not found.</div>;
 
   return (
-    <div>
-      <Button variant="ghost" className="mb-4 text-muted-foreground" onClick={() => navigate(-1)}>
-        <ArrowLeft className="w-4 h-4 mr-2" />
-        Back
-      </Button>
+    <div className="pb-12">
+      <button
+        onClick={() => navigate(-1)}
+        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4" /> Back to results
+      </button>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-7">
+
+        {/* ── LEFT / MAIN ── */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Header card */}
-          <Card className="p-6 border-border/60">
-            <div className="flex gap-5">
-              <div className="flex-shrink-0">
-                <div className="w-20 h-20 rounded-xl overflow-hidden border-2 border-peach/60 shadow-md">
+
+          {/* Hero card */}
+          <div className="rounded-3xl overflow-hidden border border-border/50 shadow-sm bg-card">
+            {/* Banner */}
+            <div className="relative h-44 bg-gradient-to-br from-rose-light via-peach/70 to-ivory overflow-hidden">
+              {nanny.photo_url && (
+                <img
+                  src={nanny.photo_url}
+                  alt={nanny.display_name}
+                  className="w-full h-full object-cover object-top opacity-50"
+                />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-card/80 via-transparent to-transparent" />
+            </div>
+
+            <div className="px-6 pb-6">
+              {/* Avatar row */}
+              <div className="flex items-end gap-4 -mt-10 mb-4">
+                <div className="w-20 h-20 rounded-2xl overflow-hidden border-[3px] border-card shadow-lg flex-shrink-0">
                   {nanny.photo_url ? (
                     <img src={nanny.photo_url} alt={nanny.display_name} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full bg-primary/10 flex items-center justify-center">
-                      <span className="text-2xl font-display font-semibold text-primary">
+                      <span className="text-3xl font-display font-bold text-primary">
                         {(nanny.display_name || nanny.full_name || '?')[0]}
                       </span>
                     </div>
                   )}
                 </div>
-              </div>
-              <div className="flex-1">
-                <h1 className="font-display text-2xl font-bold text-foreground">
-                  {nanny.display_name || nanny.full_name}
-                </h1>
-                <div className="flex flex-wrap items-center gap-3 mt-1.5">
-                  {nanny.service_area && (
-                    <span className="text-sm text-muted-foreground flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5" /> {nanny.service_area}
-                    </span>
-                  )}
-                  {nanny.years_experience > 0 && (
-                    <span className="text-sm text-muted-foreground flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5" /> {nanny.years_experience} years experience
-                    </span>
+                <div className="pb-1">
+                  {nanny.avg_rating > 0 && (
+                    <StarRating rating={nanny.avg_rating} total={nanny.total_reviews} size="md" />
                   )}
                 </div>
-                {nanny.avg_rating > 0 && (
-                  <div className="mt-2">
-                    <StarRating rating={nanny.avg_rating} total={nanny.total_reviews} size="md" />
-                  </div>
+              </div>
+
+              <h1 className="font-display text-2xl lg:text-3xl font-bold text-foreground leading-tight">
+                {nanny.display_name || nanny.full_name}
+              </h1>
+              <div className="flex flex-wrap gap-3 mt-2">
+                {nanny.service_area && (
+                  <span className="text-sm text-muted-foreground flex items-center gap-1">
+                    <MapPin className="w-3.5 h-3.5" /> {nanny.service_area}
+                  </span>
                 )}
-                {nanny.badges?.length > 0 && (
-                  <div className="mt-3">
-                    <TrustBadgeRow badges={nanny.badges} size="md" />
-                  </div>
+                {nanny.years_experience > 0 && (
+                  <span className="text-sm text-muted-foreground flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5" /> {nanny.years_experience} years experience
+                  </span>
                 )}
               </div>
-            </div>
-          </Card>
 
-          {/* Bio */}
+              {/* Trust badges */}
+              {nanny.badges?.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-4">
+                  {nanny.badges.map(b => {
+                    const meta = BADGE_META[b];
+                    if (!meta) return null;
+                    const Icon = meta.icon;
+                    return (
+                      <span key={b} className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full ${meta.color}`}>
+                        <Icon className="w-3.5 h-3.5" />
+                        {meta.label}
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* About */}
           {nanny.bio && (
-            <Card className="p-6 border-border/60">
+            <div className="bg-card border border-border/50 rounded-2xl p-6">
               <h3 className="font-display font-semibold text-lg mb-3 flex items-center gap-2">
-                <Heart className="w-4 h-4 text-primary" /> About Me
+                <Heart className="w-4 h-4 text-primary" fill="currentColor" /> About Me
               </h3>
               <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{nanny.bio}</p>
-            </Card>
+            </div>
           )}
 
-          {/* Video */}
+          {/* Intro video */}
           {nanny.intro_video_url && (
-            <Card className="p-6 border-border/60">
+            <div className="bg-card border border-border/50 rounded-2xl p-6">
               <h3 className="font-display font-semibold text-lg mb-3 flex items-center gap-2">
                 <Play className="w-4 h-4 text-primary" /> Introduction Video
               </h3>
               <div className="rounded-xl overflow-hidden bg-muted aspect-video">
                 <video src={nanny.intro_video_url} controls className="w-full h-full object-cover" />
               </div>
-            </Card>
+            </div>
           )}
 
-          {/* Details */}
-          <Card className="p-6 border-border/60">
-            <h3 className="font-display font-semibold text-lg mb-4">Details</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Details grid */}
+          <div className="bg-card border border-border/50 rounded-2xl p-6">
+            <h3 className="font-display font-semibold text-lg mb-5">Details & Credentials</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {nanny.languages?.length > 0 && (
                 <div>
-                  <p className="text-xs text-muted-foreground font-medium flex items-center gap-1 mb-1">
-                    <Globe className="w-3 h-3" /> Languages
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5 mb-2">
+                    <Globe className="w-3.5 h-3.5" /> Languages
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {nanny.languages.map(l => (
-                      <Badge key={l} variant="secondary" className="text-xs">{l}</Badge>
+                      <Badge key={l} variant="secondary" className="rounded-lg text-xs">{l}</Badge>
                     ))}
                   </div>
                 </div>
               )}
               {nanny.specialties?.length > 0 && (
                 <div>
-                  <p className="text-xs text-muted-foreground font-medium flex items-center gap-1 mb-1">
-                    <Star className="w-3 h-3" /> Specialties
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5 mb-2">
+                    <Sparkles className="w-3.5 h-3.5" /> Specialties
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {nanny.specialties.map(s => (
-                      <Badge key={s} variant="secondary" className="text-xs bg-sage/30 text-sage-foreground">{s}</Badge>
+                      <Badge key={s} variant="secondary" className="rounded-lg text-xs bg-sage/25 text-sage-foreground border-0">{s}</Badge>
                     ))}
                   </div>
                 </div>
               )}
               {nanny.certifications?.length > 0 && (
                 <div>
-                  <p className="text-xs text-muted-foreground font-medium flex items-center gap-1 mb-1">
-                    <Award className="w-3 h-3" /> Certifications
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5 mb-2">
+                    <Award className="w-3.5 h-3.5" /> Certifications
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {nanny.certifications.map(c => (
-                      <Badge key={c} variant="secondary" className="text-xs bg-peach/50 text-peach-dark">{c}</Badge>
+                      <Badge key={c} variant="secondary" className="rounded-lg text-xs bg-peach/50 text-peach-dark border-0">{c}</Badge>
                     ))}
                   </div>
                 </div>
               )}
               {nanny.education && (
                 <div>
-                  <p className="text-xs text-muted-foreground font-medium flex items-center gap-1 mb-1">
-                    <BookOpen className="w-3 h-3" /> Education
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1.5 mb-2">
+                    <BookOpen className="w-3.5 h-3.5" /> Education
                   </p>
-                  <p className="text-sm">{nanny.education}</p>
+                  <p className="text-sm text-foreground">{nanny.education}</p>
                 </div>
               )}
             </div>
-          </Card>
+          </div>
 
           {/* Reviews */}
           {reviews.length > 0 && (
-            <Card className="p-6 border-border/60">
-              <h3 className="font-display font-semibold text-lg mb-4">Reviews</h3>
-              <div className="space-y-4">
-                {reviews.map(r => (
-                  <div key={r.id} className="pb-4 border-b border-border/40 last:border-0 last:pb-0">
-                    <div className="flex items-center justify-between mb-1.5">
-                      <p className="text-sm font-semibold">{r.parent_name || 'Parent'}</p>
-                      <StarRating rating={r.rating} />
+            <div className="bg-card border border-border/50 rounded-2xl p-6">
+              <h3 className="font-display font-semibold text-lg mb-5">
+                Family Reviews
+                <span className="ml-2 text-sm font-body font-normal text-muted-foreground">({reviews.length})</span>
+              </h3>
+              <div className="space-y-5">
+                {reviews.map((r, i) => (
+                  <div key={r.id}>
+                    {i > 0 && <Separator className="mb-5 opacity-50" />}
+                    <div className="flex items-start gap-3">
+                      <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-xs font-semibold text-primary">
+                          {(r.parent_name || 'P')[0]}
+                        </span>
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between flex-wrap gap-2">
+                          <p className="text-sm font-semibold text-foreground">{r.parent_name || 'Parent'}</p>
+                          <StarRating rating={r.rating} />
+                        </div>
+                        {r.comment && (
+                          <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">"{r.comment}"</p>
+                        )}
+                        {(r.warmth_rating || r.reliability_rating || r.communication_rating) && (
+                          <div className="flex flex-wrap gap-3 mt-2.5">
+                            {r.warmth_rating && (
+                              <span className="text-[11px] text-muted-foreground">
+                                Warmth <span className="font-semibold text-foreground">{r.warmth_rating}/5</span>
+                              </span>
+                            )}
+                            {r.reliability_rating && (
+                              <span className="text-[11px] text-muted-foreground">
+                                Reliability <span className="font-semibold text-foreground">{r.reliability_rating}/5</span>
+                              </span>
+                            )}
+                            {r.communication_rating && (
+                              <span className="text-[11px] text-muted-foreground">
+                                Communication <span className="font-semibold text-foreground">{r.communication_rating}/5</span>
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    {r.comment && <p className="text-sm text-muted-foreground">{r.comment}</p>}
                   </div>
                 ))}
               </div>
-            </Card>
+            </div>
           )}
         </div>
 
-        {/* Sidebar */}
-        <div className="space-y-4">
-          <Card className="p-6 border-border/60 sticky top-6">
-            <div className="text-center mb-5">
-              <p className="font-display text-3xl font-bold text-primary">${nanny.hourly_rate}</p>
-              <p className="text-sm text-muted-foreground">per hour</p>
-            </div>
-            <Separator className="mb-5" />
-            {user?.role === 'parent' && (
-              <div className="space-y-3">
-                <Link to={`/BookNanny?nanny_id=${nanny.id}`} className="block">
-                  <Button className="w-full h-11 font-semibold">
-                    <Calendar className="w-4 h-4 mr-2" />
-                    Book Now
+        {/* ── RIGHT / SIDEBAR ── */}
+        <div>
+          <div className="sticky top-6 space-y-4">
+            {/* Booking card */}
+            <div className="bg-card border border-border/50 rounded-2xl p-6 shadow-sm">
+              <div className="text-center mb-5">
+                <p className="font-display text-4xl font-bold text-primary">${nanny.hourly_rate}</p>
+                <p className="text-sm text-muted-foreground mt-0.5">per hour</p>
+              </div>
+              <Separator className="mb-5 opacity-50" />
+
+              {user?.role === 'parent' && (
+                <div className="space-y-2.5">
+                  <Link to={`/BookNanny?nanny_id=${nanny.id}`} className="block">
+                    <Button className="w-full h-12 font-semibold rounded-xl text-sm shadow-md shadow-primary/20">
+                      <Calendar className="w-4 h-4 mr-2" />
+                      Book a Session
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="outline"
+                    className="w-full h-12 rounded-xl text-sm"
+                    onClick={handleMessage}
+                  >
+                    <MessageCircle className="w-4 h-4 mr-2" />
+                    Send a Message
                   </Button>
-                </Link>
-                <Button variant="outline" className="w-full h-11" onClick={handleMessage}>
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  Send Message
-                </Button>
+                </div>
+              )}
+
+              {/* Trust guarantee */}
+              <div className="mt-5 pt-5 border-t border-border/50">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-primary/8 flex items-center justify-center flex-shrink-0">
+                    <Shield className="w-4 h-4 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-foreground mb-0.5">CozyCare Guarantee</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Every nanny is background-screened, reference-verified, and reviewed by real families. Your family's safety comes first.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Stats */}
+            {(nanny.total_bookings > 0 || nanny.total_reviews > 0) && (
+              <div className="bg-card border border-border/50 rounded-2xl p-5">
+                <h4 className="text-sm font-semibold text-foreground mb-4">At a Glance</h4>
+                <div className="space-y-3">
+                  {nanny.total_bookings > 0 && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground">Total sessions</span>
+                      <span className="text-sm font-semibold text-foreground">{nanny.total_bookings}</span>
+                    </div>
+                  )}
+                  {nanny.avg_rating > 0 && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground">Average rating</span>
+                      <span className="text-sm font-semibold text-foreground">{nanny.avg_rating} ⭐</span>
+                    </div>
+                  )}
+                  {nanny.total_reviews > 0 && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground">Family reviews</span>
+                      <span className="text-sm font-semibold text-foreground">{nanny.total_reviews}</span>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
-
-            {/* Trust section */}
-            <div className="mt-6 pt-5 border-t border-border/60">
-              <div className="flex items-center gap-2 mb-3">
-                <Shield className="w-4 h-4 text-primary" />
-                <p className="text-sm font-semibold">Trust & Safety</p>
-              </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                All CozyCare nannies undergo identity verification, background checks, and reference screening. 
-                Your family's safety is our top priority.
-              </p>
-            </div>
-          </Card>
+          </div>
         </div>
+
       </div>
     </div>
   );
