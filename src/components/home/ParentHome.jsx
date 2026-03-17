@@ -80,7 +80,7 @@ export default function ParentHome() {
           {TRUST_PILLARS.map(({ icon: PillarIcon, label, desc }) => (
             <div key={label} className="flex items-start gap-3.5 bg-card border border-border/50 rounded-2xl p-5 shadow-sm">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Icon className="w-5 h-5 text-primary" />
+                <PillarIcon className="w-5 h-5 text-primary" />
               </div>
               <div>
                 <p className="font-semibold text-sm text-foreground">{label}</p>
