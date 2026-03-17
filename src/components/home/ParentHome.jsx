@@ -77,7 +77,7 @@ export default function ParentHome() {
       {/* ── Trust pillars ── */}
       <section>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {TRUST_PILLARS.map(({ icon: Icon, label, desc }) => (
+          {TRUST_PILLARS.map(({ icon: PillarIcon, label, desc }) => (
             <div key={label} className="flex items-start gap-3.5 bg-card border border-border/50 rounded-2xl p-5 shadow-sm">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                 <Icon className="w-5 h-5 text-primary" />
