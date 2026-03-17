@@ -9,11 +9,14 @@ import { Button } from '@/components/ui/button';
 import { base44 } from '@/api/base44Client';
 
 const Logo = () => (
-  <Link to="/Home" className="flex items-center gap-2.5 px-2">
-    <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center">
-      <Heart className="w-4.5 h-4.5 text-primary" fill="currentColor" />
+  <Link to="/Home" className="flex items-center gap-2.5 px-2 group">
+    <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-primary/20 to-peach/50 flex items-center justify-center shadow-sm">
+      <Heart className="w-4 h-4 text-primary" fill="currentColor" />
     </div>
-    <span className="font-display text-xl font-semibold text-foreground tracking-tight">CozyCare</span>
+    <div>
+      <span className="font-display text-lg font-bold text-foreground tracking-tight block leading-none">CozyCare</span>
+      <span className="text-[10px] text-muted-foreground font-body tracking-wide">Trusted family care</span>
+    </div>
   </Link>
 );
 
