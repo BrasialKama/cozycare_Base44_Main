@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 import {
-  Home, Search, Calendar, MessageCircle, User, Settings,
-  Shield, Heart, Menu, X, LogOut, Star, ClipboardList, DollarSign, Bell
+  Home, Search, Calendar, MessageCircle, User,
+  Shield, Heart, Menu, X, LogOut, DollarSign, ClipboardList
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { base44 } from '@/api/base44Client';
 
 const Logo = () => (
-  <Link to="/Home" className="flex items-center gap-2.5 px-2 group">
-    <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-primary/20 to-peach/50 flex items-center justify-center shadow-sm">
+  <Link to="/Home" className="flex items-center gap-3 px-1 group">
+    <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-primary/25 to-peach/60 flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
       <Heart className="w-4 h-4 text-primary" fill="currentColor" />
     </div>
     <div>
@@ -43,6 +43,23 @@ const navItems = {
   ],
 };
 
+function NavLink({ item, active, onClick }) {
+  return (
+    <Link
+      to={item.path}
+      onClick={onClick}
+      className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+        active
+          ? 'bg-primary/12 text-primary shadow-sm'
+          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+      }`}
+    >
+      <item.icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-primary' : ''}`} />
+      {item.label}
+    </Link>
+  );
+}
+
 export default function AppLayout() {
   const { user } = useAuth();
   const location = useLocation();
@@ -52,95 +69,89 @@ export default function AppLayout() {
 
   return (
     <div className="min-h-screen bg-background flex">
-      {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex flex-col w-64 border-r border-border bg-card/60 backdrop-blur-sm fixed inset-y-0 left-0 z-30">
-        <div className="p-5 border-b border-border">
+
+      {/* ── Desktop Sidebar ── */}
+      <aside className="hidden lg:flex flex-col w-64 border-r border-border/60 bg-card/70 backdrop-blur-sm fixed inset-y-0 left-0 z-30">
+        <div className="p-6 pb-5 border-b border-border/60">
           <Logo />
         </div>
+
         <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
-          {items.map((item) => {
-            const active = location.pathname === item.path;
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  active
-                    ? 'bg-primary/10 text-primary'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
-                }`}
-              >
-                <item.icon className="w-4.5 h-4.5" />
-                {item.label}
-              </Link>
-            );
-          })}
+          {items.map((item) => (
+            <NavLink
+              key={item.path}
+              item={item}
+              active={location.pathname === item.path}
+            />
+          ))}
         </nav>
-        <div className="p-3 border-t border-border">
-          <div className="flex items-center gap-3 px-3 py-2 mb-2">
-            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-semibold text-primary">
+
+        {/* Sidebar footer */}
+        <div className="p-4 border-t border-border/60">
+          <div className="flex items-center gap-3 px-2 py-2 mb-2 rounded-xl hover:bg-muted/40 transition-colors">
+            <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center text-xs font-bold text-primary flex-shrink-0">
               {(user?.full_name || user?.email || '?')[0]?.toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{user?.display_name || user?.full_name || 'User'}</p>
+              <p className="text-sm font-semibold text-foreground truncate">{user?.display_name || user?.full_name || 'User'}</p>
               <p className="text-xs text-muted-foreground capitalize">{role}</p>
             </div>
           </div>
           <Button
             variant="ghost"
             size="sm"
-            className="w-full justify-start text-muted-foreground hover:text-foreground"
+            className="w-full justify-start text-muted-foreground hover:text-foreground text-xs rounded-xl"
             onClick={() => base44.auth.logout()}
           >
-            <LogOut className="w-4 h-4 mr-2" />
+            <LogOut className="w-3.5 h-3.5 mr-2" />
             Sign out
           </Button>
         </div>
       </aside>
 
-      {/* Mobile header */}
-      <div className="lg:hidden fixed top-0 inset-x-0 h-14 bg-card/90 backdrop-blur-md border-b border-border z-30 flex items-center justify-between px-4">
+      {/* ── Mobile header ── */}
+      <div className="lg:hidden fixed top-0 inset-x-0 h-14 bg-card/95 backdrop-blur-md border-b border-border/60 z-30 flex items-center justify-between px-4">
         <Logo />
-        <Button variant="ghost" size="icon" onClick={() => setMobileOpen(!mobileOpen)}>
+        <Button variant="ghost" size="icon" className="rounded-xl" onClick={() => setMobileOpen(!mobileOpen)}>
           {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </Button>
       </div>
 
-      {/* Mobile drawer */}
+      {/* ── Mobile drawer ── */}
       {mobileOpen && (
         <div className="lg:hidden fixed inset-0 z-40">
           <div className="absolute inset-0 bg-foreground/20 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
-          <aside className="absolute right-0 top-0 bottom-0 w-72 bg-card border-l border-border p-4 animate-fade-in">
-            <div className="flex justify-end mb-4">
-              <Button variant="ghost" size="icon" onClick={() => setMobileOpen(false)}>
-                <X className="w-5 h-5" />
+          <aside className="absolute left-0 top-0 bottom-0 w-72 bg-card border-r border-border/60 p-5 shadow-2xl animate-fade-in">
+            <div className="flex items-center justify-between mb-6">
+              <Logo />
+              <Button variant="ghost" size="icon" className="rounded-xl" onClick={() => setMobileOpen(false)}>
+                <X className="w-4 h-4" />
               </Button>
             </div>
-            <nav className="space-y-1">
-              {items.map((item) => {
-                const active = location.pathname === item.path;
-                return (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    onClick={() => setMobileOpen(false)}
-                    className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                      active
-                        ? 'bg-primary/10 text-primary'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
-                    }`}
-                  >
-                    <item.icon className="w-4.5 h-4.5" />
-                    {item.label}
-                  </Link>
-                );
-              })}
+            <nav className="space-y-0.5">
+              {items.map((item) => (
+                <NavLink
+                  key={item.path}
+                  item={item}
+                  active={location.pathname === item.path}
+                  onClick={() => setMobileOpen(false)}
+                />
+              ))}
             </nav>
-            <div className="mt-6 pt-4 border-t border-border">
+            <div className="mt-6 pt-4 border-t border-border/60">
+              <div className="flex items-center gap-3 px-2 py-2 mb-2">
+                <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center text-xs font-bold text-primary">
+                  {(user?.full_name || user?.email || '?')[0]?.toUpperCase()}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">{user?.display_name || user?.full_name || 'User'}</p>
+                  <p className="text-xs text-muted-foreground capitalize">{role}</p>
+                </div>
+              </div>
               <Button
                 variant="ghost"
                 size="sm"
-                className="w-full justify-start text-muted-foreground"
+                className="w-full justify-start text-muted-foreground rounded-xl"
                 onClick={() => base44.auth.logout()}
               >
                 <LogOut className="w-4 h-4 mr-2" />
@@ -151,30 +162,30 @@ export default function AppLayout() {
         </div>
       )}
 
-      {/* Mobile bottom nav */}
-      <div className="lg:hidden fixed bottom-0 inset-x-0 bg-card/95 backdrop-blur-md border-t border-border z-30 safe-area-bottom">
-        <div className="flex items-center justify-around py-1.5">
+      {/* ── Mobile bottom nav ── */}
+      <div className="lg:hidden fixed bottom-0 inset-x-0 bg-card/97 backdrop-blur-md border-t border-border/60 z-30">
+        <div className="flex items-center justify-around py-2">
           {items.slice(0, 5).map((item) => {
             const active = location.pathname === item.path;
             return (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${
+                className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[10px] font-semibold transition-colors min-w-0 ${
                   active ? 'text-primary' : 'text-muted-foreground'
                 }`}
               >
-                <item.icon className="w-5 h-5" />
-                {item.label}
+                <item.icon className={`w-5 h-5 mb-0.5 ${active ? 'text-primary' : 'text-muted-foreground/70'}`} />
+                <span className="truncate">{item.label}</span>
               </Link>
             );
           })}
         </div>
       </div>
 
-      {/* Main content */}
+      {/* ── Main content ── */}
       <main className="flex-1 lg:ml-64 pt-14 lg:pt-0 pb-24 lg:pb-8">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-7 lg:py-12">
           <Outlet />
         </div>
       </main>
