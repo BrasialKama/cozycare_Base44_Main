@@ -2,12 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { MessageCircle, Send, ArrowLeft } from 'lucide-react';
+import { MessageCircle, Send, ArrowLeft, Heart } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import PageHeader from '@/components/shared/PageHeader';
-import EmptyState from '@/components/shared/EmptyState';
 
 export default function Messages() {
   const params = new URLSearchParams(window.location.search);
@@ -66,49 +63,72 @@ export default function Messages() {
     (n, i) => activeConvData.participant_emails[i] !== user?.email
   ) || 'User';
 
+  const getOtherName = (conv) =>
+    conv.participant_names?.find((n, i) => conv.participant_emails[i] !== user?.email) || 'User';
+
   return (
-    <div>
-      <div className="lg:hidden">
+    <div className="flex flex-col h-[calc(100vh-10rem)] lg:h-[calc(100vh-8rem)]">
+
+      {/* Header */}
+      <div className="mb-5">
         {activeConv ? (
-          <Button variant="ghost" size="sm" onClick={() => setActiveConv(null)} className="mb-3">
-            <ArrowLeft className="w-4 h-4 mr-2" /> Back
-          </Button>
+          <div className="lg:hidden flex items-center gap-3">
+            <Button variant="ghost" size="icon" className="rounded-xl" onClick={() => setActiveConv(null)}>
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-rose-light to-peach/60 flex items-center justify-center">
+                <span className="text-sm font-bold text-primary">{otherName[0]}</span>
+              </div>
+              <p className="font-display font-semibold text-lg">{otherName}</p>
+            </div>
+          </div>
         ) : (
-          <PageHeader icon={MessageCircle} title="Messages" subtitle="Chat with your nannies and families" />
+          <div>
+            <p className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-widest uppercase text-primary/60 mb-1.5">
+              <Heart className="w-3 h-3" fill="currentColor" /> Your conversations
+            </p>
+            <h1 className="font-display text-2xl lg:text-3xl font-bold text-foreground">Messages</h1>
+          </div>
         )}
       </div>
-      <div className="hidden lg:block">
-        <PageHeader icon={MessageCircle} title="Messages" subtitle="Chat with your nannies and families" />
-      </div>
 
-      <div className="flex gap-4 h-[calc(100vh-14rem)]">
-        {/* Conversation list */}
-        <div className={`w-full lg:w-80 flex-shrink-0 ${activeConv ? 'hidden lg:block' : ''}`}>
+      <div className="flex gap-5 flex-1 min-h-0">
+
+        {/* ── Conversation list ── */}
+        <div className={`w-full lg:w-80 flex-shrink-0 flex flex-col min-h-0 ${activeConv ? 'hidden lg:flex' : 'flex'}`}>
           {conversations.length === 0 ? (
-            <EmptyState icon={MessageCircle} title="No messages yet" description="Start a conversation from a nanny's profile" />
+            <div className="flex-1 flex flex-col items-center justify-center text-center py-12 bg-card border border-dashed border-border/60 rounded-3xl">
+              <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                <MessageCircle className="w-7 h-7 text-primary/50" />
+              </div>
+              <p className="font-display font-semibold text-foreground mb-1">No messages yet</p>
+              <p className="text-sm text-muted-foreground max-w-[16rem]">
+                Visit a nanny's profile and send them a message to get started.
+              </p>
+            </div>
           ) : (
-            <div className="space-y-1.5">
+            <div className="space-y-2 overflow-y-auto">
               {conversations.map(conv => {
-                const other = conv.participant_names?.find(
-                  (n, i) => conv.participant_emails[i] !== user?.email
-                ) || 'User';
+                const other = getOtherName(conv);
+                const isActive = activeConv === conv.id;
                 return (
                   <button
                     key={conv.id}
                     onClick={() => setActiveConv(conv.id)}
-                    className={`w-full text-left p-3.5 rounded-xl transition-all ${
-                      activeConv === conv.id
-                        ? 'bg-primary/8 border border-primary/20'
-                        : 'bg-card border border-border/60 hover:border-primary/15'
+                    className={`w-full text-left p-4 rounded-2xl transition-all ${
+                      isActive
+                        ? 'bg-primary/8 border border-primary/20 shadow-sm'
+                        : 'bg-card border border-border/50 hover:border-primary/15 hover:shadow-sm'
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                        <span className="text-sm font-semibold text-primary">{other[0]}</span>
+                      <div className={`w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 ${isActive ? 'bg-primary/15' : 'bg-gradient-to-br from-rose-light to-peach/60'}`}>
+                        <span className="text-sm font-bold text-primary">{other[0]}</span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold truncate">{other}</p>
-                        <p className="text-xs text-muted-foreground truncate">{conv.last_message || 'No messages'}</p>
+                        <p className="text-sm font-semibold text-foreground truncate">{other}</p>
+                        <p className="text-xs text-muted-foreground truncate mt-0.5">{conv.last_message || 'Start a conversation…'}</p>
                       </div>
                     </div>
                   </button>
@@ -118,26 +138,50 @@ export default function Messages() {
           )}
         </div>
 
-        {/* Messages */}
-        <div className={`flex-1 flex flex-col ${!activeConv ? 'hidden lg:flex' : ''}`}>
+        {/* ── Message thread ── */}
+        <div className={`flex-1 flex flex-col min-h-0 ${!activeConv ? 'hidden lg:flex' : 'flex'}`}>
           {!activeConv ? (
-            <div className="flex-1 flex items-center justify-center">
-              <p className="text-muted-foreground text-sm">Select a conversation</p>
+            <div className="flex-1 flex flex-col items-center justify-center text-center bg-card border border-dashed border-border/60 rounded-3xl p-8">
+              <div className="w-16 h-16 rounded-2xl bg-primary/8 flex items-center justify-center mx-auto mb-4">
+                <MessageCircle className="w-8 h-8 text-primary/40" />
+              </div>
+              <p className="font-display font-semibold text-foreground mb-1">Select a conversation</p>
+              <p className="text-sm text-muted-foreground">Choose a conversation from the left to start chatting</p>
             </div>
           ) : (
-            <>
-              <div className="pb-3 border-b border-border mb-3">
-                <h3 className="font-display font-semibold">{otherName}</h3>
+            <div className="flex flex-col flex-1 min-h-0 bg-card border border-border/40 rounded-3xl overflow-hidden">
+              {/* Thread header */}
+              <div className="px-5 py-4 border-b border-border/40 flex items-center gap-3 flex-shrink-0">
+                <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-rose-light to-peach/60 flex items-center justify-center">
+                  <span className="text-sm font-bold text-primary">{otherName[0]}</span>
+                </div>
+                <div>
+                  <p className="font-display font-semibold text-foreground leading-tight">{otherName}</p>
+                  <p className="text-xs text-muted-foreground">CozyCare caregiver</p>
+                </div>
               </div>
-              <div className="flex-1 overflow-y-auto space-y-3 pr-2">
+
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto px-5 py-5 space-y-3">
+                {messages.length === 0 && (
+                  <div className="flex flex-col items-center justify-center h-full text-center py-8 opacity-60">
+                    <Heart className="w-8 h-8 text-primary/30 mb-2" fill="currentColor" />
+                    <p className="text-sm text-muted-foreground">Say hello — start your conversation!</p>
+                  </div>
+                )}
                 {messages.map(msg => {
                   const isMine = msg.sender_email === user?.email;
                   return (
                     <div key={msg.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm ${
+                      {!isMine && (
+                        <div className="w-7 h-7 rounded-xl bg-gradient-to-br from-rose-light to-peach/60 flex items-center justify-center mr-2 flex-shrink-0 mt-auto mb-0.5">
+                          <span className="text-[10px] font-bold text-primary">{otherName[0]}</span>
+                        </div>
+                      )}
+                      <div className={`max-w-[72%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
                         isMine
-                          ? 'bg-primary text-primary-foreground rounded-br-md'
-                          : 'bg-muted rounded-bl-md'
+                          ? 'bg-primary text-primary-foreground rounded-br-md shadow-sm shadow-primary/20'
+                          : 'bg-muted/70 text-foreground rounded-bl-md'
                       }`}>
                         {msg.content}
                       </div>
@@ -146,24 +190,26 @@ export default function Messages() {
                 })}
                 <div ref={messagesEndRef} />
               </div>
-              <div className="flex gap-2 pt-3 border-t border-border mt-3">
+
+              {/* Input */}
+              <div className="px-4 py-4 border-t border-border/40 flex gap-2.5 flex-shrink-0">
                 <Input
                   value={newMessage}
                   onChange={e => setNewMessage(e.target.value)}
-                  placeholder="Type a message..."
-                  className="flex-1"
+                  placeholder={`Message ${otherName}…`}
+                  className="flex-1 rounded-2xl bg-muted/40 border-border/50 focus:border-primary/40"
                   onKeyDown={e => e.key === 'Enter' && newMessage.trim() && sendMutation.mutate()}
                 />
                 <Button
                   onClick={() => sendMutation.mutate()}
                   disabled={!newMessage.trim() || sendMutation.isPending}
                   size="icon"
-                  className="h-10 w-10"
+                  className="h-10 w-10 rounded-2xl flex-shrink-0 shadow-md shadow-primary/15"
                 >
                   <Send className="w-4 h-4" />
                 </Button>
               </div>
-            </>
+            </div>
           )}
         </div>
       </div>

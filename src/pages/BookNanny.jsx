@@ -3,12 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { ArrowLeft, Calendar, Clock, DollarSign, Shield, Heart } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Shield, Heart, CheckCircle2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { toast } from 'sonner';
@@ -60,6 +59,7 @@ export default function BookNanny() {
   const nannyPay = hours * rate;
   const platformFee = nannyPay * PLATFORM_FEE_RATE;
   const totalCost = nannyPay + platformFee;
+  const canBook = form.date && form.start_time && form.end_time && hours > 0;
 
   const bookMutation = useMutation({
     mutationFn: () => base44.entities.Booking.create({
@@ -90,92 +90,156 @@ export default function BookNanny() {
   });
 
   if (!nanny) {
-    return <div className="h-96 flex items-center justify-center"><div className="w-8 h-8 border-4 border-muted border-t-primary rounded-full animate-spin" /></div>;
+    return (
+      <div className="h-96 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-muted border-t-primary rounded-full animate-spin" />
+      </div>
+    );
   }
 
-  return (
-    <div className="max-w-xl mx-auto">
-      <Button variant="ghost" className="mb-4 text-muted-foreground" onClick={() => navigate(-1)}>
-        <ArrowLeft className="w-4 h-4 mr-2" /> Back
-      </Button>
+  const initial = (nanny.display_name || nanny.full_name || '?')[0];
 
-      <div className="text-center mb-6">
-        <h1 className="font-display text-2xl font-bold">Book {nanny.display_name || nanny.full_name}</h1>
-        <p className="text-sm text-muted-foreground mt-1">${rate}/hr · Trusted caregiver</p>
+  return (
+    <div className="max-w-lg mx-auto pb-12">
+
+      <button
+        onClick={() => navigate(-1)}
+        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-7 transition-colors group"
+      >
+        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" /> Back
+      </button>
+
+      {/* Nanny preview strip */}
+      <div className="flex items-center gap-4 bg-card border border-border/40 rounded-2xl p-4 mb-7 shadow-sm">
+        <div className="w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0">
+          {nanny.photo_url ? (
+            <img src={nanny.photo_url} alt={nanny.display_name} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-rose-light to-peach flex items-center justify-center">
+              <span className="text-xl font-display font-bold text-primary">{initial}</span>
+            </div>
+          )}
+        </div>
+        <div>
+          <p className="text-xs font-semibold tracking-widest uppercase text-primary/60 mb-0.5">
+            <Sparkles className="w-3 h-3 inline mr-1" />Booking
+          </p>
+          <h1 className="font-display text-xl font-bold text-foreground">{nanny.display_name || nanny.full_name}</h1>
+          <p className="text-sm text-muted-foreground">${rate}/hr · Trusted caregiver</p>
+        </div>
       </div>
 
-      <Card className="p-6 space-y-5">
+      {/* Form card */}
+      <div className="bg-card border border-border/40 rounded-3xl p-7 shadow-sm space-y-6">
+
+        {/* Date & time */}
         <div>
-          <Label>Date</Label>
-          <Input type="date" value={form.date} onChange={e => update('date', e.target.value)} className="mt-1" />
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label>Start Time</Label>
-            <Input type="time" value={form.start_time} onChange={e => update('start_time', e.target.value)} className="mt-1" />
+          <h2 className="font-display font-semibold text-lg mb-4 flex items-center gap-2">
+            <Calendar className="w-4.5 h-4.5 text-primary" /> When do you need care?
+          </h2>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Date</Label>
+              <Input type="date" value={form.date} onChange={e => update('date', e.target.value)} className="rounded-xl" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Start</Label>
+                <Input type="time" value={form.start_time} onChange={e => update('start_time', e.target.value)} className="rounded-xl" />
+              </div>
+              <div>
+                <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">End</Label>
+                <Input type="time" value={form.end_time} onChange={e => update('end_time', e.target.value)} className="rounded-xl" />
+              </div>
+            </div>
+            {hours > 0 && (
+              <div className="inline-flex items-center gap-2 bg-sage/15 text-sage-foreground text-sm px-3.5 py-2 rounded-xl font-medium">
+                <Clock className="w-3.5 h-3.5" /> {hours.toFixed(1)} hours
+              </div>
+            )}
           </div>
-          <div>
-            <Label>End Time</Label>
-            <Input type="time" value={form.end_time} onChange={e => update('end_time', e.target.value)} className="mt-1" />
-          </div>
         </div>
+
+        <Separator className="opacity-40" />
+
+        {/* Booking type */}
         <div>
-          <Label>Booking Type</Label>
-          <RadioGroup value={form.booking_type} onValueChange={v => update('booking_type', v)} className="flex gap-4 mt-2">
-            <div className="flex items-center gap-2">
-              <RadioGroupItem value="one_time" id="one_time" />
-              <Label htmlFor="one_time" className="font-normal cursor-pointer">One-time</Label>
-            </div>
-            <div className="flex items-center gap-2">
-              <RadioGroupItem value="recurring" id="recurring" />
-              <Label htmlFor="recurring" className="font-normal cursor-pointer">Recurring</Label>
-            </div>
+          <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3 block">Booking Type</Label>
+          <RadioGroup value={form.booking_type} onValueChange={v => update('booking_type', v)} className="flex gap-3">
+            {[
+              { value: 'one_time', label: 'One-time', sub: 'A single session' },
+              { value: 'recurring', label: 'Recurring', sub: 'Weekly schedule' },
+            ].map(opt => (
+              <label key={opt.value} className={`flex-1 flex items-start gap-3 p-4 rounded-2xl border cursor-pointer transition-all ${
+                form.booking_type === opt.value ? 'border-primary/40 bg-primary/5' : 'border-border/50 hover:border-primary/20'
+              }`}>
+                <RadioGroupItem value={opt.value} id={opt.value} className="mt-0.5" />
+                <div>
+                  <p className="text-sm font-semibold text-foreground">{opt.label}</p>
+                  <p className="text-xs text-muted-foreground">{opt.sub}</p>
+                </div>
+              </label>
+            ))}
           </RadioGroup>
         </div>
-        <div>
-          <Label>Children's Names</Label>
-          <Input value={form.children_names} onChange={e => update('children_names', e.target.value)} placeholder="e.g., Emma and Jack" className="mt-1" />
-        </div>
-        <div>
-          <Label>Special Instructions</Label>
-          <Textarea value={form.notes} onChange={e => update('notes', e.target.value)} placeholder="Any special instructions for the nanny..." rows={3} className="mt-1" />
+
+        <Separator className="opacity-40" />
+
+        {/* Kids & notes */}
+        <div className="space-y-4">
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Children's Names</Label>
+            <Input value={form.children_names} onChange={e => update('children_names', e.target.value)} placeholder="e.g., Emma and Jack" className="rounded-xl" />
+          </div>
+          <div>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Special Instructions</Label>
+            <Textarea value={form.notes} onChange={e => update('notes', e.target.value)} placeholder="Allergies, nap schedules, house rules…" rows={3} className="rounded-xl resize-none" />
+          </div>
         </div>
 
-        <Separator />
+        <Separator className="opacity-40" />
 
         {/* Price breakdown */}
-        <div className="bg-muted/40 rounded-xl p-4 space-y-2.5">
-          <h3 className="font-display font-semibold text-sm flex items-center gap-2">
-            <DollarSign className="w-4 h-4 text-primary" /> Price Breakdown
-          </h3>
+        <div className="bg-gradient-to-br from-ivory to-rose-light/30 rounded-2xl p-5 space-y-3">
+          <h3 className="font-display font-semibold text-base">Price Breakdown</h3>
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">{hours.toFixed(1)} hrs × ${rate}/hr</span>
-            <span>${nannyPay.toFixed(2)}</span>
+            <span className="text-muted-foreground">{hours > 0 ? `${hours.toFixed(1)} hrs` : '0 hrs'} × ${rate}/hr</span>
+            <span className="font-medium">${nannyPay.toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Platform fee (15%)</span>
-            <span>${platformFee.toFixed(2)}</span>
+            <span className="font-medium">${platformFee.toFixed(2)}</span>
           </div>
-          <Separator />
-          <div className="flex justify-between font-semibold">
+          <Separator className="opacity-40" />
+          <div className="flex justify-between font-semibold text-base">
             <span>Total</span>
-            <span className="text-primary">${totalCost.toFixed(2)}</span>
+            <span className="text-primary font-display text-xl">${totalCost.toFixed(2)}</span>
           </div>
         </div>
 
-        <div className="flex items-start gap-2 text-xs text-muted-foreground bg-primary/5 rounded-lg p-3">
-          <Shield className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-          <span>Your payment is protected. You will only be charged once the nanny confirms the booking.</span>
+        {/* Guarantee note */}
+        <div className="flex items-start gap-3 bg-emerald-50 rounded-2xl p-4">
+          <Shield className="w-4.5 h-4.5 text-emerald-600 flex-shrink-0 mt-0.5" />
+          <p className="text-xs text-emerald-800 leading-relaxed">
+            Your payment is protected. You'll only be charged once the nanny confirms the booking.
+          </p>
         </div>
 
         <Button
           onClick={() => bookMutation.mutate()}
-          disabled={!form.date || !form.start_time || !form.end_time || hours <= 0 || bookMutation.isPending}
-          className="w-full h-12 font-semibold text-base"
+          disabled={!canBook || bookMutation.isPending}
+          className="w-full h-13 text-base font-semibold rounded-2xl shadow-lg shadow-primary/20"
+          style={{ height: '3.25rem' }}
         >
-          {bookMutation.isPending ? 'Sending request...' : `Request Booking · $${totalCost.toFixed(2)}`}
+          {bookMutation.isPending ? (
+            <span className="flex items-center gap-2"><div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" /> Sending request…</span>
+          ) : canBook ? (
+            <span className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4" /> Request Booking · ${totalCost.toFixed(2)}</span>
+          ) : (
+            'Select a date & time to continue'
+          )}
         </Button>
-      </Card>
+      </div>
     </div>
   );
 }
