@@ -5,7 +5,7 @@ import { ArrowRight, Star } from 'lucide-react';
 
 export default function HeroSection() {
   return (
-    <section className="relative h-[85vh] min-h-[620px] overflow-hidden">
+    <section className="relative min-h-[85vh] min-h-[620px] overflow-hidden pt-16">
       {/* Background image */}
       <div className="absolute inset-0 z-0">
         <img

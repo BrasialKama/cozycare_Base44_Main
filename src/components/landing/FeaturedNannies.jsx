@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import NannyCard from '@/components/shared/NannyCard';
+import LandingNannyCard from '@/components/landing/LandingNannyCard';
 
 export default function FeaturedNannies() {
   const { data: nannies = [] } = useQuery({
@@ -38,9 +38,9 @@ export default function FeaturedNannies() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {nannies.map((nanny) => (
-            <NannyCard key={nanny.id} nanny={nanny} />
+            <LandingNannyCard key={nanny.id} nanny={nanny} />
           ))}
         </div>
       </div>
