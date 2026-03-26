@@ -44,17 +44,19 @@ const AuthenticatedApp = () => {
   if (authError) {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
-    } else if (authError.type === 'auth_required') {
-      navigateToLogin();
-      return null;
     }
+    // For auth_required, still allow public browsing routes
+    // Only redirect to login for protected routes
   }
 
   return (
     <Routes>
+      {/* Public routes — always accessible */}
       <Route path="/" element={<Landing />} />
       <Route path="/Onboarding" element={<Onboarding />} />
       <Route path="/NannyOnboarding" element={<NannyOnboarding />} />
+
+      {/* Routes inside AppLayout */}
       <Route element={<AppLayout />}>
         <Route path="/Home" element={<Home />} />
         <Route path="/FindNannies" element={<FindNannies />} />

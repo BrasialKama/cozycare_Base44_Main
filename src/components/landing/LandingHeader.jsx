@@ -14,7 +14,7 @@ export default function LandingHeader() {
     { label: 'Find a Nanny', to: '/FindNannies' },
     { label: 'Browse Nannies', to: '/FindNannies', highlight: true },
     { label: 'Nanny Portal', to: '/NannyOnboarding' },
-    { label: 'My Profile', to: '/Home' },
+    { label: 'My Profile', to: '/FamilySettings' },
   ];
 
   return (

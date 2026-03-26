@@ -9,6 +9,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import NannyCard from '@/components/shared/NannyCard';
+import VideoPreviewModal from '@/components/shared/VideoPreviewModal';
 import EmptyState from '@/components/shared/EmptyState';
 
 const SPECIALTIES = ['Infant care', 'Toddler activities', 'Special needs', 'Montessori', 'Bilingual', 'Overnight'];
@@ -20,6 +21,7 @@ export default function FindNannies() {
   const [minExperience, setMinExperience] = useState([0]);
   const [activeSpecialty, setActiveSpecialty] = useState('');
   const [filterOpen, setFilterOpen] = useState(false);
+  const [videoNanny, setVideoNanny] = useState(null);
 
   const { data: nannies = [], isLoading } = useQuery({
     queryKey: ['approvedNannies'],
@@ -170,7 +172,7 @@ export default function FindNannies() {
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {[1, 2, 3, 4].map(i => (
-            <div key={i} className="h-72 bg-muted/40 rounded-2xl animate-pulse" />
+            <div key={i} className="h-52 bg-muted/40 rounded-2xl animate-pulse" />
           ))}
         </div>
       ) : filtered.length === 0 ? (
@@ -182,10 +184,14 @@ export default function FindNannies() {
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {filtered.map(nanny => (
-              <NannyCard key={nanny.id} nanny={nanny} />
+              <NannyCard key={nanny.id} nanny={nanny} onWatchVideo={setVideoNanny} />
             ))}
           </div>
         </>
+      )}
+
+      {videoNanny && (
+        <VideoPreviewModal nanny={videoNanny} onClose={() => setVideoNanny(null)} />
       )}
     </div>
   );

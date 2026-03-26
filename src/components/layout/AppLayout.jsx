@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { base44 } from '@/api/base44Client';
 
 const Logo = () => (
-  <Link to="/Home" className="flex items-center gap-3 px-1 group">
+  <Link to="/" className="flex items-center gap-3 px-1 group">
     <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-primary/25 to-peach/60 flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
       <Heart className="w-4 h-4 text-primary" fill="currentColor" />
     </div>
@@ -22,14 +22,14 @@ const Logo = () => (
 
 const navItems = {
   parent: [
-    { path: '/Home', icon: Home, label: 'Home' },
+    { path: '/', icon: Home, label: 'Home' },
     { path: '/FindNannies', icon: Search, label: 'Find Nannies' },
     { path: '/MyBookings', icon: Calendar, label: 'Bookings' },
     { path: '/Messages', icon: MessageCircle, label: 'Messages' },
     { path: '/FamilySettings', icon: User, label: 'My Family' },
   ],
   nanny: [
-    { path: '/Home', icon: Home, label: 'Home' },
+    { path: '/', icon: Home, label: 'Home' },
     { path: '/NannyBookings', icon: Calendar, label: 'My Bookings' },
     { path: '/Messages', icon: MessageCircle, label: 'Messages' },
     { path: '/Earnings', icon: DollarSign, label: 'Earnings' },
@@ -77,13 +77,18 @@ export default function AppLayout() {
         </div>
 
         <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
-          {items.map((item) => (
-            <NavLink
-              key={item.path}
-              item={item}
-              active={location.pathname === item.path}
-            />
-          ))}
+          {items.map((item) => {
+            const active = item.path === '/'
+              ? location.pathname === '/' || location.pathname === '/Home'
+              : location.pathname === item.path;
+            return (
+              <NavLink
+                key={item.path}
+                item={item}
+                active={active}
+              />
+            );
+          })}
         </nav>
 
         {/* Sidebar footer */}
@@ -166,7 +171,9 @@ export default function AppLayout() {
       <div className="lg:hidden fixed bottom-0 inset-x-0 bg-card/97 backdrop-blur-md border-t border-border/60 z-30">
         <div className="flex items-center justify-around py-2">
           {items.slice(0, 5).map((item) => {
-            const active = location.pathname === item.path;
+            const active = item.path === '/'
+              ? location.pathname === '/' || location.pathname === '/Home'
+              : location.pathname === item.path;
             return (
               <Link
                 key={item.path}
