@@ -25,6 +25,7 @@ import AdminDashboard from '@/pages/AdminDashboard';
 import AdminApplications from '@/pages/AdminApplications';
 import AdminBookings from '@/pages/AdminBookings';
 import AdminReports from '@/pages/AdminReports';
+import Landing from '@/pages/Landing';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -51,7 +52,7 @@ const AuthenticatedApp = () => {
 
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/Home" replace />} />
+      <Route path="/" element={<Landing />} />
       <Route path="/Onboarding" element={<Onboarding />} />
       <Route path="/NannyOnboarding" element={<NannyOnboarding />} />
       <Route element={<AppLayout />}>
