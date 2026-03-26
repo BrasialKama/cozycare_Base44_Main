@@ -1,0 +1,105 @@
+@import "@fontsource/playfair-display/400.css";
+@import "@fontsource/playfair-display/600.css";
+@import "@fontsource/playfair-display/700.css";
+@import "@fontsource/geist-sans/400.css";
+@import "@fontsource/geist-sans/500.css";
+@import "@fontsource/geist-sans/600.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 40 33% 98%;
+    --foreground: 20 10% 15%;
+
+    --card: 40 33% 99%;
+    --card-foreground: 20 10% 15%;
+
+    --popover: 40 33% 99%;
+    --popover-foreground: 20 10% 15%;
+
+    --primary: 0 35% 67%;
+    --primary-foreground: 40 33% 98%;
+
+    --secondary: 100 8% 58%;
+    --secondary-foreground: 40 33% 98%;
+
+    --muted: 40 10% 90%;
+    --muted-foreground: 20 5% 40%;
+
+    --accent: 32 44% 69%;
+    --accent-foreground: 20 10% 15%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 40 10% 88%;
+    --input: 40 10% 88%;
+    --ring: 0 35% 67%;
+
+    --radius: 1rem;
+  }
+
+  .dark {
+    --background: 20 10% 10%;
+    --foreground: 40 33% 98%;
+
+    --card: 20 10% 12%;
+    --card-foreground: 40 33% 98%;
+
+    --popover: 20 10% 12%;
+    --popover-foreground: 40 33% 98%;
+
+    --primary: 0 35% 67%;
+    --primary-foreground: 20 10% 10%;
+
+    --secondary: 100 8% 58%;
+    --secondary-foreground: 20 10% 10%;
+
+    --muted: 20 10% 20%;
+    --muted-foreground: 40 10% 70%;
+
+    --accent: 32 44% 69%;
+    --accent-foreground: 40 33% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 20 10% 20%;
+    --input: 20 10% 20%;
+    --ring: 0 35% 67%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif font-semibold;
+  }
+}
+
+@layer components {
+  .boutique-card {
+    @apply bg-card border border-border/50 rounded-2xl shadow-boutique overflow-hidden transition-all duration-300 hover:shadow-elegant hover:-translate-y-1;
+  }
+  
+  .framed-image {
+    @apply relative overflow-hidden rounded-xl border-4 border-white shadow-sm;
+  }
+
+  .warm-gradient {
+    @apply bg-gradient-to-br from-[#FDF8F3] via-[#FFFBF9] to-[#FDF8F3];
+  }
+  
+  .shabby-chic-pattern {
+    background-image: radial-gradient(hsl(var(--primary) / 0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+}
