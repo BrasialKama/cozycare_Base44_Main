@@ -17,9 +17,9 @@ const HERO_IMAGES = [
   'https://images.unsplash.com/photo-1555252333-9f8e92e65df9?w=800&q=80',
   'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=800&q=80',
   'https://images.unsplash.com/photo-1566140967404-b8b3932483f5?w=800&q=80',
-  'https://images.unsplash.com/photo-1530026405186-ed1f139313f0?w=800&q=80',
-  'https://images.unsplash.com/photo-1544967082-d9d25d867d66?w=800&q=80',
-  'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80',
+  'https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=800&q=80',
+  'https://images.unsplash.com/photo-1522771930-78848d9293e8?w=800&q=80',
+  'https://images.unsplash.com/photo-1471286174890-9c112ffca5b4?w=800&q=80',
 ];
 
 const BADGE_META = {

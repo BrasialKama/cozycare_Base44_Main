@@ -52,12 +52,12 @@ const AuthenticatedApp = () => {
   return (
     <Routes>
       {/* Public routes — always accessible */}
-      <Route path="/" element={<Landing />} />
       <Route path="/Onboarding" element={<Onboarding />} />
       <Route path="/NannyOnboarding" element={<NannyOnboarding />} />
 
       {/* Routes inside AppLayout */}
       <Route element={<AppLayout />}>
+        <Route path="/" element={<Landing />} />
         <Route path="/Home" element={<Home />} />
         <Route path="/FindNannies" element={<FindNannies />} />
         <Route path="/NannyDetail" element={<NannyDetail />} />
