@@ -12,11 +12,11 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 
 const BADGE_META = {
-  id_verified: { label: 'ID Verified', icon: CheckCircle2, color: 'text-emerald-700 bg-emerald-50' },
-  background_check: { label: 'Background Check', icon: Shield, color: 'text-sky-700 bg-sky-50' },
-  reference_checked: { label: 'References Checked', icon: CheckCircle2, color: 'text-violet-700 bg-violet-50' },
-  video_verified: { label: 'Video Intro', icon: Play, color: 'text-orange-700 bg-orange-50' },
-  certifications_verified: { label: 'Certified', icon: Award, color: 'text-primary bg-rose-50' },
+  id_verified: { label: 'ID Verified', icon: CheckCircle2, color: 'text-primary bg-primary/8' },
+  background_check: { label: 'Background Check', icon: Shield, color: 'text-sage-foreground bg-sage/20' },
+  reference_checked: { label: 'References Checked', icon: CheckCircle2, color: 'text-sage-foreground bg-sage/20' },
+  video_verified: { label: 'Video Intro', icon: Play, color: 'text-peach-dark bg-peach/50' },
+  certifications_verified: { label: 'Certified', icon: Award, color: 'text-primary bg-primary/8' },
 };
 
 function ReviewCard({ review, isFirst }) {
@@ -108,7 +108,7 @@ export default function NannyDetail() {
     <div className="pb-12">
       <button
         onClick={() => navigate(-1)}
-        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-7 transition-colors group"
+        className="inline-flex items-center gap-2 text-sm font-medium text-primary/70 hover:text-primary mb-7 transition-colors group"
       >
         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" /> Back to results
       </button>
@@ -119,17 +119,22 @@ export default function NannyDetail() {
         <div className="lg:col-span-2 space-y-5">
 
           {/* Hero card */}
-          <div className="rounded-3xl overflow-hidden border border-border/40 shadow-md bg-card">
-            <div className="px-7 pt-7 pb-7">
+          <div className="rounded-3xl overflow-hidden border border-border/50 shadow-lg shadow-primary/5 bg-card">
+            <div className="px-7 pt-8 pb-7">
               <div className="flex items-end gap-5 mb-5">
-                <div className="w-24 h-24 rounded-3xl overflow-hidden border-[3px] border-card shadow-xl flex-shrink-0">
-                  {nanny.photo_url ? (
-                    <img src={nanny.photo_url} alt={nanny.display_name} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-rose-light to-peach flex items-center justify-center">
-                      <span className="text-4xl font-display font-bold text-primary">{initial}</span>
-                    </div>
-                  )}
+                <div className="relative flex-shrink-0">
+                  {/* Warm gradient ring behind photo */}
+                  <div className="absolute -inset-2 rounded-[1.75rem] bg-gradient-to-br from-rose-light via-peach/60 to-sage/30 opacity-70 blur-sm" />
+                  <div className="absolute -inset-1.5 rounded-[1.5rem] bg-gradient-to-br from-primary/15 via-peach/40 to-sage/20" />
+                  <div className="relative w-24 h-24 rounded-3xl overflow-hidden border-[3px] border-card shadow-xl">
+                    {nanny.photo_url ? (
+                      <img src={nanny.photo_url} alt={nanny.display_name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-rose-light to-peach flex items-center justify-center">
+                        <span className="text-4xl font-display font-bold text-primary">{initial}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 {nanny.avg_rating > 0 && (
                   <div className="pb-1 flex items-center gap-1.5">
@@ -175,7 +180,7 @@ export default function NannyDetail() {
 
           {/* About */}
           {nanny.bio && (
-            <div className="bg-card border border-border/40 rounded-3xl p-7">
+            <div className="bg-card border border-border/50 rounded-3xl p-7 shadow-sm shadow-primary/3">
               <h3 className="font-display font-semibold text-xl mb-4 flex items-center gap-2.5">
                 <div className="w-7 h-7 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Heart className="w-3.5 h-3.5 text-primary" fill="currentColor" />
@@ -188,7 +193,7 @@ export default function NannyDetail() {
 
           {/* Intro video */}
           {nanny.intro_video_url && (
-            <div className="bg-card border border-border/40 rounded-3xl p-7">
+            <div className="bg-card border border-border/50 rounded-3xl p-7 shadow-sm shadow-primary/3">
               <h3 className="font-display font-semibold text-xl mb-4 flex items-center gap-2.5">
                 <div className="w-7 h-7 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Play className="w-3.5 h-3.5 text-primary" />
@@ -202,8 +207,13 @@ export default function NannyDetail() {
           )}
 
           {/* Details & credentials */}
-          <div className="bg-card border border-border/40 rounded-3xl p-7">
-            <h3 className="font-display font-semibold text-xl mb-6">Details & Credentials</h3>
+          <div className="bg-card border border-border/50 rounded-3xl p-7 shadow-sm shadow-primary/3">
+            <h3 className="font-display font-semibold text-xl mb-6 flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-xl bg-peach/50 flex items-center justify-center">
+                <Award className="w-3.5 h-3.5 text-peach-dark" />
+              </div>
+              Details & Credentials
+            </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-7">
               {nanny.languages?.length > 0 && (
                 <div>
@@ -248,8 +258,11 @@ export default function NannyDetail() {
 
           {/* Reviews */}
           {reviews.length > 0 && (
-            <div className="bg-card border border-border/40 rounded-3xl p-7">
-              <h3 className="font-display font-semibold text-xl mb-6">
+            <div className="bg-card border border-border/50 rounded-3xl p-7 shadow-sm shadow-primary/3">
+              <h3 className="font-display font-semibold text-xl mb-6 flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Star className="w-3.5 h-3.5 text-primary" fill="currentColor" />
+                </div>
                 Family Reviews
                 <span className="ml-2 text-sm font-body font-normal text-muted-foreground">({reviews.length})</span>
               </h3>
@@ -265,7 +278,7 @@ export default function NannyDetail() {
           <div className="sticky top-6 space-y-4">
 
             {/* Booking card */}
-            <div className="bg-card border border-border/40 rounded-3xl p-6 shadow-lg shadow-foreground/4">
+            <div className="bg-card border border-border/50 rounded-3xl p-6 shadow-lg shadow-primary/5">
               <div className="text-center mb-6">
                 <p className="font-display text-5xl font-bold text-primary leading-none">${nanny.hourly_rate}</p>
                 <p className="text-sm text-muted-foreground mt-1.5">per hour</p>
@@ -287,8 +300,8 @@ export default function NannyDetail() {
               )}
               <div className="mt-6 pt-5 border-t border-border/40">
                 <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
-                    <Shield className="w-4 h-4 text-emerald-600" />
+                  <div className="w-9 h-9 rounded-xl bg-sage/25 flex items-center justify-center flex-shrink-0">
+                    <Shield className="w-4 h-4 text-sage-foreground" />
                   </div>
                   <div>
                     <p className="text-xs font-bold text-foreground mb-0.5">CozyCare Guarantee</p>
@@ -302,7 +315,7 @@ export default function NannyDetail() {
 
             {/* Stats */}
             {(nanny.total_bookings > 0 || nanny.avg_rating > 0 || nanny.total_reviews > 0) && (
-              <div className="bg-card border border-border/40 rounded-2xl p-5">
+              <div className="bg-card border border-border/50 rounded-2xl p-5 shadow-sm shadow-primary/3">
                 <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4">At a Glance</h4>
                 <div className="space-y-3.5">
                   {nanny.total_bookings > 0 && (
