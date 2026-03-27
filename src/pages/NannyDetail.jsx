@@ -119,8 +119,20 @@ export default function NannyDetail() {
         <div className="lg:col-span-2 space-y-5">
 
           {/* Hero card */}
-          <div className="rounded-3xl overflow-hidden border border-border/50 shadow-lg shadow-primary/5 bg-card">
-            <div className="px-7 pt-8 pb-7">
+          <div className="rounded-3xl overflow-hidden border border-border/50 shadow-lg shadow-primary/5 bg-card relative">
+            {/* Warm lifestyle background */}
+            <div className="absolute inset-0 z-0">
+              <img
+                src="https://images.unsplash.com/photo-1519689680058-324335c77eba?w=800&q=80"
+                alt=""
+                className="w-full h-full object-cover"
+              />
+              <div
+                className="absolute inset-0"
+                style={{ background: 'linear-gradient(to bottom, rgba(250,248,245,0.25) 0%, rgba(250,248,245,0.80) 55%, rgba(250,248,245,1) 100%)' }}
+              />
+            </div>
+            <div className="relative z-10 px-7 pt-8 pb-7">
               <div className="flex items-end gap-5 mb-5">
                 <div className="relative flex-shrink-0">
                   {/* Warm gradient ring behind photo */}
