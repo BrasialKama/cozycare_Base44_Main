@@ -120,20 +120,8 @@ export default function NannyDetail() {
 
           {/* Hero card */}
           <div className="rounded-3xl overflow-hidden border border-border/40 shadow-md bg-card">
-            <div className="relative h-52 overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-rose-light via-peach/60 to-ivory" />
-              {nanny.photo_url && (
-                <img src={nanny.photo_url} alt={nanny.display_name} className="absolute inset-0 w-full h-full object-cover object-top opacity-45" />
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-card/85 via-card/10 to-transparent" />
-              {/* Decorative dots */}
-              <div className="absolute top-5 right-5 grid grid-cols-3 gap-1.5 opacity-25">
-                {Array.from({ length: 9 }).map((_, i) => <div key={i} className="w-1 h-1 rounded-full bg-primary" />)}
-              </div>
-            </div>
-
-            <div className="px-7 pb-7">
-              <div className="flex items-end gap-5 -mt-12 mb-5">
+            <div className="px-7 pt-7 pb-7">
+              <div className="flex items-end gap-5 mb-5">
                 <div className="w-24 h-24 rounded-3xl overflow-hidden border-[3px] border-card shadow-xl flex-shrink-0">
                   {nanny.photo_url ? (
                     <img src={nanny.photo_url} alt={nanny.display_name} className="w-full h-full object-cover" />
