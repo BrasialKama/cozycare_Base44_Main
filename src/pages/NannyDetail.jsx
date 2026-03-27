@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
@@ -10,6 +10,17 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+
+const HERO_IMAGES = [
+  'https://images.unsplash.com/photo-1519689680058-324335c77eba?w=800&q=80',
+  'https://images.unsplash.com/photo-1586105251261-72a756497a11?w=800&q=80',
+  'https://images.unsplash.com/photo-1555252333-9f8e92e65df9?w=800&q=80',
+  'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=800&q=80',
+  'https://images.unsplash.com/photo-1566140967404-b8b3932483f5?w=800&q=80',
+  'https://images.unsplash.com/photo-1530026405186-ed1f139313f0?w=800&q=80',
+  'https://images.unsplash.com/photo-1544967082-d9d25d867d66?w=800&q=80',
+  'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80',
+];
 
 const BADGE_META = {
   id_verified: { label: 'ID Verified', icon: CheckCircle2, color: 'text-primary bg-primary/8' },
@@ -92,6 +103,8 @@ export default function NannyDetail() {
     }
   };
 
+  const heroImage = useMemo(() => HERO_IMAGES[Math.floor(Math.random() * HERO_IMAGES.length)], [id]);
+
   if (isLoading) {
     return (
       <div className="h-96 flex items-center justify-center">
@@ -123,7 +136,7 @@ export default function NannyDetail() {
             {/* Warm lifestyle background */}
             <div className="absolute inset-0 z-0">
               <img
-                src="https://images.unsplash.com/photo-1519689680058-324335c77eba?w=800&q=80"
+                src={heroImage}
                 alt=""
                 className="w-full h-full object-cover"
               />
