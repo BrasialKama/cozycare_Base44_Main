@@ -100,48 +100,48 @@ export default function FamilySettings() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['familyProfile'] });
-      toast.success('Family profile saved!');
+      toast.success('Profil obitelji spremljen!');
       if (!existing) navigate('/Home');
     },
   });
 
   return (
     <div className="max-w-xl mx-auto">
-      <PageHeader icon={User} title="My Family Profile" subtitle="Tell us about your family so we can find the best nannies" />
+      <PageHeader icon={User} title="Profil obitelji" subtitle="Recite nam o svojoj obitelji kako bismo pronašli najbolje dadilje" />
 
       <Card className="p-6 space-y-5">
         <div>
-          <Label>Family Name</Label>
+          <Label>Ime obitelji</Label>
           <Input value={form.family_name} onChange={e => update('family_name', e.target.value)} placeholder="e.g., Obitelj Horvat" className="mt-1" />
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <Label>Phone</Label>
+            <Label>Telefon</Label>
             <Input value={form.phone} onChange={e => update('phone', e.target.value)} type="tel" className="mt-1" />
           </div>
           <div>
-            <Label>Neighborhood</Label>
+            <Label>Kvart</Label>
             <Input value={form.neighborhood} onChange={e => update('neighborhood', e.target.value)} className="mt-1" />
           </div>
         </div>
 
         <div>
-          <Label>Address</Label>
+          <Label>Adresa</Label>
           <Input value={form.address} onChange={e => update('address', e.target.value)} className="mt-1" />
         </div>
 
         <div>
-          <Label>Emergency Contact</Label>
+          <Label>Kontakt za hitne slučajeve</Label>
           <Input value={form.emergency_contact} onChange={e => update('emergency_contact', e.target.value)} className="mt-1" />
         </div>
 
         {/* Children */}
         <div>
           <div className="flex items-center justify-between mb-3">
-            <Label>Children</Label>
+            <Label>Djeca</Label>
             <Button variant="ghost" size="sm" onClick={addChild} className="text-xs text-primary">
-              <Plus className="w-3 h-3 mr-1" /> Add child
+              <Plus className="w-3 h-3 mr-1" /> Dodaj dijete
             </Button>
           </div>
           <div className="space-y-3">
@@ -149,14 +149,14 @@ export default function FamilySettings() {
               <div key={idx} className="grid grid-cols-12 gap-2 items-end">
                 <div className="col-span-5">
                   <Input
-                    placeholder="Name"
+                    placeholder="Ime"
                     value={child.name}
                     onChange={e => updateChild(idx, 'name', e.target.value)}
                   />
                 </div>
                 <div className="col-span-2">
                   <Input
-                    placeholder="Age"
+                    placeholder="Dob"
                     type="number"
                     value={child.age}
                     onChange={e => updateChild(idx, 'age', e.target.value)}
@@ -164,7 +164,7 @@ export default function FamilySettings() {
                 </div>
                 <div className="col-span-4">
                   <Input
-                    placeholder="Special needs"
+                    placeholder="Posebne potrebe"
                     value={child.needs}
                     onChange={e => updateChild(idx, 'needs', e.target.value)}
                   />
@@ -180,23 +180,23 @@ export default function FamilySettings() {
         </div>
 
         <div>
-          <Label>Schedule Preferences</Label>
-          <Textarea value={form.schedule_preferences} onChange={e => update('schedule_preferences', e.target.value)} rows={2} className="mt-1" placeholder="e.g., Weekday mornings, occasional date nights" />
+          <Label>Preferencije rasporeda</Label>
+          <Textarea value={form.schedule_preferences} onChange={e => update('schedule_preferences', e.target.value)} rows={2} className="mt-1" placeholder="npr. jutro radnim danom, povremene večeri" />
         </div>
 
         <div>
-          <Label>Special Requirements</Label>
-          <Textarea value={form.special_requirements} onChange={e => update('special_requirements', e.target.value)} rows={2} className="mt-1" placeholder="e.g., Pet-friendly, nut allergy awareness" />
+          <Label>Posebni zahtjevi</Label>
+          <Textarea value={form.special_requirements} onChange={e => update('special_requirements', e.target.value)} rows={2} className="mt-1" placeholder="npr. ljubimci u kući, alergije na hranu" />
         </div>
 
         <div>
-          <Label>Preferred Languages (comma-separated)</Label>
+          <Label>Željeni jezici (odvojeno zarezima)</Label>
           <Input value={form.preferred_languages} onChange={e => update('preferred_languages', e.target.value)} className="mt-1" />
         </div>
 
         <Button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending} className="w-full h-11 font-semibold">
           <Save className="w-4 h-4 mr-2" />
-          {saveMutation.isPending ? 'Saving...' : 'Save Profile'}
+          {saveMutation.isPending ? 'Spremanje...' : 'Spremi profil'}
         </Button>
       </Card>
     </div>

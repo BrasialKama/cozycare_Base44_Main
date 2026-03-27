@@ -15,31 +15,31 @@ const Logo = () => (
     </div>
     <div>
       <span className="font-display text-lg font-bold text-foreground tracking-tight block leading-none">CozyCare</span>
-      <span className="text-[10px] text-muted-foreground font-body tracking-wide">Trusted family care</span>
+      <span className="text-[10px] text-muted-foreground font-body tracking-wide">Pouzdana obiteljska skrb</span>
     </div>
   </Link>
 );
 
 const navItems = {
   parent: [
-    { path: '/', icon: Home, label: 'Home' },
-    { path: '/FindNannies', icon: Search, label: 'Find Nannies' },
-    { path: '/MyBookings', icon: Calendar, label: 'Bookings' },
-    { path: '/Messages', icon: MessageCircle, label: 'Messages' },
-    { path: '/FamilySettings', icon: User, label: 'My Family' },
+    { path: '/', icon: Home, label: 'Početna' },
+    { path: '/FindNannies', icon: Search, label: 'Pretraži dadilje' },
+    { path: '/MyBookings', icon: Calendar, label: 'Rezervacije' },
+    { path: '/Messages', icon: MessageCircle, label: 'Poruke' },
+    { path: '/FamilySettings', icon: User, label: 'Moja obitelj' },
   ],
   nanny: [
-    { path: '/', icon: Home, label: 'Home' },
-    { path: '/NannyBookings', icon: Calendar, label: 'My Bookings' },
-    { path: '/Messages', icon: MessageCircle, label: 'Messages' },
-    { path: '/Earnings', icon: DollarSign, label: 'Earnings' },
-    { path: '/NannyProfile', icon: User, label: 'My Profile' },
+    { path: '/', icon: Home, label: 'Početna' },
+    { path: '/NannyBookings', icon: Calendar, label: 'Moje rezervacije' },
+    { path: '/Messages', icon: MessageCircle, label: 'Poruke' },
+    { path: '/Earnings', icon: DollarSign, label: 'Zarada' },
+    { path: '/NannyProfile', icon: User, label: 'Moj profil' },
   ],
   admin: [
-    { path: '/AdminDashboard', icon: Home, label: 'Dashboard' },
-    { path: '/AdminApplications', icon: ClipboardList, label: 'Applications' },
-    { path: '/AdminBookings', icon: Calendar, label: 'Bookings' },
-    { path: '/AdminReports', icon: Shield, label: 'Reports' },
+    { path: '/AdminDashboard', icon: Home, label: 'Nadzorna ploča' },
+    { path: '/AdminApplications', icon: ClipboardList, label: 'Prijave' },
+    { path: '/AdminBookings', icon: Calendar, label: 'Rezervacije' },
+    { path: '/AdminReports', icon: Shield, label: 'Prijave problema' },
   ],
 };
 
@@ -109,7 +109,7 @@ export default function AppLayout() {
             onClick={() => base44.auth.logout()}
           >
             <LogOut className="w-3.5 h-3.5 mr-2" />
-            Sign out
+            Odjava
           </Button>
         </div>
       </aside>
@@ -160,7 +160,7 @@ export default function AppLayout() {
                 onClick={() => base44.auth.logout()}
               >
                 <LogOut className="w-4 h-4 mr-2" />
-                Sign out
+                Odjava
               </Button>
             </div>
           </aside>

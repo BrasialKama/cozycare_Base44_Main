@@ -19,21 +19,21 @@ export default function FeaturedNannies() {
         <div className="flex flex-col md:flex-row items-end justify-between mb-12 gap-6">
           <div className="max-w-2xl">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-secondary mb-3">
-              Featured caregivers
+              Istaknute dadilje
             </p>
             <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground leading-tight">
-              Meet Our Exceptional Nannies
+              Upoznajte naše iznimne dadilje
             </h2>
             <p className="mt-4 text-muted-foreground text-lg italic leading-relaxed">
-              Hand-selected for their experience, warmth, and dedication to
-              exceptional family care.
+              Ručno odabrane za svoje iskustvo, toplinu i predanost
+              iznimnoj obiteljskoj skrbi.
             </p>
           </div>
           <Link
             to="/FindNannies"
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-primary/80 transition-colors group shrink-0"
           >
-            Browse all caregivers
+            Pregledaj sve dadilje
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </Link>
         </div>

@@ -14,10 +14,10 @@ import { Label } from '@/components/ui/label';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const STEPS = [
-  { id: 0, icon: User, label: 'About You', sub: 'Your basic info' },
-  { id: 1, icon: Star, label: 'Experience', sub: 'Skills & rates' },
-  { id: 2, icon: Camera, label: 'Verification', sub: 'Photo & ID' },
-  { id: 3, icon: CheckCircle2, label: 'Review', sub: 'Final check' },
+  { id: 0, icon: User, label: 'O vama', sub: 'Osnovni podaci' },
+  { id: 1, icon: Star, label: 'Iskustvo', sub: 'Vještine i cijena' },
+  { id: 2, icon: Camera, label: 'Verifikacija', sub: 'Foto i dokument' },
+  { id: 3, icon: CheckCircle2, label: 'Pregled', sub: 'Završna provjera' },
 ];
 
 function UploadZone({ label, hint, accept, file, onChange, icon: Icon }) {
@@ -35,7 +35,7 @@ function UploadZone({ label, hint, accept, file, onChange, icon: Icon }) {
           <p className={`text-sm font-medium ${file ? 'text-primary' : 'text-muted-foreground'}`}>
             {file ? file.name : `Upload ${label.toLowerCase()}`}
           </p>
-          {!file && <p className="text-xs text-muted-foreground mt-0.5">Click to browse files</p>}
+          {!file && <p className="text-xs text-muted-foreground mt-0.5">Kliknite za odabir datoteke</p>}
         </div>
         <input type="file" accept={accept} className="hidden" onChange={e => onChange(e.target.files?.[0])} />
       </label>
@@ -109,9 +109,9 @@ export default function NannyOnboarding() {
           <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-primary/20 to-peach/50 flex items-center justify-center mx-auto mb-4 shadow-md">
             <Heart className="w-8 h-8 text-primary" fill="currentColor" />
           </div>
-          <h1 className="font-display text-3xl font-bold text-foreground">Join CozyCare</h1>
+          <h1 className="font-display text-3xl font-bold text-foreground">Pridruži se CozyCare-u</h1>
           <p className="text-sm text-muted-foreground mt-2 max-w-xs mx-auto leading-relaxed">
-            Complete your profile and start connecting with families who need you.
+            Ispunite svoj profil i počnite se povezivati s obiteljima kojima trebate.
           </p>
         </div>
 
@@ -155,31 +155,31 @@ export default function NannyOnboarding() {
               {step === 0 && (
                 <div className="space-y-5">
                   <div className="mb-6">
-                    <p className="text-xs font-bold text-primary/70 uppercase tracking-widest mb-1">Step 1 of 4</p>
-                    <h2 className="font-display text-2xl font-bold text-foreground">About You</h2>
-                    <p className="text-sm text-muted-foreground mt-1">Tell families who you are and where you work.</p>
+                    <p className="text-xs font-bold text-primary/70 uppercase tracking-widest mb-1">Korak 1 od 4</p>
+                    <h2 className="font-display text-2xl font-bold text-foreground">O vama</h2>
+                    <p className="text-sm text-muted-foreground mt-1">Recite obiteljima tko ste i gdje radite.</p>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Legal Name</Label>
+                      <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Puno ime</Label>
                       <Input value={form.full_name} onChange={e => update('full_name', e.target.value)} className="rounded-xl" />
                     </div>
                     <div>
-                      <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Display Name</Label>
-                      <Input value={form.display_name} onChange={e => update('display_name', e.target.value)} placeholder="As families see you" className="rounded-xl" />
+                      <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Prikazano ime</Label>
+                      <Input value={form.display_name} onChange={e => update('display_name', e.target.value)} placeholder="Kako vas obitelji vide" className="rounded-xl" />
                     </div>
                   </div>
                   <div>
-                    <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Phone</Label>
+                    <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Telefon</Label>
                     <Input value={form.phone} onChange={e => update('phone', e.target.value)} type="tel" className="rounded-xl" />
                   </div>
                   <div>
-                    <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Service Area</Label>
+                    <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Područje rada</Label>
                     <Input value={form.service_area} onChange={e => update('service_area', e.target.value)} placeholder="e.g., Gornji Grad, Zagreb" className="rounded-xl" />
                   </div>
                   <div>
-                    <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">About Me</Label>
-                    <Textarea value={form.bio} onChange={e => update('bio', e.target.value)} placeholder="Share your personality, childcare philosophy, and what makes you special as a caregiver…" rows={4} className="rounded-xl resize-none" />
+                    <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">O meni</Label>
+                    <Textarea value={form.bio} onChange={e => update('bio', e.target.value)} placeholder="Podijelite svoju osobnost, filozofiju brige o djeci i što vas čini posebnom dadiljom…" rows={4} className="rounded-xl resize-none" />
                   </div>
                 </div>
               )}
@@ -187,38 +187,38 @@ export default function NannyOnboarding() {
               {step === 1 && (
                 <div className="space-y-5">
                   <div className="mb-6">
-                    <p className="text-xs font-bold text-primary/70 uppercase tracking-widest mb-1">Step 2 of 4</p>
-                    <h2 className="font-display text-2xl font-bold text-foreground">Experience & Skills</h2>
-                    <p className="text-sm text-muted-foreground mt-1">Help families understand your qualifications.</p>
+                    <p className="text-xs font-bold text-primary/70 uppercase tracking-widest mb-1">Korak 2 od 4</p>
+                    <h2 className="font-display text-2xl font-bold text-foreground">Iskustvo i vještine</h2>
+                    <p className="text-sm text-muted-foreground mt-1">Pomozite obiteljima da razumiju vaše kvalifikacije.</p>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Hourly Rate (€)</Label>
+                      <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Satnica (€)</Label>
                       <Input type="number" value={form.hourly_rate} onChange={e => update('hourly_rate', e.target.value)} className="rounded-xl" />
                     </div>
                     <div>
-                      <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Years Experience</Label>
+                      <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Godine iskustva</Label>
                       <Input type="number" value={form.years_experience} onChange={e => update('years_experience', e.target.value)} className="rounded-xl" />
                     </div>
                   </div>
                   <div>
-                    <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Education</Label>
-                    <Input value={form.education} onChange={e => update('education', e.target.value)} placeholder="e.g., B.A. Early Childhood Education" className="rounded-xl" />
+                    <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Obrazovanje</Label>
+                    <Input value={form.education} onChange={e => update('education', e.target.value)} placeholder="npr. Prvostupnica ranog odgoja" className="rounded-xl" />
                   </div>
                   <div>
-                    <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Languages <span className="normal-case font-normal">(comma-separated)</span></Label>
+                    <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Jezici <span className="normal-case font-normal">(odvojeno zarezima)</span></Label>
                     <Input value={form.languages} onChange={e => update('languages', e.target.value)} placeholder="Croatian, English, German" className="rounded-xl" />
                   </div>
                   <div>
-                    <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Specialties <span className="normal-case font-normal">(comma-separated)</span></Label>
-                    <Input value={form.specialties} onChange={e => update('specialties', e.target.value)} placeholder="Infant care, Special needs, Tutoring" className="rounded-xl" />
+                    <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Specijalnosti <span className="normal-case font-normal">(odvojeno zarezima)</span></Label>
+                    <Input value={form.specialties} onChange={e => update('specialties', e.target.value)} placeholder="Njega dojenčadi, Posebne potrebe, Podučavanje" className="rounded-xl" />
                   </div>
                   <div>
-                    <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Certifications <span className="normal-case font-normal">(comma-separated)</span></Label>
-                    <Input value={form.certifications} onChange={e => update('certifications', e.target.value)} placeholder="CPR, First Aid, Montessori" className="rounded-xl" />
+                    <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Certifikati <span className="normal-case font-normal">(odvojeno zarezima)</span></Label>
+                    <Input value={form.certifications} onChange={e => update('certifications', e.target.value)} placeholder="Prva pomoć, CPR, Montessori" className="rounded-xl" />
                   </div>
                   <div>
-                    <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Emergency Contact</Label>
+                    <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Kontakt za hitne slučajeve</Label>
                     <Input value={form.emergency_contact} onChange={e => update('emergency_contact', e.target.value)} className="rounded-xl" />
                   </div>
                 </div>
@@ -227,33 +227,33 @@ export default function NannyOnboarding() {
               {step === 2 && (
                 <div className="space-y-6">
                   <div className="mb-6">
-                    <p className="text-xs font-bold text-primary/70 uppercase tracking-widest mb-1">Step 3 of 4</p>
-                    <h2 className="font-display text-2xl font-bold text-foreground">Verification & Media</h2>
-                    <p className="text-sm text-muted-foreground mt-1">Help families trust you before they even meet you.</p>
+                    <p className="text-xs font-bold text-primary/70 uppercase tracking-widest mb-1">Korak 3 od 4</p>
+                    <h2 className="font-display text-2xl font-bold text-foreground">Verifikacija i mediji</h2>
+                    <p className="text-sm text-muted-foreground mt-1">Pomozite obiteljima da vam vjeruju prije nego vas upoznaju.</p>
                   </div>
-                  <UploadZone label="Profile Photo" hint="A warm, friendly photo helps families connect with you." accept="image/*" file={photoFile} onChange={setPhotoFile} icon={Camera} />
-                  <UploadZone label="Introduction Video" hint="A 1–2 minute video introducing yourself builds instant trust with families." accept="video/*" file={videoFile} onChange={setVideoFile} icon={Sparkles} />
-                  <UploadZone label="Government ID" hint="Required for identity verification. Your ID is securely stored and never shared with families." accept="image/*,.pdf" file={idFile} onChange={setIdFile} icon={Shield} />
+                  <UploadZone label="Profilna fotografija" hint="Topla, prijateljska fotografija pomaže obiteljima da se povežu s vama." accept="image/*" file={photoFile} onChange={setPhotoFile} icon={Camera} />
+                  <UploadZone label="Video predstavljanje" hint="Video od 1–2 minute u kojem se predstavite gradi povjerenje obitelji." accept="video/*" file={videoFile} onChange={setVideoFile} icon={Sparkles} />
+                  <UploadZone label="Osobna iskaznica" hint="Potrebna za provjeru identiteta. Vaš dokument je sigurno pohranjen i nikad se ne dijeli s obiteljima." accept="image/*,.pdf" file={idFile} onChange={setIdFile} icon={Shield} />
                 </div>
               )}
 
               {step === 3 && (
                 <div className="space-y-5">
                   <div className="mb-6">
-                    <p className="text-xs font-bold text-primary/70 uppercase tracking-widest mb-1">Step 4 of 4</p>
-                    <h2 className="font-display text-2xl font-bold text-foreground">Review Your Profile</h2>
-                    <p className="text-sm text-muted-foreground mt-1">Our team reviews applications within 24–48 hours.</p>
+                    <p className="text-xs font-bold text-primary/70 uppercase tracking-widest mb-1">Korak 4 od 4</p>
+                    <h2 className="font-display text-2xl font-bold text-foreground">Pregledajte svoj profil</h2>
+                    <p className="text-sm text-muted-foreground mt-1">Naš tim pregledava prijave unutar 24–48 sati.</p>
                   </div>
                   <div className="bg-gradient-to-br from-ivory to-rose-light/30 rounded-2xl p-5 space-y-3.5">
                     {[
-                      ['Name', form.display_name || form.full_name],
-                      ['Rate', `€${form.hourly_rate}/hr`],
-                      ['Experience', `${form.years_experience} years`],
-                      ['Service Area', form.service_area || '—'],
-                      ['Languages', form.languages || '—'],
-                      ['Photo', photoFile ? '✓ Uploaded' : '— Not added'],
-                      ['Video', videoFile ? '✓ Uploaded' : '— Not added'],
-                      ['ID Document', idFile ? '✓ Uploaded' : '— Not added'],
+                      ['Ime', form.display_name || form.full_name],
+                      ['Satnica', `€${form.hourly_rate}/h`],
+                      ['Iskustvo', `${form.years_experience} godina`],
+                      ['Područje', form.service_area || '—'],
+                      ['Jezici', form.languages || '—'],
+                      ['Fotografija', photoFile ? '✓ Učitano' : '— Nije dodano'],
+                      ['Video', videoFile ? '✓ Učitano' : '— Nije dodano'],
+                      ['Osobna iskaznica', idFile ? '✓ Učitano' : '— Nije dodano'],
                     ].map(([key, val]) => (
                       <div key={key} className="flex items-center justify-between">
                         <span className="text-xs font-semibold text-muted-foreground">{key}</span>
@@ -264,7 +264,7 @@ export default function NannyOnboarding() {
                   <div className="flex items-start gap-3 bg-sage/15 rounded-2xl p-4">
                     <CheckCircle2 className="w-4.5 h-4.5 text-sage-foreground flex-shrink-0 mt-0.5" />
                     <p className="text-xs text-sage-foreground leading-relaxed">
-                      By submitting, you agree to our caregiver standards. We'll notify you once your profile is reviewed and approved.
+                      Slanjem pristajete na naše standarde za dadilje. Obavijestit ćemo vas kada vaš profil bude pregledan i odobren.
                     </p>
                   </div>
                 </div>
@@ -281,11 +281,11 @@ export default function NannyOnboarding() {
               disabled={step === 0}
               className="rounded-xl"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" /> Back
+              <ArrowLeft className="w-4 h-4 mr-2" /> Natrag
             </Button>
             {step < 3 ? (
               <Button onClick={() => setStep(s => s + 1)} className="rounded-xl">
-                Continue <ArrowRight className="w-4 h-4 ml-2" />
+                Dalje <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             ) : (
               <Button
@@ -296,10 +296,10 @@ export default function NannyOnboarding() {
                 {createMutation.isPending ? (
                   <span className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                    Submitting…
+                    Šaljem…
                   </span>
                 ) : (
-                  <span className="flex items-center gap-2"><Heart className="w-4 h-4" fill="currentColor" /> Submit Application</span>
+                  <span className="flex items-center gap-2"><Heart className="w-4 h-4" fill="currentColor" /> Pošalji prijavu</span>
                 )}
               </Button>
             )}

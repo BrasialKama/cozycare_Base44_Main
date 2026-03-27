@@ -9,9 +9,9 @@ import NannyCard from '@/components/shared/NannyCard';
 
 const greetingTime = () => {
   const h = new Date().getHours();
-  if (h < 12) return 'Good morning';
-  if (h < 17) return 'Good afternoon';
-  return 'Good evening';
+  if (h < 12) return 'Dobro jutro';
+  if (h < 17) return 'Dobar dan';
+  return 'Dobra večer';
 };
 
 export default function ParentHome() {
@@ -45,28 +45,28 @@ export default function ParentHome() {
         <div className="relative px-8 py-12 lg:px-16 lg:py-16">
           <p className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-widest uppercase text-primary/70 mb-5">
             <Sparkles className="w-3.5 h-3.5" />
-            Trusted family care
+            Pouzdana obiteljska skrb
           </p>
           <h1 className="font-display text-4xl lg:text-5xl font-bold text-foreground leading-[1.12] max-w-xl">
             {greetingTime()},&nbsp;
             <span className="text-primary italic">{firstName}.</span>
             <br />
-            <span className="text-foreground/60 font-medium">Your family deserves the very best.</span>
+            <span className="text-foreground/60 font-medium">Vaša obitelj zaslužuje samo najbolje.</span>
           </h1>
           <p className="mt-5 text-base text-muted-foreground max-w-md leading-relaxed">
-            Discover warm, background-checked caregivers who feel like family — handpicked for trust, love, and reliability.
+            Otkrijte tople, provjerene dadilje koje se osjećaju kao obitelj — odabrane za povjerenje, ljubav i pouzdanost.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link to="/FindNannies">
               <Button size="lg" className="h-12 px-8 font-semibold rounded-full shadow-lg shadow-primary/20 text-sm">
                 <Search className="w-4 h-4 mr-2" />
-                Find a Nanny
+                Pronađi dadilju
               </Button>
             </Link>
             <Link to="/MyBookings">
               <Button size="lg" variant="outline" className="h-12 px-8 font-semibold rounded-full bg-white/80 hover:bg-white text-sm border-white/60">
                 <Calendar className="w-4 h-4 mr-2" />
-                My Bookings
+                Moje rezervacije
               </Button>
             </Link>
           </div>
@@ -77,9 +77,9 @@ export default function ParentHome() {
       <section>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
-            { icon: Shield, label: 'Background Checked', desc: 'Every caregiver passes a full background screen before joining' },
-            { icon: Star, label: 'Reference Verified', desc: 'References personally reviewed by our care quality team' },
-            { icon: Heart, label: 'Family-Rated', desc: 'Real reviews from real families — honest, detailed, and verified' },
+            { icon: Shield, label: 'Provjera pozadine', desc: 'Svaka dadilja prolazi kompletnu provjeru prije pridruživanja' },
+            { icon: Star, label: 'Provjerene reference', desc: 'Reference osobno pregledava naš tim za kvalitetu skrbi' },
+            { icon: Heart, label: 'Ocjene obitelji', desc: 'Stvarne recenzije stvarnih obitelji — iskrene, detaljne i provjerene' },
           ].map(({ icon: Icon, label, desc }) => (
             <div key={label} className="flex items-start gap-4 bg-card border border-border/50 rounded-2xl p-5 shadow-sm">
               <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -98,9 +98,9 @@ export default function ParentHome() {
       {myBookings.length > 0 && (
         <section>
           <div className="flex items-center justify-between mb-5">
-            <h2 className="font-display text-2xl font-semibold text-foreground">Upcoming Care</h2>
+            <h2 className="font-display text-2xl font-semibold text-foreground">Nadolazeća skrb</h2>
             <Link to="/MyBookings" className="text-sm text-primary font-medium flex items-center gap-1 hover:underline">
-              View all <ArrowRight className="w-3.5 h-3.5" />
+              Prikaži sve <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
           <div className="space-y-3">
@@ -111,7 +111,7 @@ export default function ParentHome() {
                     <Calendar className="w-4.5 h-4.5 text-sage-foreground" />
                   </div>
                   <div>
-                    <p className="font-semibold text-sm text-foreground">{b.nanny_name || 'Your Nanny'}</p>
+                    <p className="font-semibold text-sm text-foreground">{b.nanny_name || 'Vaša dadilja'}</p>
                     <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       {b.date} · {b.start_time}–{b.end_time}
@@ -129,13 +129,13 @@ export default function ParentHome() {
 
       {/* ── Quick access ── */}
       <section>
-        <h2 className="font-display text-2xl font-semibold text-foreground mb-5">Everything You Need</h2>
+        <h2 className="font-display text-2xl font-semibold text-foreground mb-5">Sve što trebate</h2>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[
-            { icon: Search, label: 'Find Nannies', sub: 'Browse caregivers', path: '/FindNannies', bg: 'bg-rose-light', fg: 'text-primary' },
-            { icon: Calendar, label: 'Bookings', sub: 'Manage sessions', path: '/MyBookings', bg: 'bg-peach/60', fg: 'text-peach-dark' },
-            { icon: MessageCircle, label: 'Messages', sub: 'Chat with nannies', path: '/Messages', bg: 'bg-sage/25', fg: 'text-sage-foreground' },
-            { icon: Shield, label: 'Safety', sub: 'Our safeguards', path: '/SafetyCenter', bg: 'bg-powder-blue/40', fg: 'text-foreground/60' },
+            { icon: Search, label: 'Pretraži dadilje', sub: 'Pregledaj dadilje', path: '/FindNannies', bg: 'bg-rose-light', fg: 'text-primary' },
+            { icon: Calendar, label: 'Rezervacije', sub: 'Upravljaj terminima', path: '/MyBookings', bg: 'bg-peach/60', fg: 'text-peach-dark' },
+            { icon: MessageCircle, label: 'Poruke', sub: 'Razgovaraj s dadiljama', path: '/Messages', bg: 'bg-sage/25', fg: 'text-sage-foreground' },
+            { icon: Shield, label: 'Sigurnost', sub: 'Naše mjere zaštite', path: '/SafetyCenter', bg: 'bg-powder-blue/40', fg: 'text-foreground/60' },
           ].map((item) => (
             <Link key={item.path} to={item.path}>
               <div className="bg-card border border-border/50 rounded-2xl p-5 hover:shadow-md hover:border-primary/20 transition-all duration-200 cursor-pointer group h-full">
@@ -155,11 +155,11 @@ export default function ParentHome() {
         <section>
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="font-display text-2xl font-semibold text-foreground">Top-Rated Caregivers</h2>
-              <p className="text-sm text-muted-foreground mt-1">Loved by families — verified, reviewed, and ready to help</p>
+              <h2 className="font-display text-2xl font-semibold text-foreground">Najbolje ocijenjene dadilje</h2>
+              <p className="text-sm text-muted-foreground mt-1">Omiljene među obiteljima — provjerene, ocijenjene i spremne pomoći</p>
             </div>
             <Link to="/FindNannies" className="text-sm text-primary font-medium flex items-center gap-1 hover:underline flex-shrink-0 ml-4">
-              See all <ArrowRight className="w-3.5 h-3.5" />
+              Prikaži sve <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -176,12 +176,12 @@ export default function ParentHome() {
           <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
             <Heart className="w-8 h-8 text-primary/60" />
           </div>
-          <h3 className="font-display text-xl font-semibold text-foreground mb-2">Your perfect nanny awaits</h3>
+          <h3 className="font-display text-xl font-semibold text-foreground mb-2">Vaša savršena dadilja čeka</h3>
           <p className="text-muted-foreground text-sm max-w-xs mx-auto mb-6">
-            We're curating caregivers in your area. Browse available nannies to get started.
+            Biramo dadilje u vašem području. Pregledajte dostupne dadilje za početak.
           </p>
           <Link to="/FindNannies">
-            <Button className="rounded-full px-8">Browse Nannies</Button>
+            <Button className="rounded-full px-8">Pretraži dadilje</Button>
           </Link>
         </section>
       )}

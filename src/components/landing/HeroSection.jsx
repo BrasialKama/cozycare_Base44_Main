@@ -44,7 +44,7 @@ export default function HeroSection() {
             }}
           >
             <Star className="h-3.5 w-3.5 fill-current" />
-            Trusted by Zagreb families · Over 200 verified nannies
+            Vjeruju nam zagrebačke obitelji · Više od 200 provjerenih dadilja
           </div>
 
           {/* Frosted content veil */}
@@ -66,8 +66,8 @@ export default function HeroSection() {
                   '0 1px 12px rgba(255,253,248,0.85), 0 0 32px rgba(255,253,248,0.6)',
               }}
             >
-              A <span className="text-primary italic">Warm</span> Welcome{' '}
-              <span className="block">for Your Little Ones.</span>
+              <span className="text-primary italic">Topla</span> dobrodošlica{' '}
+              <span className="block">za vaše mališane.</span>
             </h1>
             <p
               className="mt-6 text-lg md:text-xl max-w-lg leading-relaxed font-medium text-foreground"
@@ -76,9 +76,9 @@ export default function HeroSection() {
                 textShadow: '0 1px 8px rgba(255,253,248,0.9)',
               }}
             >
-              Browse our curated collection of verified nannies — no account needed
-              until you're ready to book. Every caregiver is background-checked,
-              ID-verified, and reference-reviewed.
+              Pregledajte našu kolekciju provjerenih dadilja — račun nije potreban
+              dok ne budete spremni rezervirati. Svaka dadilja je provjerena,
+              s potvrđenim identitetom i referencama.
             </p>
           </div>
 
@@ -89,7 +89,7 @@ export default function HeroSection() {
               className="bg-primary text-primary-foreground h-14 px-10 text-lg hover:bg-primary/90 group"
             >
               <Link to="/FindNannies">
-                Find Your Nanny
+                Pronađi svoju dadilju
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-0.5" />
               </Link>
             </Button>
@@ -105,7 +105,7 @@ export default function HeroSection() {
                 WebkitBackdropFilter: 'blur(12px)',
               }}
             >
-              <Link to="/Onboarding">Join CozyCare</Link>
+              <Link to="/Onboarding">Pridruži se CozyCare-u</Link>
             </Button>
           </div>
 
@@ -113,11 +113,11 @@ export default function HeroSection() {
             className="mt-5 text-xs text-center sm:text-left italic tracking-wide text-muted-foreground"
             style={{ opacity: 0.9 }}
           >
-            Verified caregivers
+            Provjerene dadilje
             <span className="mx-2 opacity-40">·</span>
-            Thoughtful matching
+            Pažljivo uparivanje
             <span className="mx-2 opacity-40">·</span>
-            Trusted care
+            Pouzdana skrb
           </p>
         </div>
       </div>

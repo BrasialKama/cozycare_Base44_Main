@@ -12,10 +12,10 @@ import { TrustBadgeRow } from '@/components/shared/TrustBadge';
 import { toast } from 'sonner';
 
 const STATUS_CONFIG = {
-  approved: { label: 'Live — visible to families', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-  pending: { label: 'Under review · 24–48 hrs', color: 'bg-peach/50 text-peach-dark border-peach/30' },
-  rejected: { label: 'Not approved', color: 'bg-destructive/10 text-destructive border-destructive/20' },
-  suspended: { label: 'Suspended', color: 'bg-muted text-muted-foreground border-border' },
+  approved: { label: 'Aktivan — vidljiv obiteljima', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  pending: { label: 'Na pregledu · 24–48 h', color: 'bg-peach/50 text-peach-dark border-peach/30' },
+  rejected: { label: 'Nije odobren', color: 'bg-destructive/10 text-destructive border-destructive/20' },
+  suspended: { label: 'Suspendiran', color: 'bg-muted text-muted-foreground border-border' },
 };
 
 function SectionLabel({ children }) {
@@ -64,7 +64,7 @@ export default function NannyProfile() {
     const { file_url } = await base44.integrations.Core.UploadFile({ file });
     await base44.entities.NannyProfile.update(profile.id, { photo_url: file_url });
     queryClient.invalidateQueries({ queryKey: ['myNannyProfile'] });
-    toast.success('Photo updated!');
+    toast.success('Fotografija ažurirana!');
   };
 
   const saveMutation = useMutation({
@@ -83,7 +83,7 @@ export default function NannyProfile() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['myNannyProfile'] });
-      toast.success('Profile saved!');
+      toast.success('Profil spremljen!');
     },
   });
 
@@ -95,7 +95,7 @@ export default function NannyProfile() {
     return (
       <div className="text-center py-20">
         <Heart className="w-12 h-12 text-primary/30 mx-auto mb-4" />
-        <p className="text-muted-foreground">No profile found. Please complete onboarding first.</p>
+        <p className="text-muted-foreground">Profil nije pronađen. Molimo prvo završite registraciju.</p>
       </div>
     );
   }
@@ -109,10 +109,10 @@ export default function NannyProfile() {
       {/* Header */}
       <div>
         <p className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-widest uppercase text-primary/60 mb-2">
-          <Heart className="w-3 h-3" fill="currentColor" /> Your profile
+          <Heart className="w-3 h-3" fill="currentColor" /> Vaš profil
         </p>
-        <h1 className="font-display text-3xl font-bold text-foreground">My Profile</h1>
-        <p className="text-sm text-muted-foreground mt-1">How families see you on CozyCare.</p>
+        <h1 className="font-display text-3xl font-bold text-foreground">Moj profil</h1>
+        <p className="text-sm text-muted-foreground mt-1">Kako vas obitelji vide na CozyCare-u.</p>
       </div>
 
       {/* Status & stats strip */}
@@ -123,12 +123,12 @@ export default function NannyProfile() {
         {profile.avg_rating > 0 && (
           <span className="flex items-center gap-1.5 text-sm text-foreground font-semibold">
             <Star className="w-4 h-4 text-amber-400 fill-amber-400" /> {profile.avg_rating.toFixed(1)}
-            <span className="font-normal text-muted-foreground text-xs">({profile.total_reviews} reviews)</span>
+            <span className="font-normal text-muted-foreground text-xs">({profile.total_reviews} recenzija)</span>
           </span>
         )}
         {profile.total_bookings > 0 && (
           <span className="flex items-center gap-1.5 text-sm text-foreground font-semibold">
-            <Clock className="w-4 h-4 text-primary/60" /> {profile.total_bookings} sessions
+            <Clock className="w-4 h-4 text-primary/60" /> {profile.total_bookings} termina
           </span>
         )}
         {profile.badges?.length > 0 && (
@@ -141,7 +141,7 @@ export default function NannyProfile() {
       {/* Photo */}
       <div className="bg-card border border-border/40 rounded-3xl p-6">
         <h2 className="font-display font-semibold text-lg mb-5 flex items-center gap-2">
-          <Camera className="w-4.5 h-4.5 text-primary" /> Profile Photo
+          <Camera className="w-4.5 h-4.5 text-primary" /> Profilna fotografija
         </h2>
         <div className="flex items-center gap-5">
           <div className="w-24 h-24 rounded-3xl overflow-hidden border-2 border-peach/60 flex-shrink-0 shadow-sm">
@@ -156,12 +156,12 @@ export default function NannyProfile() {
           <div>
             <label className="cursor-pointer">
               <Button variant="outline" size="sm" asChild className="rounded-xl">
-                <span><Upload className="w-3.5 h-3.5 mr-1.5" /> Change Photo</span>
+                <span><Upload className="w-3.5 h-3.5 mr-1.5" /> Promijeni fotografiju</span>
               </Button>
               <input type="file" accept="image/*" className="hidden" onChange={e => handlePhotoUpload(e.target.files?.[0])} />
             </label>
             <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
-              A warm, friendly photo helps families connect with you.
+              Topla, prijateljska fotografija pomaže obiteljima da se povežu s vama.
             </p>
           </div>
         </div>
@@ -169,54 +169,54 @@ export default function NannyProfile() {
 
       {/* Core info */}
       <div className="bg-card border border-border/40 rounded-3xl p-6 space-y-5">
-        <h2 className="font-display font-semibold text-lg">Basic Information</h2>
+        <h2 className="font-display font-semibold text-lg">Osnovni podaci</h2>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <SectionLabel>Display Name</SectionLabel>
+            <SectionLabel>Prikazano ime</SectionLabel>
             <Input value={form.display_name} onChange={e => update('display_name', e.target.value)} className="rounded-xl" />
           </div>
           <div>
-            <SectionLabel>Hourly Rate ($)</SectionLabel>
+            <SectionLabel>Satnica (€)</SectionLabel>
             <Input type="number" value={form.hourly_rate} onChange={e => update('hourly_rate', e.target.value)} className="rounded-xl" />
           </div>
         </div>
         <div>
-          <SectionLabel>Service Area</SectionLabel>
-          <Input value={form.service_area} onChange={e => update('service_area', e.target.value)} placeholder="e.g., Downtown Portland" className="rounded-xl" />
+          <SectionLabel>Područje rada</SectionLabel>
+          <Input value={form.service_area} onChange={e => update('service_area', e.target.value)} placeholder="npr. Gornji Grad, Zagreb" className="rounded-xl" />
         </div>
         <div>
-          <SectionLabel>About Me</SectionLabel>
-          <Textarea value={form.bio} onChange={e => update('bio', e.target.value)} rows={4} placeholder="Share your personality and childcare philosophy…" className="rounded-xl resize-none" />
+          <SectionLabel>O meni</SectionLabel>
+          <Textarea value={form.bio} onChange={e => update('bio', e.target.value)} rows={4} placeholder="Podijelite svoju osobnost i filozofiju brige o djeci…" className="rounded-xl resize-none" />
         </div>
       </div>
 
       {/* Credentials */}
       <div className="bg-card border border-border/40 rounded-3xl p-6 space-y-5">
         <h2 className="font-display font-semibold text-lg flex items-center gap-2">
-          <Shield className="w-4.5 h-4.5 text-primary" /> Credentials
+          <Shield className="w-4.5 h-4.5 text-primary" /> Kvalifikacije
         </h2>
         <div>
-          <SectionLabel>Education</SectionLabel>
-          <Input value={form.education} onChange={e => update('education', e.target.value)} placeholder="e.g., B.A. Early Childhood Education" className="rounded-xl" />
+          <SectionLabel>Obrazovanje</SectionLabel>
+          <Input value={form.education} onChange={e => update('education', e.target.value)} placeholder="npr. Prvostupnica ranog odgoja" className="rounded-xl" />
         </div>
         <div>
-          <SectionLabel>Languages <span className="normal-case font-normal">(comma-separated)</span></SectionLabel>
-          <Input value={form.languages} onChange={e => update('languages', e.target.value)} placeholder="English, Spanish" className="rounded-xl" />
+          <SectionLabel>Jezici <span className="normal-case font-normal">(odvojeno zarezima)</span></SectionLabel>
+          <Input value={form.languages} onChange={e => update('languages', e.target.value)} placeholder="Hrvatski, Engleski" className="rounded-xl" />
         </div>
         <div>
-          <SectionLabel>Specialties <span className="normal-case font-normal">(comma-separated)</span></SectionLabel>
-          <Input value={form.specialties} onChange={e => update('specialties', e.target.value)} placeholder="Infant care, Special needs, Tutoring" className="rounded-xl" />
+          <SectionLabel>Specijalnosti <span className="normal-case font-normal">(odvojeno zarezima)</span></SectionLabel>
+          <Input value={form.specialties} onChange={e => update('specialties', e.target.value)} placeholder="Njega dojenčadi, Posebne potrebe, Podučavanje" className="rounded-xl" />
         </div>
         <div>
-          <SectionLabel>Certifications <span className="normal-case font-normal">(comma-separated)</span></SectionLabel>
+          <SectionLabel>Certifikati <span className="normal-case font-normal">(odvojeno zarezima)</span></SectionLabel>
           <Input value={form.certifications} onChange={e => update('certifications', e.target.value)} placeholder="CPR, First Aid, Montessori" className="rounded-xl" />
         </div>
       </div>
 
       {/* Emergency contact */}
       <div className="bg-card border border-border/40 rounded-3xl p-6">
-        <h2 className="font-display font-semibold text-lg mb-4">Emergency Contact</h2>
-        <Input value={form.emergency_contact} onChange={e => update('emergency_contact', e.target.value)} placeholder="Name and phone number" className="rounded-xl" />
+        <h2 className="font-display font-semibold text-lg mb-4">Kontakt za hitne slučajeve</h2>
+        <Input value={form.emergency_contact} onChange={e => update('emergency_contact', e.target.value)} placeholder="Ime i broj telefona" className="rounded-xl" />
       </div>
 
       <Button
@@ -228,10 +228,10 @@ export default function NannyProfile() {
         {saveMutation.isPending ? (
           <span className="flex items-center gap-2">
             <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-            Saving…
+            Spremanje…
           </span>
         ) : (
-          <span className="flex items-center gap-2"><Save className="w-4 h-4" /> Save Changes</span>
+          <span className="flex items-center gap-2"><Save className="w-4 h-4" /> Spremi promjene</span>
         )}
       </Button>
     </div>

@@ -7,9 +7,9 @@ import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 
 const TRUST_POINTS = [
-  { icon: Shield, text: 'Every nanny background-checked' },
-  { icon: Star, text: 'Real reviews from real families' },
-  { icon: CheckCircle2, text: 'Reference-verified caregivers' },
+  { icon: Shield, text: 'Svaka dadilja provjerena' },
+  { icon: Star, text: 'Stvarne recenzije obitelji' },
+  { icon: CheckCircle2, text: 'Provjerene reference' },
 ];
 
 export default function Onboarding() {
@@ -43,11 +43,11 @@ export default function Onboarding() {
             <Heart className="w-10 h-10 text-primary" fill="currentColor" />
           </div>
           <h1 className="font-display text-4xl font-bold text-foreground leading-tight">
-            Welcome to<br />
+            Dobrodošli u<br />
             <span className="text-primary italic">CozyCare</span>
           </h1>
           <p className="text-muted-foreground mt-3 text-sm leading-relaxed max-w-xs mx-auto">
-            A warm, trusted place where families find caregivers they love.
+            Toplo i pouzdano mjesto gdje obitelji pronalaze dadilje koje vole.
           </p>
         </div>
 
@@ -70,7 +70,7 @@ export default function Onboarding() {
           <div className="flex-1 h-px bg-border/60" />
         </div>
 
-        <p className="text-center text-sm font-semibold text-foreground mb-4">How are you joining?</p>
+        <p className="text-center text-sm font-semibold text-foreground mb-4">Kako nam se pridružujete?</p>
 
         {/* Role cards */}
         <div className="space-y-3 mb-7">
@@ -78,15 +78,15 @@ export default function Onboarding() {
             {
               id: 'parent',
               emoji: '🏡',
-              title: "I'm looking for a nanny",
-              description: 'Find trusted, verified caregivers for your family',
+              title: 'Tražim dadilju',
+              description: 'Pronađite pouzdane, provjerene dadilje za svoju obitelj',
               bg: selectedRole === 'parent' ? 'border-primary bg-primary/5 shadow-md shadow-primary/10' : 'border-border/60 bg-card hover:border-primary/25',
             },
             {
               id: 'nanny',
               emoji: '💛',
-              title: "I'm a caregiver",
-              description: 'Join our boutique platform and connect with families',
+              title: 'Ja sam dadilja',
+              description: 'Pridružite se našoj platformi i povežite se s obiteljima',
               bg: selectedRole === 'nanny' ? 'border-sage bg-sage/10 shadow-md shadow-sage/10' : 'border-border/60 bg-card hover:border-sage/40',
             },
           ].map((role) => (
@@ -120,18 +120,18 @@ export default function Onboarding() {
           {loading ? (
             <span className="flex items-center gap-2">
               <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-              Setting up your account…
+              Postavljanje računa…
             </span>
           ) : (
             <span className="flex items-center gap-2">
-              Get Started
+              Započni
               <ArrowRight className="w-4 h-4" />
             </span>
           )}
         </Button>
 
         <p className="text-center text-xs text-muted-foreground mt-5 leading-relaxed">
-          By joining, you agree to our terms. We take the safety of your family seriously.
+          Pridruživanjem prihvaćate naše uvjete. Sigurnost vaše obitelji nam je prioritet.
         </p>
       </motion.div>
     </div>

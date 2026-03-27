@@ -23,10 +23,10 @@ export default function AdminBookings() {
 
   return (
     <div>
-      <PageHeader icon={Calendar} title="All Bookings" subtitle="View and manage platform bookings" />
+      <PageHeader icon={Calendar} title="Sve rezervacije" subtitle="Pregled i upravljanje rezervacijama platforme" />
 
       {bookings.length === 0 ? (
-        <EmptyState icon={Calendar} title="No bookings yet" />
+        <EmptyState icon={Calendar} title="Još nema rezervacija" />
       ) : (
         <div className="space-y-3">
           {bookings.map(b => (
@@ -39,9 +39,9 @@ export default function AdminBookings() {
                     </Badge>
                   </div>
                   <p className="text-sm">
-                    <span className="font-semibold">{b.parent_name || 'Parent'}</span>
+                    <span className="font-semibold">{b.parent_name || 'Roditelj'}</span>
                     <span className="text-muted-foreground"> → </span>
-                    <span className="font-semibold">{b.nanny_name || 'Nanny'}</span>
+                    <span className="font-semibold">{b.nanny_name || 'Dadilja'}</span>
                   </p>
                   <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
                     <Calendar className="w-3 h-3" /> {b.date}
@@ -49,9 +49,9 @@ export default function AdminBookings() {
                   </p>
                 </div>
                 <div className="text-right text-xs space-y-0.5">
-                  <p className="font-semibold">Total: €{b.total_cost?.toFixed(2)}</p>
-                  <p className="text-muted-foreground">Fee: €{b.platform_fee?.toFixed(2)}</p>
-                  <p className="text-muted-foreground">Payout: €{b.nanny_payout?.toFixed(2)}</p>
+                  <p className="font-semibold">Ukupno: €{b.total_cost?.toFixed(2)}</p>
+                  <p className="text-muted-foreground">Naknada: €{b.platform_fee?.toFixed(2)}</p>
+                  <p className="text-muted-foreground">Isplata: €{b.nanny_payout?.toFixed(2)}</p>
                 </div>
               </div>
             </Card>

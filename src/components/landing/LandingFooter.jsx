@@ -32,7 +32,7 @@ export default function LandingFooter() {
             <span className="font-display text-xl font-bold text-foreground tracking-tight">CozyCare</span>
           </Link>
           <p className="text-sm text-muted-foreground max-w-md leading-relaxed mb-5">
-            A boutique childcare marketplace. Every nanny on CozyCare is ID verified, background checked, and reference reviewed.
+            Boutique tržište za čuvanje djece. Svaka dadilja na CozyCare-u ima potvrđen identitet, provjeru pozadine i provjerene reference.
           </p>
           {/* Social icons */}
           <div className="flex items-center gap-4">
@@ -59,30 +59,30 @@ export default function LandingFooter() {
         {/* Link columns */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 mb-12">
           <FooterSection
-            title="For Parents"
+            title="Za roditelje"
             links={[
-              { label: 'Search Nannies', to: '/FindNannies' },
-              { label: 'Trust & Safety', to: '/SafetyCenter' },
-              { label: 'Family Stories', to: '/' },
-              { label: 'Pricing', to: '/' },
+              { label: 'Pretraži dadilje', to: '/FindNannies' },
+              { label: 'Povjerenje i sigurnost', to: '/SafetyCenter' },
+              { label: 'Priče obitelji', to: '/' },
+              { label: 'Cijene', to: '/' },
             ]}
           />
           <FooterSection
-            title="For Nannies"
+            title="Za dadilje"
             links={[
-              { label: 'Apply as a Nanny', to: '/NannyOnboarding' },
-              { label: 'Verification Process', to: '/SafetyCenter' },
-              { label: 'Nanny Community', to: '/' },
-              { label: 'Resources', to: '/' },
+              { label: 'Prijavi se kao dadilja', to: '/NannyOnboarding' },
+              { label: 'Postupak verifikacije', to: '/SafetyCenter' },
+              { label: 'Zajednica dadilja', to: '/' },
+              { label: 'Resursi', to: '/' },
             ]}
           />
           <FooterSection
-            title="Support"
+            title="Podrška"
             links={[
-              { label: 'Help Center', to: '/' },
-              { label: 'Contact Us', to: '/' },
-              { label: 'Privacy Policy', to: '/' },
-              { label: 'Terms of Service', to: '/' },
+              { label: 'Centar za pomoć', to: '/' },
+              { label: 'Kontaktirajte nas', to: '/' },
+              { label: 'Pravila privatnosti', to: '/' },
+              { label: 'Uvjeti korištenja', to: '/' },
             ]}
           />
         </div>
@@ -90,7 +90,7 @@ export default function LandingFooter() {
         {/* Bottom */}
         <div className="border-t border-border/40 pt-6">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} CozyCare. All rights reserved. Made with care for Zagreb families.
+            © {new Date().getFullYear()} CozyCare. Sva prava pridržana. Napravljeno s ljubavlju za zagrebačke obitelji.
           </p>
         </div>
       </div>

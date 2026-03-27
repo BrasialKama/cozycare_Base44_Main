@@ -23,11 +23,11 @@ const HERO_IMAGES = [
 ];
 
 const BADGE_META = {
-  id_verified: { label: 'ID Verified', icon: CheckCircle2, color: 'text-primary bg-primary/8' },
-  background_check: { label: 'Background Check', icon: Shield, color: 'text-sage-foreground bg-sage/20' },
-  reference_checked: { label: 'References Checked', icon: CheckCircle2, color: 'text-sage-foreground bg-sage/20' },
-  video_verified: { label: 'Video Intro', icon: Play, color: 'text-peach-dark bg-peach/50' },
-  certifications_verified: { label: 'Certified', icon: Award, color: 'text-primary bg-primary/8' },
+  id_verified: { label: 'Potvrđen identitet', icon: CheckCircle2, color: 'text-primary bg-primary/8' },
+  background_check: { label: 'Provjera pozadine', icon: Shield, color: 'text-sage-foreground bg-sage/20' },
+  reference_checked: { label: 'Provjerene reference', icon: CheckCircle2, color: 'text-sage-foreground bg-sage/20' },
+  video_verified: { label: 'Video predstavljanje', icon: Play, color: 'text-peach-dark bg-peach/50' },
+  certifications_verified: { label: 'Certificirana', icon: Award, color: 'text-primary bg-primary/8' },
 };
 
 function ReviewCard({ review, isFirst }) {
@@ -52,9 +52,9 @@ function ReviewCard({ review, isFirst }) {
           )}
           {(review.warmth_rating || review.reliability_rating || review.communication_rating) && (
             <div className="flex flex-wrap gap-3 mt-3">
-              {review.warmth_rating && <span className="text-[11px] text-muted-foreground bg-muted/50 px-2.5 py-1 rounded-lg">Warmth <strong className="text-foreground">{review.warmth_rating}/5</strong></span>}
-              {review.reliability_rating && <span className="text-[11px] text-muted-foreground bg-muted/50 px-2.5 py-1 rounded-lg">Reliability <strong className="text-foreground">{review.reliability_rating}/5</strong></span>}
-              {review.communication_rating && <span className="text-[11px] text-muted-foreground bg-muted/50 px-2.5 py-1 rounded-lg">Communication <strong className="text-foreground">{review.communication_rating}/5</strong></span>}
+              {review.warmth_rating && <span className="text-[11px] text-muted-foreground bg-muted/50 px-2.5 py-1 rounded-lg">Toplina <strong className="text-foreground">{review.warmth_rating}/5</strong></span>}
+              {review.reliability_rating && <span className="text-[11px] text-muted-foreground bg-muted/50 px-2.5 py-1 rounded-lg">Pouzdanost <strong className="text-foreground">{review.reliability_rating}/5</strong></span>}
+              {review.communication_rating && <span className="text-[11px] text-muted-foreground bg-muted/50 px-2.5 py-1 rounded-lg">Komunikacija <strong className="text-foreground">{review.communication_rating}/5</strong></span>}
             </div>
           )}
         </div>
@@ -113,7 +113,7 @@ export default function NannyDetail() {
     );
   }
 
-  if (!nanny) return <div className="text-center py-16 text-muted-foreground">Caregiver not found.</div>;
+  if (!nanny) return <div className="text-center py-16 text-muted-foreground">Dadilja nije pronađena.</div>;
 
   const initial = (nanny.display_name || nanny.full_name || '?')[0];
 
@@ -123,7 +123,7 @@ export default function NannyDetail() {
         onClick={() => navigate(-1)}
         className="inline-flex items-center gap-2 text-sm font-medium text-primary/70 hover:text-primary mb-7 transition-colors group"
       >
-        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" /> Back to results
+        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" /> Natrag na rezultate
       </button>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-7">
@@ -167,7 +167,7 @@ export default function NannyDetail() {
                       <Star key={i} className={`w-4 h-4 ${i < Math.round(nanny.avg_rating) ? 'text-amber-400 fill-amber-400' : 'text-muted/30'}`} />
                     ))}
                     <span className="text-sm font-semibold text-foreground ml-1">{nanny.avg_rating.toFixed(1)}</span>
-                    {nanny.total_reviews > 0 && <span className="text-xs text-muted-foreground">({nanny.total_reviews} reviews)</span>}
+                    {nanny.total_reviews > 0 && <span className="text-xs text-muted-foreground">({nanny.total_reviews} recenzija)</span>}
                   </div>
                 )}
               </div>
@@ -181,7 +181,7 @@ export default function NannyDetail() {
                   <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-primary/60" /> {nanny.service_area}</span>
                 )}
                 {nanny.years_experience > 0 && (
-                  <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-primary/60" /> {nanny.years_experience} years experience</span>
+                  <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-primary/60" /> {nanny.years_experience} godina iskustva</span>
                 )}
               </div>
 
@@ -210,7 +210,7 @@ export default function NannyDetail() {
                 <div className="w-7 h-7 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Heart className="w-3.5 h-3.5 text-primary" fill="currentColor" />
                 </div>
-                About Me
+                O meni
               </h3>
               <p className="text-sm text-muted-foreground leading-[1.8] whitespace-pre-line">{nanny.bio}</p>
             </div>
@@ -223,7 +223,7 @@ export default function NannyDetail() {
                 <div className="w-7 h-7 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Play className="w-3.5 h-3.5 text-primary" />
                 </div>
-                Introduction Video
+                Video predstavljanje
               </h3>
               <div className="rounded-2xl overflow-hidden bg-muted aspect-video">
                 <video src={nanny.intro_video_url} controls className="w-full h-full object-cover" />
@@ -237,13 +237,13 @@ export default function NannyDetail() {
               <div className="w-7 h-7 rounded-xl bg-peach/50 flex items-center justify-center">
                 <Award className="w-3.5 h-3.5 text-peach-dark" />
               </div>
-              Details & Credentials
+              Detalji i kvalifikacije
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-7">
               {nanny.languages?.length > 0 && (
                 <div>
                   <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5 mb-3">
-                    <Globe className="w-3.5 h-3.5" /> Languages
+                    <Globe className="w-3.5 h-3.5" /> Jezici
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {nanny.languages.map(l => <Badge key={l} variant="secondary" className="rounded-xl text-xs px-3 py-1">{l}</Badge>)}
@@ -253,7 +253,7 @@ export default function NannyDetail() {
               {nanny.specialties?.length > 0 && (
                 <div>
                   <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5 mb-3">
-                    <Sparkles className="w-3.5 h-3.5" /> Specialties
+                    <Sparkles className="w-3.5 h-3.5" /> Specijalnosti
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {nanny.specialties.map(s => <Badge key={s} className="rounded-xl text-xs px-3 py-1 bg-sage/20 text-sage-foreground border-0">{s}</Badge>)}
@@ -263,7 +263,7 @@ export default function NannyDetail() {
               {nanny.certifications?.length > 0 && (
                 <div>
                   <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5 mb-3">
-                    <Award className="w-3.5 h-3.5" /> Certifications
+                    <Award className="w-3.5 h-3.5" /> Certifikati
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {nanny.certifications.map(c => <Badge key={c} className="rounded-xl text-xs px-3 py-1 bg-peach/50 text-peach-dark border-0">{c}</Badge>)}
@@ -273,7 +273,7 @@ export default function NannyDetail() {
               {nanny.education && (
                 <div>
                   <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5 mb-3">
-                    <BookOpen className="w-3.5 h-3.5" /> Education
+                    <BookOpen className="w-3.5 h-3.5" /> Obrazovanje
                   </p>
                   <p className="text-sm text-foreground leading-relaxed">{nanny.education}</p>
                 </div>
@@ -288,7 +288,7 @@ export default function NannyDetail() {
                 <div className="w-7 h-7 rounded-xl bg-primary/10 flex items-center justify-center">
                   <Star className="w-3.5 h-3.5 text-primary" fill="currentColor" />
                 </div>
-                Family Reviews
+                Recenzije obitelji
                 <span className="ml-2 text-sm font-body font-normal text-muted-foreground">({reviews.length})</span>
               </h3>
               {reviews.map((r, i) => (
@@ -306,7 +306,7 @@ export default function NannyDetail() {
             <div className="bg-card border border-border/50 rounded-3xl p-6 shadow-lg shadow-primary/5">
               <div className="text-center mb-6">
                 <p className="font-display text-5xl font-bold text-primary leading-none">€{nanny.hourly_rate}</p>
-                <p className="text-sm text-muted-foreground mt-1.5">per hour</p>
+                <p className="text-sm text-muted-foreground mt-1.5">po satu</p>
               </div>
               <Separator className="mb-6 opacity-40" />
               {user?.role === 'parent' && (
@@ -314,12 +314,12 @@ export default function NannyDetail() {
                   <Link to={`/BookNanny?nanny_id=${nanny.id}`} className="block">
                     <Button className="w-full h-12 font-semibold rounded-2xl text-sm shadow-md shadow-primary/25">
                       <Calendar className="w-4 h-4 mr-2" />
-                      Book a Session
+                      Rezerviraj termin
                     </Button>
                   </Link>
                   <Button variant="outline" className="w-full h-12 rounded-2xl text-sm border-border/60" onClick={handleMessage}>
                     <MessageCircle className="w-4 h-4 mr-2" />
-                    Send a Message
+                    Pošalji poruku
                   </Button>
                 </div>
               )}
@@ -329,9 +329,9 @@ export default function NannyDetail() {
                     <Shield className="w-4 h-4 text-sage-foreground" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-foreground mb-0.5">CozyCare Guarantee</p>
+                    <p className="text-xs font-bold text-foreground mb-0.5">CozyCare jamstvo</p>
                     <p className="text-xs text-muted-foreground leading-relaxed">
-                      Every nanny is background-screened, reference-verified, and reviewed by real families.
+                      Svaka dadilja ima provjeru pozadine, verificirane reference i recenzije stvarnih obitelji.
                     </p>
                   </div>
                 </div>
@@ -341,17 +341,17 @@ export default function NannyDetail() {
             {/* Stats */}
             {(nanny.total_bookings > 0 || nanny.avg_rating > 0 || nanny.total_reviews > 0) && (
               <div className="bg-card border border-border/50 rounded-2xl p-5 shadow-sm shadow-primary/3">
-                <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4">At a Glance</h4>
+                <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4">Pregled</h4>
                 <div className="space-y-3.5">
                   {nanny.total_bookings > 0 && (
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-muted-foreground">Total sessions</span>
+                      <span className="text-xs text-muted-foreground">Ukupno termina</span>
                       <span className="text-sm font-semibold text-foreground">{nanny.total_bookings}</span>
                     </div>
                   )}
                   {nanny.avg_rating > 0 && (
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-muted-foreground">Average rating</span>
+                      <span className="text-xs text-muted-foreground">Prosječna ocjena</span>
                       <span className="text-sm font-semibold text-foreground flex items-center gap-1">
                         <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />{nanny.avg_rating.toFixed(1)}
                       </span>
@@ -359,7 +359,7 @@ export default function NannyDetail() {
                   )}
                   {nanny.total_reviews > 0 && (
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-muted-foreground">Family reviews</span>
+                      <span className="text-xs text-muted-foreground">Recenzije obitelji</span>
                       <span className="text-sm font-semibold text-foreground">{nanny.total_reviews}</span>
                     </div>
                   )}

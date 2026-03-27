@@ -19,7 +19,7 @@ export default function VideoPreviewModal({ nanny, onClose }) {
             <h3 className="font-display font-bold text-lg text-foreground">
               {nanny.display_name || nanny.full_name}
             </h3>
-            <p className="text-xs text-muted-foreground">Verification Video</p>
+            <p className="text-xs text-muted-foreground">Video verifikacija</p>
           </div>
           <button
             onClick={onClose}
@@ -40,7 +40,7 @@ export default function VideoPreviewModal({ nanny, onClose }) {
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <p className="text-sm text-muted-foreground">Video coming soon</p>
+              <p className="text-sm text-muted-foreground">Video uskoro dostupan</p>
             </div>
           )}
         </div>

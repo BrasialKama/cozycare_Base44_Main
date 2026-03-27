@@ -33,7 +33,7 @@ export default function AdminApplications() {
     mutationFn: ({ id, data }) => base44.entities.NannyProfile.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['allNanniesAdmin'] });
-      toast.success('Profile updated');
+      toast.success('Profil ažuriran');
     },
   });
 
@@ -60,7 +60,7 @@ export default function AdminApplications() {
               <Badge className={`text-[10px] ${statusStyles[nanny.status]} border-0`}>{nanny.status}</Badge>
             </div>
             <p className="text-xs text-muted-foreground">{nanny.user_email}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">${nanny.hourly_rate}/hr · {nanny.years_experience || 0} yrs exp · {nanny.service_area || '—'}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">€{nanny.hourly_rate}/h · {nanny.years_experience || 0} god. iskustva · {nanny.service_area || '—'}</p>
             {nanny.badges?.length > 0 && (
               <div className="mt-1.5">
                 <TrustBadgeRow badges={nanny.badges} />
@@ -73,7 +73,7 @@ export default function AdminApplications() {
           <Dialog>
             <DialogTrigger asChild>
               <Button variant="outline" size="sm" className="h-8 text-xs">
-                <Eye className="w-3 h-3 mr-1" /> Details
+                <Eye className="w-3 h-3 mr-1" /> Detalji
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
@@ -82,29 +82,29 @@ export default function AdminApplications() {
               </DialogHeader>
               <div className="space-y-3 text-sm mt-2">
                 <div><strong>Email:</strong> {nanny.user_email}</div>
-                <div><strong>Display Name:</strong> {nanny.display_name}</div>
-                <div><strong>Rate:</strong> ${nanny.hourly_rate}/hr</div>
-                <div><strong>Experience:</strong> {nanny.years_experience} years</div>
-                <div><strong>Education:</strong> {nanny.education || '—'}</div>
-                <div><strong>Languages:</strong> {nanny.languages?.join(', ') || '—'}</div>
-                <div><strong>Specialties:</strong> {nanny.specialties?.join(', ') || '—'}</div>
-                <div><strong>Certifications:</strong> {nanny.certifications?.join(', ') || '—'}</div>
-                <div><strong>Bio:</strong> {nanny.bio || '—'}</div>
+                <div><strong>Prikazano ime:</strong> {nanny.display_name}</div>
+                <div><strong>Satnica:</strong> €{nanny.hourly_rate}/h</div>
+                <div><strong>Iskustvo:</strong> {nanny.years_experience} godina</div>
+                <div><strong>Obrazovanje:</strong> {nanny.education || '—'}</div>
+                <div><strong>Jezici:</strong> {nanny.languages?.join(', ') || '—'}</div>
+                <div><strong>Specijalnosti:</strong> {nanny.specialties?.join(', ') || '—'}</div>
+                <div><strong>Certifikati:</strong> {nanny.certifications?.join(', ') || '—'}</div>
+                <div><strong>O meni:</strong> {nanny.bio || '—'}</div>
                 {nanny.id_document_url && (
                   <a href={nanny.id_document_url} target="_blank" rel="noopener noreferrer" className="text-primary flex items-center gap-1">
-                    <ExternalLink className="w-3 h-3" /> View ID Document
+                    <ExternalLink className="w-3 h-3" /> Pogledaj dokument
                   </a>
                 )}
                 {nanny.intro_video_url && (
                   <div>
-                    <p className="font-semibold mb-1">Intro Video:</p>
+                    <p className="font-semibold mb-1">Video predstavljanje:</p>
                     <video src={nanny.intro_video_url} controls className="w-full rounded-lg" />
                   </div>
                 )}
 
                 {/* Badge management */}
                 <div className="pt-3 border-t">
-                  <p className="font-semibold mb-2">Manage Trust Badges:</p>
+                  <p className="font-semibold mb-2">Upravljaj oznakama povjerenja:</p>
                   <div className="flex flex-wrap gap-2">
                     {ALL_BADGES.map(badge => {
                       const hasBadge = nanny.badges?.includes(badge);
@@ -138,7 +138,7 @@ export default function AdminApplications() {
                 className="h-8 text-xs"
                 onClick={() => updateMutation.mutate({ id: nanny.id, data: { status: 'approved' } })}
               >
-                <Check className="w-3 h-3 mr-1" /> Approve
+                <Check className="w-3 h-3 mr-1" /> Odobri
               </Button>
               <Button
                 size="sm"
@@ -146,7 +146,7 @@ export default function AdminApplications() {
                 className="h-8 text-xs text-destructive"
                 onClick={() => updateMutation.mutate({ id: nanny.id, data: { status: 'rejected' } })}
               >
-                <X className="w-3 h-3 mr-1" /> Reject
+                <X className="w-3 h-3 mr-1" /> Odbij
               </Button>
             </>
           )}
@@ -157,7 +157,7 @@ export default function AdminApplications() {
               className="h-8 text-xs text-destructive"
               onClick={() => updateMutation.mutate({ id: nanny.id, data: { status: 'suspended' } })}
             >
-              Suspend
+              Suspendiraj
             </Button>
           )}
         </div>
@@ -167,31 +167,31 @@ export default function AdminApplications() {
 
   return (
     <div>
-      <PageHeader icon={ClipboardList} title="Nanny Applications" subtitle="Review and manage nanny profiles" />
+      <PageHeader icon={ClipboardList} title="Prijave dadilja" subtitle="Pregledajte i upravljajte profilima dadilja" />
 
       <Tabs defaultValue="pending">
         <TabsList className="mb-4">
-          <TabsTrigger value="pending">Pending ({pending.length})</TabsTrigger>
-          <TabsTrigger value="approved">Approved ({approved.length})</TabsTrigger>
-          <TabsTrigger value="rejected">Rejected ({rejected.length})</TabsTrigger>
+          <TabsTrigger value="pending">Na čekanju ({pending.length})</TabsTrigger>
+          <TabsTrigger value="approved">Odobrene ({approved.length})</TabsTrigger>
+          <TabsTrigger value="rejected">Odbijene ({rejected.length})</TabsTrigger>
         </TabsList>
         <TabsContent value="pending">
           {pending.length === 0 ? (
-            <EmptyState icon={ClipboardList} title="No pending applications" />
+            <EmptyState icon={ClipboardList} title="Nema prijava na čekanju" />
           ) : (
             <div className="space-y-3">{pending.map(n => <NannyRow key={n.id} nanny={n} />)}</div>
           )}
         </TabsContent>
         <TabsContent value="approved">
           {approved.length === 0 ? (
-            <EmptyState icon={ClipboardList} title="No approved nannies" />
+            <EmptyState icon={ClipboardList} title="Nema odobrenih dadilja" />
           ) : (
             <div className="space-y-3">{approved.map(n => <NannyRow key={n.id} nanny={n} />)}</div>
           )}
         </TabsContent>
         <TabsContent value="rejected">
           {rejected.length === 0 ? (
-            <EmptyState icon={ClipboardList} title="No rejected applications" />
+            <EmptyState icon={ClipboardList} title="Nema odbijenih prijava" />
           ) : (
             <div className="space-y-3">{rejected.map(n => <NannyRow key={n.id} nanny={n} />)}</div>
           )}

@@ -5,32 +5,32 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 const badgeConfig = {
   id_verified: {
     icon: ShieldCheck,
-    label: 'ID Verified',
-    description: 'Identity verified with government-issued ID',
+    label: 'Potvrđen identitet',
+    description: 'Identitet potvrđen službenim dokumentom',
     color: 'text-primary bg-primary/10',
   },
   background_check: {
     icon: FileCheck,
-    label: 'Background Checked',
-    description: 'Passed comprehensive background screening',
+    label: 'Provjera pozadine',
+    description: 'Prošla kompletnu provjeru pozadine',
     color: 'text-secondary-foreground bg-secondary/60',
   },
   reference_checked: {
     icon: UserCheck,
-    label: 'References Verified',
-    description: 'Professional references have been contacted and verified',
+    label: 'Provjerene reference',
+    description: 'Profesionalne reference su kontaktirane i provjerene',
     color: 'text-accent-foreground bg-accent',
   },
   video_verified: {
     icon: Camera,
-    label: 'Video Verified',
-    description: 'Completed live video verification interview',
+    label: 'Video verifikacija',
+    description: 'Završen video intervju za verifikaciju',
     color: 'text-terracotta bg-peach',
   },
   certifications_verified: {
     icon: Award,
-    label: 'Certifications Verified',
-    description: 'Professional certifications verified',
+    label: 'Certifikati provjereni',
+    description: 'Profesionalni certifikati su provjereni',
     color: 'text-sage-foreground bg-sage/40',
   },
 };

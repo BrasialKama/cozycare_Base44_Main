@@ -11,10 +11,10 @@ export default function LandingHeader() {
   };
 
   const navItems = [
-    { label: 'Find a Nanny', to: '/FindNannies' },
-    { label: 'Browse Nannies', to: '/FindNannies', highlight: true },
-    { label: 'Nanny Portal', to: '/NannyOnboarding' },
-    { label: 'My Profile', to: '/FamilySettings' },
+    { label: 'Pronađi dadilju', to: '/FindNannies' },
+    { label: 'Pretraži dadilje', to: '/FindNannies', highlight: true },
+    { label: 'Portal za dadilje', to: '/NannyOnboarding' },
+    { label: 'Moj profil', to: '/FamilySettings' },
   ];
 
   return (
@@ -56,7 +56,7 @@ export default function LandingHeader() {
             onClick={handleSignOut}
             className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors"
           >
-            Sign Out
+            Odjava
           </button>
         </nav>
 
@@ -133,7 +133,7 @@ export default function LandingHeader() {
                     background: 'rgba(255,253,248,0.6)',
                   }}
                 >
-                  Sign Out
+                  Odjava
                 </button>
               </div>
             </nav>

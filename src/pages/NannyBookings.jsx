@@ -33,7 +33,7 @@ export default function NannyBookings() {
     mutationFn: ({ id, data }) => base44.entities.Booking.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['nannyBookingsAll'] });
-      toast.success('Booking updated');
+      toast.success('Rezervacija ažurirana');
     },
   });
 
@@ -46,7 +46,7 @@ export default function NannyBookings() {
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
-            <h3 className="font-semibold text-sm">{booking.parent_name || 'Family'}</h3>
+            <h3 className="font-semibold text-sm">{booking.parent_name || 'Obitelj'}</h3>
             <Badge className={`text-[11px] ${statusStyles[booking.status]} border-0`}>
               {booking.status?.replace('_', ' ')}
             </Badge>
@@ -58,7 +58,7 @@ export default function NannyBookings() {
             <Clock className="w-3 h-3" /> {booking.start_time} - {booking.end_time}
           </p>
           {booking.children_names && (
-            <p className="text-xs text-muted-foreground mt-1">Children: {booking.children_names}</p>
+            <p className="text-xs text-muted-foreground mt-1">Djeca: {booking.children_names}</p>
           )}
         </div>
         <div className="text-right">
@@ -70,7 +70,7 @@ export default function NannyBookings() {
                 className="h-7 px-2.5 text-xs"
                 onClick={() => updateMutation.mutate({ id: booking.id, data: { status: 'confirmed' } })}
               >
-                <Check className="w-3 h-3 mr-1" /> Accept
+                <Check className="w-3 h-3 mr-1" /> Prihvati
               </Button>
               <Button
                 size="sm"
@@ -78,7 +78,7 @@ export default function NannyBookings() {
                 className="h-7 px-2.5 text-xs text-destructive"
                 onClick={() => updateMutation.mutate({ id: booking.id, data: { status: 'cancelled' } })}
               >
-                <X className="w-3 h-3 mr-1" /> Decline
+                <X className="w-3 h-3 mr-1" /> Odbij
               </Button>
             </div>
           )}
@@ -89,7 +89,7 @@ export default function NannyBookings() {
               className="h-7 px-2.5 text-xs mt-2"
               onClick={() => updateMutation.mutate({ id: booking.id, data: { status: 'completed', arrival_confirmed: true, departure_confirmed: true } })}
             >
-              Mark Complete
+              Označi završenim
             </Button>
           )}
         </div>
@@ -99,12 +99,12 @@ export default function NannyBookings() {
 
   return (
     <div>
-      <PageHeader icon={Calendar} title="My Bookings" subtitle="Manage your babysitting requests" />
+      <PageHeader icon={Calendar} title="Moje rezervacije" subtitle="Upravljajte zahtjevima za čuvanje" />
 
       {pending.length > 0 && (
         <div className="mb-6">
           <h2 className="font-display font-semibold mb-3 text-sm text-primary">
-            Pending Requests ({pending.length})
+            Zahtjevi na čekanju ({pending.length})
           </h2>
           <div className="space-y-3">
             {pending.map(b => <BookingCard key={b.id} booking={b} showActions />)}
@@ -114,19 +114,19 @@ export default function NannyBookings() {
 
       <Tabs defaultValue="upcoming" className="w-full">
         <TabsList className="mb-4">
-          <TabsTrigger value="upcoming">Upcoming ({upcoming.length})</TabsTrigger>
-          <TabsTrigger value="past">Past ({past.length})</TabsTrigger>
+          <TabsTrigger value="upcoming">Nadolazeći ({upcoming.length})</TabsTrigger>
+          <TabsTrigger value="past">Prošli ({past.length})</TabsTrigger>
         </TabsList>
         <TabsContent value="upcoming">
           {upcoming.length === 0 ? (
-            <EmptyState icon={Calendar} title="No upcoming bookings" />
+            <EmptyState icon={Calendar} title="Nema nadolazećih rezervacija" />
           ) : (
             <div className="space-y-3">{upcoming.map(b => <BookingCard key={b.id} booking={b} showActions />)}</div>
           )}
         </TabsContent>
         <TabsContent value="past">
           {past.length === 0 ? (
-            <EmptyState icon={Calendar} title="No past bookings" />
+            <EmptyState icon={Calendar} title="Nema prošlih rezervacija" />
           ) : (
             <div className="space-y-3">{past.map(b => <BookingCard key={b.id} booking={b} />)}</div>
           )}

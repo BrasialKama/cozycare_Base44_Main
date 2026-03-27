@@ -48,7 +48,7 @@ export default function LeaveReview() {
       });
     },
     onSuccess: () => {
-      toast.success('Thank you for your review!');
+      toast.success('Hvala na vašoj recenziji!');
       navigate('/MyBookings');
     },
   });
@@ -56,49 +56,49 @@ export default function LeaveReview() {
   return (
     <div className="max-w-lg mx-auto">
       <Button variant="ghost" className="mb-4 text-muted-foreground" onClick={() => navigate(-1)}>
-        <ArrowLeft className="w-4 h-4 mr-2" /> Back
+        <ArrowLeft className="w-4 h-4 mr-2" /> Natrag
       </Button>
 
       <div className="text-center mb-6">
-        <h1 className="font-display text-2xl font-bold">Leave a Review</h1>
-        {booking && <p className="text-sm text-muted-foreground mt-1">for {booking.nanny_name}</p>}
+        <h1 className="font-display text-2xl font-bold">Ostavi recenziju</h1>
+        {booking && <p className="text-sm text-muted-foreground mt-1">za {booking.nanny_name}</p>}
       </div>
 
       <Card className="p-6 space-y-6">
         <div>
-          <Label className="mb-2 block">Overall Rating</Label>
+          <Label className="mb-2 block">Ukupna ocjena</Label>
           <StarRating rating={rating} size="lg" interactive onChange={setRating} />
         </div>
 
         <div className="grid grid-cols-3 gap-4">
           <div>
             <Label className="text-xs mb-1 block flex items-center gap-1">
-              <Heart className="w-3 h-3" /> Warmth
+              <Heart className="w-3 h-3" /> Toplina
             </Label>
             <StarRating rating={warmth} interactive onChange={setWarmth} />
           </div>
           <div>
             <Label className="text-xs mb-1 block flex items-center gap-1">
-              <Shield className="w-3 h-3" /> Reliability
+              <Shield className="w-3 h-3" /> Pouzdanost
             </Label>
             <StarRating rating={reliability} interactive onChange={setReliability} />
           </div>
           <div>
             <Label className="text-xs mb-1 block flex items-center gap-1">
-              <MessageCircle className="w-3 h-3" /> Communication
+              <MessageCircle className="w-3 h-3" /> Komunikacija
             </Label>
             <StarRating rating={communication} interactive onChange={setCommunication} />
           </div>
         </div>
 
         <div>
-          <Label>Your Review</Label>
+          <Label>Vaša recenzija</Label>
           <Textarea
             value={comment}
             onChange={e => setComment(e.target.value)}
             rows={4}
             className="mt-1"
-            placeholder="Share your experience with this nanny..."
+            placeholder="Podijelite svoje iskustvo s ovom dadiljom..."
           />
         </div>
 
@@ -107,7 +107,7 @@ export default function LeaveReview() {
           disabled={rating === 0 || submitMutation.isPending}
           className="w-full h-11 font-semibold"
         >
-          {submitMutation.isPending ? 'Submitting...' : 'Submit Review'}
+          {submitMutation.isPending ? 'Šaljem...' : 'Pošalji recenziju'}
         </Button>
       </Card>
     </div>

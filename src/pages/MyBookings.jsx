@@ -29,7 +29,7 @@ function BookingCard({ booking, onCancel }) {
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2 flex-wrap">
               <div>
-                <h3 className="font-display font-bold text-base text-foreground leading-tight">{booking.nanny_name || 'Your Nanny'}</h3>
+                <h3 className="font-display font-bold text-base text-foreground leading-tight">{booking.nanny_name || 'Vaša dadilja'}</h3>
                 <span className={`inline-block text-[11px] font-semibold px-2.5 py-0.5 rounded-full mt-1 capitalize ${STATUS_STYLES[booking.status] || 'bg-muted text-muted-foreground'}`}>
                   {booking.status?.replace('_', ' ')}
                 </span>
@@ -68,13 +68,13 @@ function BookingCard({ booking, onCancel }) {
               className="text-xs text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl"
               onClick={() => onCancel(booking.id)}
             >
-              Cancel booking
+              Otkaži rezervaciju
             </Button>
           )}
           {booking.status === 'completed' && (
             <Link to={`/LeaveReview?booking_id=${booking.id}`}>
               <Button variant="ghost" size="sm" className="text-xs text-primary hover:bg-primary/8 rounded-xl">
-                <Star className="w-3 h-3 mr-1.5 fill-current" /> Leave a review
+                <Star className="w-3 h-3 mr-1.5 fill-current" /> Ostavi recenziju
               </Button>
             </Link>
           )}
@@ -98,7 +98,7 @@ export default function MyBookings() {
     mutationFn: (id) => base44.entities.Booking.update(id, { status: 'cancelled' }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['parentBookings'] });
-      toast.success('Booking cancelled');
+      toast.success('Rezervacija otkazana');
     },
   });
 
@@ -110,10 +110,10 @@ export default function MyBookings() {
       {/* Header */}
       <div>
         <p className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-widest uppercase text-primary/60 mb-2">
-          <Heart className="w-3 h-3" fill="currentColor" /> Your sessions
+          <Heart className="w-3 h-3" fill="currentColor" /> Vaši termini
         </p>
-        <h1 className="font-display text-3xl lg:text-4xl font-bold text-foreground">My Bookings</h1>
-        <p className="text-sm text-muted-foreground mt-1.5">Manage your upcoming and past care sessions.</p>
+        <h1 className="font-display text-3xl lg:text-4xl font-bold text-foreground">Moje rezervacije</h1>
+        <p className="text-sm text-muted-foreground mt-1.5">Upravljajte nadolazećim i prošlim terminima skrbi.</p>
       </div>
 
       {isLoading ? (
@@ -124,10 +124,10 @@ export default function MyBookings() {
         <Tabs defaultValue="upcoming" className="w-full">
           <TabsList className="mb-5 bg-muted/50 rounded-2xl p-1 h-auto">
             <TabsTrigger value="upcoming" className="rounded-xl text-sm font-semibold px-5 py-2 data-[state=active]:bg-card data-[state=active]:shadow-sm">
-              Upcoming {upcoming.length > 0 && <span className="ml-2 bg-primary/15 text-primary text-xs px-2 py-0.5 rounded-full font-bold">{upcoming.length}</span>}
+              Nadolazeći {upcoming.length > 0 && <span className="ml-2 bg-primary/15 text-primary text-xs px-2 py-0.5 rounded-full font-bold">{upcoming.length}</span>}
             </TabsTrigger>
             <TabsTrigger value="past" className="rounded-xl text-sm font-semibold px-5 py-2 data-[state=active]:bg-card data-[state=active]:shadow-sm">
-              Past {past.length > 0 && <span className="ml-2 bg-muted text-muted-foreground text-xs px-2 py-0.5 rounded-full font-bold">{past.length}</span>}
+              Prošli {past.length > 0 && <span className="ml-2 bg-muted text-muted-foreground text-xs px-2 py-0.5 rounded-full font-bold">{past.length}</span>}
             </TabsTrigger>
           </TabsList>
 
@@ -137,13 +137,13 @@ export default function MyBookings() {
                 <div className="w-16 h-16 rounded-2xl bg-primary/8 flex items-center justify-center mx-auto mb-4">
                   <Calendar className="w-8 h-8 text-primary/40" />
                 </div>
-                <h3 className="font-display font-semibold text-lg text-foreground mb-1.5">No upcoming sessions</h3>
+                <h3 className="font-display font-semibold text-lg text-foreground mb-1.5">Nema nadolazećih termina</h3>
                 <p className="text-sm text-muted-foreground mb-6 max-w-xs mx-auto">
-                  Find a caregiver you love and book your first session together.
+                  Pronađite dadilju koju volite i rezervirajte prvi termin zajedno.
                 </p>
                 <Link to="/FindNannies">
                   <Button className="rounded-full px-7">
-                    <Search className="w-4 h-4 mr-2" /> Find a Nanny
+                    <Search className="w-4 h-4 mr-2" /> Pronađi dadilju
                   </Button>
                 </Link>
               </div>
@@ -160,14 +160,14 @@ export default function MyBookings() {
                 <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-4">
                   <Clock className="w-8 h-8 text-muted-foreground/40" />
                 </div>
-                <p className="text-muted-foreground text-sm">Your completed sessions will appear here.</p>
+                <p className="text-muted-foreground text-sm">Vaši završeni termini će se pojaviti ovdje.</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {past.map(b => <BookingCard key={b.id} booking={b} onCancel={cancelMutation.mutate} />)}
                 <div className="text-center pt-4">
                   <Link to="/FindNannies" className="text-sm text-primary font-medium inline-flex items-center gap-1.5 hover:underline">
-                    Book another session <ArrowRight className="w-3.5 h-3.5" />
+                    Rezerviraj novi termin <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
               </div>

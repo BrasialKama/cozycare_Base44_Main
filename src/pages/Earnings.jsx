@@ -22,15 +22,15 @@ export default function Earnings() {
 
   return (
     <div>
-      <PageHeader icon={DollarSign} title="Earnings" subtitle="Track your income and completed bookings" />
+      <PageHeader icon={DollarSign} title="Zarada" subtitle="Pratite svoje prihode i završene rezervacije" />
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
         {[
-          { icon: DollarSign, label: 'Total Earnings', value: `€${totalEarnings.toFixed(2)}`, color: 'bg-primary/8 text-primary' },
-          { icon: Calendar, label: 'Completed Jobs', value: bookings.length, color: 'bg-sage/30 text-sage-foreground' },
-          { icon: Clock, label: 'Total Hours', value: `${totalHours.toFixed(1)}h`, color: 'bg-peach/50 text-peach-dark' },
-          { icon: TrendingUp, label: 'Avg per Booking', value: `€${avgPerBooking.toFixed(2)}`, color: 'bg-powder-blue/40 text-foreground' },
+          { icon: DollarSign, label: 'Ukupna zarada', value: `€${totalEarnings.toFixed(2)}`, color: 'bg-primary/8 text-primary' },
+          { icon: Calendar, label: 'Završeni poslovi', value: bookings.length, color: 'bg-sage/30 text-sage-foreground' },
+          { icon: Clock, label: 'Ukupno sati', value: `${totalHours.toFixed(1)}h`, color: 'bg-peach/50 text-peach-dark' },
+          { icon: TrendingUp, label: 'Prosj. po rezervaciji', value: `€${avgPerBooking.toFixed(2)}`, color: 'bg-powder-blue/40 text-foreground' },
         ].map((stat) => (
           <Card key={stat.label} className="p-4 border-border/60">
             <div className={`w-10 h-10 rounded-xl ${stat.color} flex items-center justify-center mb-2`}>
@@ -43,16 +43,16 @@ export default function Earnings() {
       </div>
 
       {/* Transaction history */}
-      <h2 className="font-display font-semibold text-lg mb-4">Earning History</h2>
+      <h2 className="font-display font-semibold text-lg mb-4">Povijest zarade</h2>
       {bookings.length === 0 ? (
-        <EmptyState icon={DollarSign} title="No earnings yet" description="Complete bookings to start earning" />
+        <EmptyState icon={DollarSign} title="Još nema zarade" description="Završite rezervacije da počnete zarađivati" />
       ) : (
         <div className="space-y-2">
           {bookings.map(b => (
             <Card key={b.id} className="p-4 border-border/60">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-semibold">{b.parent_name || 'Family'}</p>
+                  <p className="text-sm font-semibold">{b.parent_name || 'Obitelj'}</p>
                   <p className="text-xs text-muted-foreground">{b.date} · {b.hours}h</p>
                 </div>
                 <p className="font-display font-semibold text-primary">+€{b.nanny_payout?.toFixed(2)}</p>

@@ -12,7 +12,7 @@ import NannyCard from '@/components/shared/NannyCard';
 import VideoPreviewModal from '@/components/shared/VideoPreviewModal';
 import EmptyState from '@/components/shared/EmptyState';
 
-const SPECIALTIES = ['Infant care', 'Toddler activities', 'Special needs', 'Montessori', 'Bilingual', 'Overnight'];
+const SPECIALTIES = ['Njega dojenčadi', 'Aktivnosti za malu djecu', 'Posebne potrebe', 'Montessori', 'Dvojezična', 'Noćno čuvanje'];
 
 export default function FindNannies() {
   const [search, setSearch] = useState('');
@@ -61,13 +61,13 @@ export default function FindNannies() {
       <div className="pt-2">
         <p className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-widest uppercase text-primary/60 mb-2">
           <Sparkles className="w-3.5 h-3.5" />
-          Verified caregivers
+          Provjerene dadilje
         </p>
         <h1 className="font-display text-3xl lg:text-4xl font-bold text-foreground leading-tight">
-          Find Your Perfect Nanny
+          Pronađite savršenu dadilju
         </h1>
         <p className="mt-1.5 text-muted-foreground text-sm max-w-lg">
-          Every caregiver on CozyCare is background-checked, reference-verified, and reviewed by real families.
+          Svaka dadilja na CozyCare platformi je provjerena, s potvrđenim referencama i recenzijama stvarnih obitelji.
         </p>
       </div>
 
@@ -75,7 +75,7 @@ export default function FindNannies() {
         <div className="flex-1 relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Search by name, neighborhood, or specialty…"
+            placeholder="Pretraži po imenu, kvartu ili specijalnosti…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-11 h-12 rounded-xl bg-card border-border/60 text-sm"
@@ -91,41 +91,41 @@ export default function FindNannies() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="rating">Top Rated</SelectItem>
-            <SelectItem value="rate_low">Price: Low–High</SelectItem>
-            <SelectItem value="rate_high">Price: High–Low</SelectItem>
-            <SelectItem value="experience">Most Experienced</SelectItem>
+            <SelectItem value="rating">Najbolje ocijenjene</SelectItem>
+            <SelectItem value="rate_low">Cijena: niska–visoka</SelectItem>
+            <SelectItem value="rate_high">Cijena: visoka–niska</SelectItem>
+            <SelectItem value="experience">Najiskusnije</SelectItem>
           </SelectContent>
         </Select>
         <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
           <SheetTrigger asChild>
             <Button variant="outline" className={`h-12 rounded-xl px-4 ${hasActiveFilters ? 'border-primary text-primary bg-primary/5' : 'border-border/60 bg-card'}`}>
               <SlidersHorizontal className="w-4 h-4 mr-2" />
-              Filters
+              Filtri
               {hasActiveFilters && <span className="ml-1.5 w-2 h-2 rounded-full bg-primary inline-block" />}
             </Button>
           </SheetTrigger>
           <SheetContent className="w-[320px]">
             <SheetHeader className="pb-6 border-b border-border/50">
-              <SheetTitle className="font-display text-xl">Refine Your Search</SheetTitle>
+              <SheetTitle className="font-display text-xl">Poboljšajte pretragu</SheetTitle>
             </SheetHeader>
             <div className="space-y-8 mt-6 px-1">
               <div>
                 <Label className="text-sm font-semibold mb-4 block text-foreground">
-                  Max Hourly Rate <span className="font-normal text-primary ml-2">${maxRate[0]}/hr</span>
+                  Maks. satnica <span className="font-normal text-primary ml-2">€{maxRate[0]}/h</span>
                 </Label>
                 <Slider value={maxRate} onValueChange={setMaxRate} min={10} max={100} step={5} />
-                <div className="flex justify-between text-xs text-muted-foreground mt-2"><span>$10</span><span>$100</span></div>
+                <div className="flex justify-between text-xs text-muted-foreground mt-2"><span>€10</span><span>€100</span></div>
               </div>
               <div>
                 <Label className="text-sm font-semibold mb-4 block text-foreground">
-                  Min Experience <span className="font-normal text-primary ml-2">{minExperience[0]} yrs</span>
+                  Min. iskustvo <span className="font-normal text-primary ml-2">{minExperience[0]} god.</span>
                 </Label>
                 <Slider value={minExperience} onValueChange={setMinExperience} min={0} max={20} step={1} />
-                <div className="flex justify-between text-xs text-muted-foreground mt-2"><span>0 yrs</span><span>20 yrs</span></div>
+                <div className="flex justify-between text-xs text-muted-foreground mt-2"><span>0 god.</span><span>20 god.</span></div>
               </div>
               <div>
-                <Label className="text-sm font-semibold mb-3 block text-foreground">Specialty</Label>
+                <Label className="text-sm font-semibold mb-3 block text-foreground">Specijalnost</Label>
                 <div className="flex flex-wrap gap-2">
                   {SPECIALTIES.map(s => (
                     <button
@@ -144,9 +144,9 @@ export default function FindNannies() {
               </div>
               <div className="pt-4 flex gap-2">
                 <Button variant="outline" className="flex-1" onClick={() => { setMaxRate([80]); setMinExperience([0]); setActiveSpecialty(''); }}>
-                  Reset
+                  Poništi
                 </Button>
-                <Button className="flex-1" onClick={() => setFilterOpen(false)}>Apply</Button>
+                <Button className="flex-1" onClick={() => setFilterOpen(false)}>Primijeni</Button>
               </div>
             </div>
           </SheetContent>
@@ -154,8 +154,8 @@ export default function FindNannies() {
       </div>
 
       <div className="flex gap-2 flex-wrap -mt-4">
-        {['All', ...SPECIALTIES.slice(0, 5)].map(s => {
-          const val = s === 'All' ? '' : s;
+        {['Sve', ...SPECIALTIES.slice(0, 5)].map(s => {
+          const val = s === 'Sve' ? '' : s;
           return (
             <button
               key={s}
@@ -179,11 +179,11 @@ export default function FindNannies() {
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <EmptyState icon={Search} title="No nannies found" description="Try adjusting your search or filters" />
+        <EmptyState icon={Search} title="Nema pronađenih dadilja" description="Pokušajte prilagoditi pretragu ili filtre" />
       ) : (
         <>
           <p className="text-xs text-muted-foreground font-medium -mt-4">
-            {filtered.length} caregiver{filtered.length !== 1 ? 's' : ''} available
+            {filtered.length} {filtered.length === 1 ? 'dadilja dostupna' : 'dadilja dostupno'}
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {filtered.map(nanny => (

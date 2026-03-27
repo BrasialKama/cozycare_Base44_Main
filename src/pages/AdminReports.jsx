@@ -29,16 +29,16 @@ export default function AdminReports() {
     mutationFn: ({ id, status }) => base44.entities.Report.update(id, { status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminReports'] });
-      toast.success('Report updated');
+      toast.success('Prijava ažurirana');
     },
   });
 
   return (
     <div>
-      <PageHeader icon={Shield} title="Reports" subtitle="Manage safety reports and disputes" />
+      <PageHeader icon={Shield} title="Prijave problema" subtitle="Upravljajte prijavama sigurnosti i sporovima" />
 
       {reports.length === 0 ? (
-        <EmptyState icon={Shield} title="No reports" description="No safety concerns have been reported" />
+        <EmptyState icon={Shield} title="Nema prijava" description="Nema prijavljenih sigurnosnih problema" />
       ) : (
         <div className="space-y-3">
           {reports.map(r => (
@@ -52,8 +52,8 @@ export default function AdminReports() {
                   </div>
                   <p className="text-sm text-muted-foreground">{r.description}</p>
                   <p className="text-xs text-muted-foreground mt-1.5">
-                    Reported by: {r.reporter_email}
-                    {r.reported_email && ` · Against: ${r.reported_email}`}
+                    Prijavio/la: {r.reporter_email}
+                    {r.reported_email && ` · Protiv: ${r.reported_email}`}
                   </p>
                 </div>
                 <Select
@@ -64,10 +64,10 @@ export default function AdminReports() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="open">Open</SelectItem>
-                    <SelectItem value="investigating">Investigating</SelectItem>
-                    <SelectItem value="resolved">Resolved</SelectItem>
-                    <SelectItem value="dismissed">Dismissed</SelectItem>
+                    <SelectItem value="open">Otvoreno</SelectItem>
+                    <SelectItem value="investigating">Istraživanje</SelectItem>
+                    <SelectItem value="resolved">Riješeno</SelectItem>
+                    <SelectItem value="dismissed">Odbačeno</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

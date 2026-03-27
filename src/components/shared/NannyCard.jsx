@@ -4,11 +4,11 @@ import { MapPin, Clock, Award, CheckCircle2, Star, Video } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const BADGE_CONFIG = {
-  id_verified: { label: 'ID Verified', color: 'text-primary bg-primary/8' },
-  background_check: { label: 'Background Check', color: 'text-sage-foreground bg-sage/20' },
-  reference_checked: { label: 'References', color: 'text-sage-foreground bg-sage/20' },
-  video_verified: { label: 'Video Intro', color: 'text-muted-foreground bg-muted/60' },
-  certifications_verified: { label: 'Certified', color: 'text-primary bg-primary/8' },
+  id_verified: { label: 'Potvrđen ID', color: 'text-primary bg-primary/8' },
+  background_check: { label: 'Provjera pozadine', color: 'text-sage-foreground bg-sage/20' },
+  reference_checked: { label: 'Reference', color: 'text-sage-foreground bg-sage/20' },
+  video_verified: { label: 'Video', color: 'text-muted-foreground bg-muted/60' },
+  certifications_verified: { label: 'Certificirana', color: 'text-primary bg-primary/8' },
 };
 
 export default function NannyCard({ nanny, onWatchVideo }) {
@@ -53,7 +53,7 @@ export default function NannyCard({ nanny, onWatchVideo }) {
 
           {/* Experience + rate */}
           <p className="text-sm text-muted-foreground mt-0.5">
-            {nanny.years_experience > 0 && <>{nanny.years_experience}+ yrs exp · </>}
+            {nanny.years_experience > 0 && <>{nanny.years_experience}+ god. iskustva · </>}
             <span className="font-semibold text-foreground">€{nanny.hourly_rate}</span>/hr
           </p>
 
@@ -78,7 +78,7 @@ export default function NannyCard({ nanny, onWatchVideo }) {
       <div className="flex flex-wrap gap-1.5 mt-3">
         {nanny.years_experience > 0 && (
           <Badge className="text-[11px] font-medium bg-peach/50 text-peach-dark border-0 rounded-full px-2.5 py-0.5">
-            <Clock className="w-2.5 h-2.5 mr-1" />{nanny.years_experience} yrs
+            <Clock className="w-2.5 h-2.5 mr-1" />{nanny.years_experience} god.
           </Badge>
         )}
         {nanny.specialties?.slice(0, 2).map(s => (
@@ -89,7 +89,7 @@ export default function NannyCard({ nanny, onWatchVideo }) {
         ))}
         {nanny.certifications?.length > 0 && (
           <Badge className="text-[11px] font-medium bg-primary/8 text-primary border-0 rounded-full px-2.5 py-0.5">
-            <Award className="w-2.5 h-2.5 mr-1" />{nanny.certifications.length} cert{nanny.certifications.length > 1 ? 's' : ''}
+            <Award className="w-2.5 h-2.5 mr-1" />{nanny.certifications.length} cert.
           </Badge>
         )}
       </div>
@@ -124,7 +124,7 @@ export default function NannyCard({ nanny, onWatchVideo }) {
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary/80 transition-colors"
           >
             <Video className="w-3.5 h-3.5" />
-            Watch Intro
+            Pogledaj video
           </button>
         </div>
       )}

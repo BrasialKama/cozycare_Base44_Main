@@ -8,15 +8,15 @@ import { Button } from '@/components/ui/button';
 
 const greetingTime = () => {
   const h = new Date().getHours();
-  if (h < 12) return 'Good morning';
-  if (h < 17) return 'Good afternoon';
-  return 'Good evening';
+  if (h < 12) return 'Dobro jutro';
+  if (h < 17) return 'Dobar dan';
+  return 'Dobra večer';
 };
 
 const STATUS_CONFIG = {
-  approved: { label: 'Your profile is live', sub: 'Families can find and book you.', color: 'bg-emerald-50 border-emerald-200 text-emerald-700', icon: CheckCircle2 },
-  pending: { label: 'Profile under review', sub: 'We\'ll notify you once approved — usually 24–48 hours.', color: 'bg-peach/40 border-peach/30 text-peach-dark', icon: Clock },
-  rejected: { label: 'Profile not approved', sub: 'Please update your profile and resubmit.', color: 'bg-destructive/8 border-destructive/15 text-destructive', icon: Heart },
+  approved: { label: 'Vaš profil je aktivan', sub: 'Obitelji vas mogu pronaći i rezervirati.', color: 'bg-emerald-50 border-emerald-200 text-emerald-700', icon: CheckCircle2 },
+  pending: { label: 'Profil na pregledu', sub: 'Obavijestit ćemo vas kad bude odobren — obično 24–48 sati.', color: 'bg-peach/40 border-peach/30 text-peach-dark', icon: Clock },
+  rejected: { label: 'Profil nije odobren', sub: 'Ažurirajte profil i pošaljite ponovo.', color: 'bg-destructive/8 border-destructive/15 text-destructive', icon: Heart },
 };
 
 export default function NannyHome() {
@@ -51,7 +51,7 @@ export default function NannyHome() {
         <div className="absolute -bottom-8 -left-8 w-44 h-44 rounded-full bg-primary/6 blur-3xl pointer-events-none" />
         <div className="relative px-7 py-10 lg:px-12 lg:py-12">
           <p className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-widest uppercase text-primary/70 mb-4">
-            <Sparkles className="w-3.5 h-3.5" /> CozyCare Caregiver
+            <Sparkles className="w-3.5 h-3.5" /> CozyCare dadilja
           </p>
           <h1 className="font-display text-3xl lg:text-4xl font-bold text-foreground leading-tight">
             {greetingTime()},<br />
@@ -59,18 +59,18 @@ export default function NannyHome() {
           </h1>
           <p className="mt-3 text-sm text-muted-foreground max-w-xs leading-relaxed">
             {profile?.status === 'approved'
-              ? 'Your profile is live — families can discover and book you today.'
-              : 'Welcome to your caregiver dashboard.'}
+              ? 'Vaš profil je aktivan — obitelji vas mogu pronaći i rezervirati.'
+              : 'Dobrodošli na vašu nadzornu ploču.'}
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link to="/NannyBookings">
               <Button size="sm" className="rounded-full px-5 shadow-md shadow-primary/15">
-                <Calendar className="w-3.5 h-3.5 mr-2" /> My Bookings
+                <Calendar className="w-3.5 h-3.5 mr-2" /> Moje rezervacije
               </Button>
             </Link>
             <Link to="/NannyProfile">
               <Button size="sm" variant="outline" className="rounded-full px-5 bg-white/70 border-white/60">
-                <User className="w-3.5 h-3.5 mr-2" /> Edit Profile
+                <User className="w-3.5 h-3.5 mr-2" /> Uredi profil
               </Button>
             </Link>
           </div>
@@ -92,13 +92,13 @@ export default function NannyHome() {
 
       {/* ── Stats ── */}
       <section>
-        <h2 className="font-display text-xl font-semibold text-foreground mb-4">Your Stats</h2>
+        <h2 className="font-display text-xl font-semibold text-foreground mb-4">Vaša statistika</h2>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[
-            { icon: Calendar, label: 'Total Sessions', value: profile?.total_bookings || 0, path: '/NannyBookings', bg: 'bg-rose-light', fg: 'text-primary' },
-            { icon: Star, label: 'Avg Rating', value: profile?.avg_rating ? profile.avg_rating.toFixed(1) : '—', path: '/NannyProfile', bg: 'bg-peach/50', fg: 'text-peach-dark' },
-            { icon: MessageCircle, label: 'Messages', value: '—', path: '/Messages', bg: 'bg-sage/25', fg: 'text-sage-foreground' },
-            { icon: DollarSign, label: 'Earnings', value: '—', path: '/Earnings', bg: 'bg-powder-blue/40', fg: 'text-foreground/60' },
+            { icon: Calendar, label: 'Ukupno termina', value: profile?.total_bookings || 0, path: '/NannyBookings', bg: 'bg-rose-light', fg: 'text-primary' },
+            { icon: Star, label: 'Prosj. ocjena', value: profile?.avg_rating ? profile.avg_rating.toFixed(1) : '—', path: '/NannyProfile', bg: 'bg-peach/50', fg: 'text-peach-dark' },
+            { icon: MessageCircle, label: 'Poruke', value: '—', path: '/Messages', bg: 'bg-sage/25', fg: 'text-sage-foreground' },
+            { icon: DollarSign, label: 'Zarada', value: '—', path: '/Earnings', bg: 'bg-powder-blue/40', fg: 'text-foreground/60' },
           ].map(item => (
             <Link key={item.path} to={item.path}>
               <div className="bg-card border border-border/50 rounded-2xl p-5 hover:shadow-md hover:border-primary/20 transition-all group">
@@ -117,9 +117,9 @@ export default function NannyHome() {
       {upcoming.length > 0 && (
         <section>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-display text-xl font-semibold text-foreground">Upcoming Sessions</h2>
+            <h2 className="font-display text-xl font-semibold text-foreground">Nadolazeći termini</h2>
             <Link to="/NannyBookings" className="text-sm text-primary font-medium flex items-center gap-1 hover:underline">
-              View all <ArrowRight className="w-3.5 h-3.5" />
+              Prikaži sve <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
           <div className="space-y-3">
@@ -130,7 +130,7 @@ export default function NannyHome() {
                     {(b.parent_name || 'F')[0]}
                   </div>
                   <div>
-                    <p className="font-semibold text-sm text-foreground">{b.parent_name || 'Family'}</p>
+                    <p className="font-semibold text-sm text-foreground">{b.parent_name || 'Obitelj'}</p>
                     <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
                       <Clock className="w-3 h-3" /> {b.date} · {b.start_time}–{b.end_time}
                     </p>
@@ -149,12 +149,12 @@ export default function NannyHome() {
 
       {/* ── Quick links ── */}
       <section>
-        <h2 className="font-display text-xl font-semibold text-foreground mb-4">Quick Access</h2>
+        <h2 className="font-display text-xl font-semibold text-foreground mb-4">Brzi pristup</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {[
-            { icon: User, label: 'Edit My Profile', sub: 'Update bio & photos', path: '/NannyProfile', bg: 'bg-rose-light/60', fg: 'text-primary' },
-            { icon: MessageCircle, label: 'Messages', sub: 'Chat with families', path: '/Messages', bg: 'bg-sage/20', fg: 'text-sage-foreground' },
-            { icon: DollarSign, label: 'Earnings', sub: 'Track your income', path: '/Earnings', bg: 'bg-powder-blue/40', fg: 'text-foreground/60' },
+            { icon: User, label: 'Uredi profil', sub: 'Ažuriraj bio i fotografije', path: '/NannyProfile', bg: 'bg-rose-light/60', fg: 'text-primary' },
+            { icon: MessageCircle, label: 'Poruke', sub: 'Razgovaraj s obiteljima', path: '/Messages', bg: 'bg-sage/20', fg: 'text-sage-foreground' },
+            { icon: DollarSign, label: 'Zarada', sub: 'Prati svoje prihode', path: '/Earnings', bg: 'bg-powder-blue/40', fg: 'text-foreground/60' },
           ].map(item => (
             <Link key={item.path} to={item.path}>
               <div className="bg-card border border-border/50 rounded-2xl p-5 hover:shadow-md hover:border-primary/20 transition-all group h-full">

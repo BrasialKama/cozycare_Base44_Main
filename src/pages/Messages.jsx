@@ -86,9 +86,9 @@ export default function Messages() {
         ) : (
           <div>
             <p className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-widest uppercase text-primary/60 mb-1.5">
-              <Heart className="w-3 h-3" fill="currentColor" /> Your conversations
+              <Heart className="w-3 h-3" fill="currentColor" /> Vaši razgovori
             </p>
-            <h1 className="font-display text-2xl lg:text-3xl font-bold text-foreground">Messages</h1>
+            <h1 className="font-display text-2xl lg:text-3xl font-bold text-foreground">Poruke</h1>
           </div>
         )}
       </div>
@@ -102,9 +102,9 @@ export default function Messages() {
               <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                 <MessageCircle className="w-7 h-7 text-primary/50" />
               </div>
-              <p className="font-display font-semibold text-foreground mb-1">No messages yet</p>
+              <p className="font-display font-semibold text-foreground mb-1">Još nema poruka</p>
               <p className="text-sm text-muted-foreground max-w-[16rem]">
-                Visit a nanny's profile and send them a message to get started.
+                Posjetite profil dadilje i pošaljite joj poruku za početak.
               </p>
             </div>
           ) : (
@@ -128,7 +128,7 @@ export default function Messages() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-foreground truncate">{other}</p>
-                        <p className="text-xs text-muted-foreground truncate mt-0.5">{conv.last_message || 'Start a conversation…'}</p>
+                        <p className="text-xs text-muted-foreground truncate mt-0.5">{conv.last_message || 'Započnite razgovor…'}</p>
                       </div>
                     </div>
                   </button>
@@ -145,8 +145,8 @@ export default function Messages() {
               <div className="w-16 h-16 rounded-2xl bg-primary/8 flex items-center justify-center mx-auto mb-4">
                 <MessageCircle className="w-8 h-8 text-primary/40" />
               </div>
-              <p className="font-display font-semibold text-foreground mb-1">Select a conversation</p>
-              <p className="text-sm text-muted-foreground">Choose a conversation from the left to start chatting</p>
+              <p className="font-display font-semibold text-foreground mb-1">Odaberite razgovor</p>
+              <p className="text-sm text-muted-foreground">Odaberite razgovor s lijeve strane za početak</p>
             </div>
           ) : (
             <div className="flex flex-col flex-1 min-h-0 bg-card border border-border/40 rounded-3xl overflow-hidden">
@@ -157,7 +157,7 @@ export default function Messages() {
                 </div>
                 <div>
                   <p className="font-display font-semibold text-foreground leading-tight">{otherName}</p>
-                  <p className="text-xs text-muted-foreground">CozyCare caregiver</p>
+                  <p className="text-xs text-muted-foreground">CozyCare dadilja</p>
                 </div>
               </div>
 
@@ -166,7 +166,7 @@ export default function Messages() {
                 {messages.length === 0 && (
                   <div className="flex flex-col items-center justify-center h-full text-center py-8 opacity-60">
                     <Heart className="w-8 h-8 text-primary/30 mb-2" fill="currentColor" />
-                    <p className="text-sm text-muted-foreground">Say hello — start your conversation!</p>
+                    <p className="text-sm text-muted-foreground">Pozdravite — započnite razgovor!</p>
                   </div>
                 )}
                 {messages.map(msg => {
@@ -196,7 +196,7 @@ export default function Messages() {
                 <Input
                   value={newMessage}
                   onChange={e => setNewMessage(e.target.value)}
-                  placeholder={`Message ${otherName}…`}
+                  placeholder={`Poruka za ${otherName}…`}
                   className="flex-1 rounded-2xl bg-muted/40 border-border/50 focus:border-primary/40"
                   onKeyDown={e => e.key === 'Enter' && newMessage.trim() && sendMutation.mutate()}
                 />

@@ -31,17 +31,17 @@ export default function AdminDashboard() {
   const openReports = reports.filter(r => r.status === 'open').length;
 
   const stats = [
-    { icon: ClipboardList, label: 'Pending Applications', value: pendingApps, color: 'bg-peach/50 text-peach-dark', link: '/AdminApplications' },
-    { icon: Users, label: 'Approved Nannies', value: approvedNannies, color: 'bg-sage/30 text-sage-foreground', link: '/AdminApplications' },
-    { icon: Calendar, label: 'Completed Bookings', value: completedBookings, color: 'bg-primary/8 text-primary', link: '/AdminBookings' },
-    { icon: DollarSign, label: 'Platform Revenue', value: `€${totalRevenue.toFixed(2)}`, color: 'bg-powder-blue/40 text-foreground', link: '/AdminBookings' },
-    { icon: Shield, label: 'Open Reports', value: openReports, color: 'bg-destructive/10 text-destructive', link: '/AdminReports' },
-    { icon: BarChart3, label: 'Total Bookings', value: bookings.length, color: 'bg-muted text-muted-foreground', link: '/AdminBookings' },
+    { icon: ClipboardList, label: 'Prijave na čekanju', value: pendingApps, color: 'bg-peach/50 text-peach-dark', link: '/AdminApplications' },
+    { icon: Users, label: 'Odobrene dadilje', value: approvedNannies, color: 'bg-sage/30 text-sage-foreground', link: '/AdminApplications' },
+    { icon: Calendar, label: 'Završene rezervacije', value: completedBookings, color: 'bg-primary/8 text-primary', link: '/AdminBookings' },
+    { icon: DollarSign, label: 'Prihod platforme', value: `€${totalRevenue.toFixed(2)}`, color: 'bg-powder-blue/40 text-foreground', link: '/AdminBookings' },
+    { icon: Shield, label: 'Otvorene prijave', value: openReports, color: 'bg-destructive/10 text-destructive', link: '/AdminReports' },
+    { icon: BarChart3, label: 'Ukupno rezervacija', value: bookings.length, color: 'bg-muted text-muted-foreground', link: '/AdminBookings' },
   ];
 
   return (
     <div>
-      <PageHeader icon={BarChart3} title="Admin Dashboard" subtitle="Platform overview and management" />
+      <PageHeader icon={BarChart3} title="Nadzorna ploča" subtitle="Pregled i upravljanje platformom" />
 
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
         {stats.map(stat => (
