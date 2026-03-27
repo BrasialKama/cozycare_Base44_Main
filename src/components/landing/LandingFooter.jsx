@@ -90,7 +90,7 @@ export default function LandingFooter() {
         {/* Bottom */}
         <div className="border-t border-border/40 pt-6">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} CozyCare. All rights reserved. Made with care for families everywhere.
+            © {new Date().getFullYear()} CozyCare. All rights reserved. Made with care for Zagreb families.
           </p>
         </div>
       </div>

@@ -34,7 +34,7 @@ export default function AdminDashboard() {
     { icon: ClipboardList, label: 'Pending Applications', value: pendingApps, color: 'bg-peach/50 text-peach-dark', link: '/AdminApplications' },
     { icon: Users, label: 'Approved Nannies', value: approvedNannies, color: 'bg-sage/30 text-sage-foreground', link: '/AdminApplications' },
     { icon: Calendar, label: 'Completed Bookings', value: completedBookings, color: 'bg-primary/8 text-primary', link: '/AdminBookings' },
-    { icon: DollarSign, label: 'Platform Revenue', value: `$${totalRevenue.toFixed(2)}`, color: 'bg-powder-blue/40 text-foreground', link: '/AdminBookings' },
+    { icon: DollarSign, label: 'Platform Revenue', value: `€${totalRevenue.toFixed(2)}`, color: 'bg-powder-blue/40 text-foreground', link: '/AdminBookings' },
     { icon: Shield, label: 'Open Reports', value: openReports, color: 'bg-destructive/10 text-destructive', link: '/AdminReports' },
     { icon: BarChart3, label: 'Total Bookings', value: bookings.length, color: 'bg-muted text-muted-foreground', link: '/AdminBookings' },
   ];

@@ -49,9 +49,9 @@ export default function AdminBookings() {
                   </p>
                 </div>
                 <div className="text-right text-xs space-y-0.5">
-                  <p className="font-semibold">Total: ${b.total_cost?.toFixed(2)}</p>
-                  <p className="text-muted-foreground">Fee: ${b.platform_fee?.toFixed(2)}</p>
-                  <p className="text-muted-foreground">Payout: ${b.nanny_payout?.toFixed(2)}</p>
+                  <p className="font-semibold">Total: €{b.total_cost?.toFixed(2)}</p>
+                  <p className="text-muted-foreground">Fee: €{b.platform_fee?.toFixed(2)}</p>
+                  <p className="text-muted-foreground">Payout: €{b.nanny_payout?.toFixed(2)}</p>
                 </div>
               </div>
             </Card>

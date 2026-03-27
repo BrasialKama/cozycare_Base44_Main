@@ -28,7 +28,7 @@ export default function TrustPillars() {
           <TrustCard
             icon={<BadgeCheck className="h-7 w-7 text-secondary" />}
             title="Background Checked"
-            description="Comprehensive criminal record and enhanced DBS safety screening."
+            description="Comprehensive criminal record and safety screening."
           />
           <TrustCard
             icon={<Video className="h-7 w-7 text-accent-foreground" />}

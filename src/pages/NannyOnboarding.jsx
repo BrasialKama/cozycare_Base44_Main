@@ -175,7 +175,7 @@ export default function NannyOnboarding() {
                   </div>
                   <div>
                     <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Service Area</Label>
-                    <Input value={form.service_area} onChange={e => update('service_area', e.target.value)} placeholder="e.g., Downtown Portland" className="rounded-xl" />
+                    <Input value={form.service_area} onChange={e => update('service_area', e.target.value)} placeholder="e.g., Gornji Grad, Zagreb" className="rounded-xl" />
                   </div>
                   <div>
                     <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">About Me</Label>
@@ -193,7 +193,7 @@ export default function NannyOnboarding() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Hourly Rate ($)</Label>
+                      <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Hourly Rate (€)</Label>
                       <Input type="number" value={form.hourly_rate} onChange={e => update('hourly_rate', e.target.value)} className="rounded-xl" />
                     </div>
                     <div>
@@ -207,7 +207,7 @@ export default function NannyOnboarding() {
                   </div>
                   <div>
                     <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Languages <span className="normal-case font-normal">(comma-separated)</span></Label>
-                    <Input value={form.languages} onChange={e => update('languages', e.target.value)} placeholder="English, Spanish, French" className="rounded-xl" />
+                    <Input value={form.languages} onChange={e => update('languages', e.target.value)} placeholder="Croatian, English, German" className="rounded-xl" />
                   </div>
                   <div>
                     <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Specialties <span className="normal-case font-normal">(comma-separated)</span></Label>
@@ -247,7 +247,7 @@ export default function NannyOnboarding() {
                   <div className="bg-gradient-to-br from-ivory to-rose-light/30 rounded-2xl p-5 space-y-3.5">
                     {[
                       ['Name', form.display_name || form.full_name],
-                      ['Rate', `$${form.hourly_rate}/hr`],
+                      ['Rate', `€${form.hourly_rate}/hr`],
                       ['Experience', `${form.years_experience} years`],
                       ['Service Area', form.service_area || '—'],
                       ['Languages', form.languages || '—'],

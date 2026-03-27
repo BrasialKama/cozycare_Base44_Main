@@ -305,7 +305,7 @@ export default function NannyDetail() {
             {/* Booking card */}
             <div className="bg-card border border-border/50 rounded-3xl p-6 shadow-lg shadow-primary/5">
               <div className="text-center mb-6">
-                <p className="font-display text-5xl font-bold text-primary leading-none">${nanny.hourly_rate}</p>
+                <p className="font-display text-5xl font-bold text-primary leading-none">€{nanny.hourly_rate}</p>
                 <p className="text-sm text-muted-foreground mt-1.5">per hour</p>
               </div>
               <Separator className="mb-6 opacity-40" />

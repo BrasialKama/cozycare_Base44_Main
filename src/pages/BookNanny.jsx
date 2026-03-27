@@ -125,7 +125,7 @@ export default function BookNanny() {
             <Sparkles className="w-3 h-3 inline mr-1" />Booking
           </p>
           <h1 className="font-display text-xl font-bold text-foreground">{nanny.display_name || nanny.full_name}</h1>
-          <p className="text-sm text-muted-foreground">${rate}/hr · Trusted caregiver</p>
+          <p className="text-sm text-muted-foreground">€{rate}/hr · Trusted caregiver</p>
         </div>
       </div>
 
@@ -203,17 +203,17 @@ export default function BookNanny() {
         <div className="bg-gradient-to-br from-ivory to-rose-light/30 rounded-2xl p-5 space-y-3">
           <h3 className="font-display font-semibold text-base">Price Breakdown</h3>
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">{hours > 0 ? `${hours.toFixed(1)} hrs` : '0 hrs'} × ${rate}/hr</span>
-            <span className="font-medium">${nannyPay.toFixed(2)}</span>
+            <span className="text-muted-foreground">{hours > 0 ? `${hours.toFixed(1)} hrs` : '0 hrs'} × €{rate}/hr</span>
+            <span className="font-medium">€{nannyPay.toFixed(2)}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Platform fee (15%)</span>
-            <span className="font-medium">${platformFee.toFixed(2)}</span>
+            <span className="font-medium">€{platformFee.toFixed(2)}</span>
           </div>
           <Separator className="opacity-40" />
           <div className="flex justify-between font-semibold text-base">
             <span>Total</span>
-            <span className="text-primary font-display text-xl">${totalCost.toFixed(2)}</span>
+            <span className="text-primary font-display text-xl">€{totalCost.toFixed(2)}</span>
           </div>
         </div>
 
@@ -234,7 +234,7 @@ export default function BookNanny() {
           {bookMutation.isPending ? (
             <span className="flex items-center gap-2"><div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" /> Sending request…</span>
           ) : canBook ? (
-            <span className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4" /> Request Booking · ${totalCost.toFixed(2)}</span>
+            <span className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4" /> Request Booking · €{totalCost.toFixed(2)}</span>
           ) : (
             'Select a date & time to continue'
           )}

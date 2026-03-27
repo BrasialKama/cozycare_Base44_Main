@@ -27,10 +27,10 @@ export default function Earnings() {
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
         {[
-          { icon: DollarSign, label: 'Total Earnings', value: `$${totalEarnings.toFixed(2)}`, color: 'bg-primary/8 text-primary' },
+          { icon: DollarSign, label: 'Total Earnings', value: `€${totalEarnings.toFixed(2)}`, color: 'bg-primary/8 text-primary' },
           { icon: Calendar, label: 'Completed Jobs', value: bookings.length, color: 'bg-sage/30 text-sage-foreground' },
           { icon: Clock, label: 'Total Hours', value: `${totalHours.toFixed(1)}h`, color: 'bg-peach/50 text-peach-dark' },
-          { icon: TrendingUp, label: 'Avg per Booking', value: `$${avgPerBooking.toFixed(2)}`, color: 'bg-powder-blue/40 text-foreground' },
+          { icon: TrendingUp, label: 'Avg per Booking', value: `€${avgPerBooking.toFixed(2)}`, color: 'bg-powder-blue/40 text-foreground' },
         ].map((stat) => (
           <Card key={stat.label} className="p-4 border-border/60">
             <div className={`w-10 h-10 rounded-xl ${stat.color} flex items-center justify-center mb-2`}>
@@ -55,7 +55,7 @@ export default function Earnings() {
                   <p className="text-sm font-semibold">{b.parent_name || 'Family'}</p>
                   <p className="text-xs text-muted-foreground">{b.date} · {b.hours}h</p>
                 </div>
-                <p className="font-display font-semibold text-primary">+${b.nanny_payout?.toFixed(2)}</p>
+                <p className="font-display font-semibold text-primary">+€{b.nanny_payout?.toFixed(2)}</p>
               </div>
             </Card>
           ))}

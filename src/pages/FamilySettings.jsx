@@ -112,7 +112,7 @@ export default function FamilySettings() {
       <Card className="p-6 space-y-5">
         <div>
           <Label>Family Name</Label>
-          <Input value={form.family_name} onChange={e => update('family_name', e.target.value)} placeholder="e.g., The Smith Family" className="mt-1" />
+          <Input value={form.family_name} onChange={e => update('family_name', e.target.value)} placeholder="e.g., Obitelj Horvat" className="mt-1" />
         </div>
 
         <div className="grid grid-cols-2 gap-4">

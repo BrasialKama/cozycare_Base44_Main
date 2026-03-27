@@ -51,7 +51,7 @@ export default function LandingNannyCard({ nanny }) {
             )}
           </div>
           <p className="text-sm text-muted-foreground mt-0.5">
-            {expLabel} · ${nanny.hourly_rate}/hr
+            {expLabel} · €{nanny.hourly_rate}/hr
           </p>
 
           {/* Trust badges */}

@@ -54,7 +54,7 @@ export default function NannyCard({ nanny, onWatchVideo }) {
           {/* Experience + rate */}
           <p className="text-sm text-muted-foreground mt-0.5">
             {nanny.years_experience > 0 && <>{nanny.years_experience}+ yrs exp · </>}
-            <span className="font-semibold text-foreground">${nanny.hourly_rate}</span>/hr
+            <span className="font-semibold text-foreground">€{nanny.hourly_rate}</span>/hr
           </p>
 
           {/* Location */}

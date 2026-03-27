@@ -35,7 +35,7 @@ function BookingCard({ booking, onCancel }) {
                 </span>
               </div>
               <p className="font-display font-bold text-primary text-lg flex-shrink-0">
-                ${booking.total_cost?.toFixed(2)}
+                €{booking.total_cost?.toFixed(2)}
               </p>
             </div>
 

@@ -62,7 +62,7 @@ export default function NannyBookings() {
           )}
         </div>
         <div className="text-right">
-          <p className="font-display font-semibold text-primary">${booking.nanny_payout?.toFixed(2)}</p>
+          <p className="font-display font-semibold text-primary">€{booking.nanny_payout?.toFixed(2)}</p>
           {showActions && booking.status === 'pending' && (
             <div className="flex gap-1.5 mt-2">
               <Button

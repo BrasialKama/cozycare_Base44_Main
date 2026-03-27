@@ -44,7 +44,7 @@ export default function HeroSection() {
             }}
           >
             <Star className="h-3.5 w-3.5 fill-current" />
-            Trusted by London families · Over 200 verified nannies
+            Trusted by Zagreb families · Over 200 verified nannies
           </div>
 
           {/* Frosted content veil */}
