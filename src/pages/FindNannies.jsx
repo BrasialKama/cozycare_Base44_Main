@@ -25,7 +25,10 @@ export default function FindNannies() {
 
   const { data: nannies = [], isLoading } = useQuery({
     queryKey: ['approvedNannies'],
-    queryFn: () => base44.entities.NannyProfile.filter({ status: 'approved' }),
+    queryFn: async () => {
+      const all = await base44.entities.NannyProfile.list();
+      return all.filter(n => n.status === 'approved');
+    },
   });
 
   const filtered = useMemo(() => {
