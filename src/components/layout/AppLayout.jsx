@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 import {
   Home, Search, Calendar, MessageCircle, User,
-  Shield, Heart, Menu, X, LogOut, DollarSign, ClipboardList
+  Shield, Heart, LogOut, DollarSign, ClipboardList
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { base44 } from '@/api/base44Client';
@@ -60,12 +60,35 @@ function NavLink({ item, active, onClick }) {
   );
 }
 
+const mobileTabNav = {
+  parent: [
+    { path: '/', icon: Home, label: 'Početna' },
+    { path: '/FindNannies', icon: Search, label: 'Pretraži' },
+    { path: '/MyBookings', icon: Calendar, label: 'Rezervacije' },
+    { path: '/Messages', icon: MessageCircle, label: 'Poruke' },
+    { path: '/FamilySettings', icon: User, label: 'Profil' },
+  ],
+  nanny: [
+    { path: '/', icon: Home, label: 'Početna' },
+    { path: '/NannyBookings', icon: Calendar, label: 'Rezervacije' },
+    { path: '/Messages', icon: MessageCircle, label: 'Poruke' },
+    { path: '/Earnings', icon: DollarSign, label: 'Zarada' },
+    { path: '/NannyProfile', icon: User, label: 'Profil' },
+  ],
+  admin: [
+    { path: '/AdminDashboard', icon: Home, label: 'Nadzorna' },
+    { path: '/AdminApplications', icon: ClipboardList, label: 'Prijave' },
+    { path: '/AdminBookings', icon: Calendar, label: 'Rezervacije' },
+    { path: '/AdminReports', icon: Shield, label: 'Problemi' },
+  ],
+};
+
 export default function AppLayout() {
   const { user } = useAuth();
   const location = useLocation();
-  const [mobileOpen, setMobileOpen] = useState(false);
   const role = user?.role || 'parent';
   const items = navItems[role] || navItems.parent;
+  const mobileTabItems = mobileTabNav[role] || mobileTabNav.parent;
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -114,63 +137,15 @@ export default function AppLayout() {
         </div>
       </aside>
 
-      {/* ── Mobile header ── */}
-      <div className="lg:hidden fixed top-0 inset-x-0 h-14 bg-card/95 backdrop-blur-md border-b border-border/60 z-30 flex items-center justify-between px-4">
+      {/* ── Mobile header (logo only, no hamburger/drawer) ── */}
+      <div className="lg:hidden fixed top-0 inset-x-0 h-14 bg-card/95 backdrop-blur-md border-b border-border/60 z-30 flex items-center px-4">
         <Logo />
-        <Button variant="ghost" size="icon" className="rounded-xl" onClick={() => setMobileOpen(!mobileOpen)}>
-          {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </Button>
       </div>
 
-      {/* ── Mobile drawer ── */}
-      {mobileOpen && (
-        <div className="lg:hidden fixed inset-0 z-40">
-          <div className="absolute inset-0 bg-foreground/20 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
-          <aside className="absolute left-0 top-0 bottom-0 w-72 bg-card border-r border-border/60 p-5 shadow-2xl animate-fade-in">
-            <div className="flex items-center justify-between mb-6">
-              <Logo />
-              <Button variant="ghost" size="icon" className="rounded-xl" onClick={() => setMobileOpen(false)}>
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
-            <nav className="space-y-0.5">
-              {items.map((item) => (
-                <NavLink
-                  key={item.path}
-                  item={item}
-                  active={location.pathname === item.path}
-                  onClick={() => setMobileOpen(false)}
-                />
-              ))}
-            </nav>
-            <div className="mt-6 pt-4 border-t border-border/60">
-              <div className="flex items-center gap-3 px-2 py-2 mb-2">
-                <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center text-xs font-bold text-primary">
-                  {(user?.full_name || user?.email || '?')[0]?.toUpperCase()}
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">{user?.display_name || user?.full_name || 'User'}</p>
-                  <p className="text-xs text-muted-foreground capitalize">{role}</p>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full justify-start text-muted-foreground rounded-xl"
-                onClick={() => base44.auth.logout()}
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Odjava
-              </Button>
-            </div>
-          </aside>
-        </div>
-      )}
-
-      {/* ── Mobile bottom nav ── */}
+      {/* ── Mobile bottom tab bar ── */}
       <div className="lg:hidden fixed bottom-0 inset-x-0 bg-card/97 backdrop-blur-md border-t border-border/60 z-30">
         <div className="flex items-center justify-around py-2">
-          {items.slice(0, 5).map((item) => {
+          {mobileTabItems.map((item) => {
             const active = item.path === '/'
               ? location.pathname === '/' || location.pathname === '/Home'
               : location.pathname === item.path;

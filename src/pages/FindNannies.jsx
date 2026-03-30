@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Search, SlidersHorizontal, X, Sparkles } from 'lucide-react';
+import { normalize } from '@/lib/normalize';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -37,13 +38,13 @@ export default function FindNannies() {
 
   const filtered = useMemo(() => {
     let result = nannies.filter(n => {
-      const q = search.toLowerCase();
+      const q = normalize(search);
       const matchesSearch = !search ||
-        n.display_name?.toLowerCase().includes(q) ||
-        n.full_name?.toLowerCase().includes(q) ||
-        n.bio?.toLowerCase().includes(q) ||
-        n.service_area?.toLowerCase().includes(q) ||
-        n.specialties?.some(s => s.toLowerCase().includes(q));
+        normalize(n.display_name).includes(q) ||
+        normalize(n.full_name).includes(q) ||
+        normalize(n.bio).includes(q) ||
+        normalize(n.service_area).includes(q) ||
+        n.specialties?.some(s => normalize(s).includes(q));
       const matchesRate = (n.hourly_rate || 0) <= maxRate[0];
       const matchesExp = (n.years_experience || 0) >= minExperience[0];
       const matchesSpecialty = !activeSpecialty ||
