@@ -170,16 +170,31 @@ export default function BookNanny() {
           <div className="space-y-4">
             <div>
               <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Datum</Label>
-              <Input type="date" value={form.date} onChange={e => update('date', e.target.value)} className="rounded-xl" />
+              <input
+                type="date"
+                value={form.date}
+                onChange={e => update('date', e.target.value)}
+                className="w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+              />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Početak</Label>
-                <Input type="time" value={form.start_time} onChange={e => update('start_time', e.target.value)} className="rounded-xl" />
+                <input
+                  type="time"
+                  value={form.start_time}
+                  onChange={e => update('start_time', e.target.value)}
+                  className="w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+                />
               </div>
               <div>
                 <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Završetak</Label>
-                <Input type="time" value={form.end_time} onChange={e => update('end_time', e.target.value)} className="rounded-xl" />
+                <input
+                  type="time"
+                  value={form.end_time}
+                  onChange={e => update('end_time', e.target.value)}
+                  className="w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+                />
               </div>
             </div>
 
