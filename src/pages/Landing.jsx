@@ -2,6 +2,7 @@ import React from 'react';
 import LandingHeader from '@/components/landing/LandingHeader';
 import HeroSection from '@/components/landing/HeroSection';
 import HowItWorks from '@/components/landing/HowItWorks';
+import SafetySection from '@/components/landing/SafetySection';
 import TrustPillars from '@/components/landing/TrustPillars';
 import FeaturedNannies from '@/components/landing/FeaturedNannies';
 import CTABanner from '@/components/landing/CTABanner';
@@ -13,6 +14,7 @@ export default function Landing() {
       <LandingHeader />
       <HeroSection />
       <HowItWorks />
+      <SafetySection />
       <TrustPillars />
       <FeaturedNannies />
       <CTABanner />
