@@ -37,7 +37,10 @@ export default function BookNanny() {
     special_notes: '',
   });
 
-  const update = (key, val) => setForm(prev => ({ ...prev, [key]: val }));
+  const update = (key, val) => {
+    console.log(`Field update: ${key} =`, JSON.stringify(val));
+    setForm(prev => ({ ...prev, [key]: val }));
+  };
 
   // Calculate duration and price whenever times change
   const calculateDuration = (start, end) => {
@@ -178,6 +181,10 @@ export default function BookNanny() {
                 <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Završetak</Label>
                 <Input type="time" value={form.end_time} onChange={e => update('end_time', e.target.value)} className="rounded-xl" />
               </div>
+            </div>
+
+            <div className="text-xs text-red-500 font-mono p-2 bg-red-50 rounded">
+              DEBUG: start="{form.start_time}" end="{form.end_time}" duration={durationHours} rate={rate}
             </div>
 
             {timeError && (
