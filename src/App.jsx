@@ -12,7 +12,7 @@ import NannyOnboarding from '@/pages/NannyOnboarding';
 import Home from '@/pages/Home';
 import FindNannies from '@/pages/FindNannies';
 import NannyDetail from '@/pages/NannyDetail';
-import BookNanny from '@/pages/BookNanny';
+import BookNanny from '@/pages/BookNanny.jsx';
 import MyBookings from '@/pages/MyBookings';
 import NannyBookings from '@/pages/NannyBookings';
 import Messages from '@/pages/Messages';
