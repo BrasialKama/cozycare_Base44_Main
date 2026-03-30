@@ -64,23 +64,19 @@ export default function BookNanny() {
   const bookMutation = useMutation({
     mutationFn: () => base44.entities.Booking.create({
       parent_email: user.email,
-      nanny_email: nanny.user_email,
-      nanny_profile_id: nanny.id,
-      family_profile_id: family?.id,
+      nanny_id: nanny.id,
+      nanny_name: `${nanny.first_name} ${nanny.last_name}`,
+      family_name: user.display_name || user.full_name || '',
       date: form.date,
       start_time: form.start_time,
       end_time: form.end_time,
-      hours,
-      hourly_rate: rate,
-      platform_fee: Math.round(platformFee * 100) / 100,
-      total_cost: Math.round(totalCost * 100) / 100,
-      nanny_payout: Math.round(nannyPay * 100) / 100,
-      status: 'pending',
-      booking_type: form.booking_type,
-      notes: form.notes,
-      children_names: form.children_names,
-      parent_name: user.display_name || user.full_name,
-      nanny_name: nanny.display_name || nanny.full_name,
+      duration_hours: hours,
+      total_price: Math.round(totalCost * 100) / 100,
+      status: 'Na čekanju',
+      message: form.notes,
+      address: family?.address || '',
+      children_count: form.children_names ? form.children_names.split(/[,i]/).length : 1,
+      special_notes: form.children_names,
     }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['myBookings'] });
@@ -97,7 +93,8 @@ export default function BookNanny() {
     );
   }
 
-  const initial = (nanny.display_name || nanny.full_name || '?')[0];
+  const nannyName = `${nanny.first_name} ${nanny.last_name}`;
+  const initial = (nanny.first_name || '?')[0];
 
   return (
     <div className="max-w-lg mx-auto pb-12">
@@ -113,7 +110,7 @@ export default function BookNanny() {
       <div className="flex items-center gap-4 bg-card border border-border/40 rounded-2xl p-4 mb-7 shadow-sm">
         <div className="w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0">
           {nanny.photo_url ? (
-            <img src={nanny.photo_url} alt={nanny.display_name} className="w-full h-full object-cover" />
+            <img src={nanny.photo_url} alt={nannyName} className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-rose-light to-peach flex items-center justify-center">
               <span className="text-xl font-display font-bold text-primary">{initial}</span>
@@ -124,7 +121,7 @@ export default function BookNanny() {
           <p className="text-xs font-semibold tracking-widest uppercase text-primary/60 mb-0.5">
             <Sparkles className="w-3 h-3 inline mr-1" />Rezervacija
           </p>
-          <h1 className="font-display text-xl font-bold text-foreground">{nanny.display_name || nanny.full_name}</h1>
+          <h1 className="font-display text-xl font-bold text-foreground">{nannyName}</h1>
           <p className="text-sm text-muted-foreground">€{rate}/h · Pouzdana dadilja</p>
         </div>
       </div>

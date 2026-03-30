@@ -12,12 +12,12 @@ export default function Earnings() {
 
   const { data: bookings = [] } = useQuery({
     queryKey: ['nannyEarnings', user?.email],
-    queryFn: () => base44.entities.Booking.filter({ nanny_email: user?.email, status: 'completed' }, '-date'),
+    queryFn: () => base44.entities.Booking.filter({ status: 'Završeno' }, '-date'),
     enabled: !!user?.email,
   });
 
-  const totalEarnings = bookings.reduce((sum, b) => sum + (b.nanny_payout || 0), 0);
-  const totalHours = bookings.reduce((sum, b) => sum + (b.hours || 0), 0);
+  const totalEarnings = bookings.reduce((sum, b) => sum + (b.total_price || 0), 0);
+  const totalHours = bookings.reduce((sum, b) => sum + (b.duration_hours || 0), 0);
   const avgPerBooking = bookings.length > 0 ? totalEarnings / bookings.length : 0;
 
   return (
@@ -52,10 +52,10 @@ export default function Earnings() {
             <Card key={b.id} className="p-4 border-border/60">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-semibold">{b.parent_name || 'Obitelj'}</p>
-                  <p className="text-xs text-muted-foreground">{b.date} · {b.hours}h</p>
+                  <p className="text-sm font-semibold">{b.family_name || 'Obitelj'}</p>
+                  <p className="text-xs text-muted-foreground">{b.date} · {b.duration_hours}h</p>
                 </div>
-                <p className="font-display font-semibold text-primary">+€{b.nanny_payout?.toFixed(2)}</p>
+                <p className="font-display font-semibold text-primary">+€{b.total_price?.toFixed(2)}</p>
               </div>
             </Card>
           ))}

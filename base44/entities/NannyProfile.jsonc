@@ -1,0 +1,97 @@
+{
+  "name": "NannyProfile",
+  "type": "object",
+  "properties": {
+    "first_name": {
+      "type": "string",
+      "description": "First name"
+    },
+    "last_name": {
+      "type": "string",
+      "description": "Last name"
+    },
+    "photo_url": {
+      "type": "string",
+      "description": "Profile photo URL"
+    },
+    "bio": {
+      "type": "string",
+      "description": "Personal description in Croatian"
+    },
+    "location": {
+      "type": "string",
+      "description": "Zagreb neighbourhood, e.g. \u010crnomerec, Zagreb"
+    },
+    "hourly_rate": {
+      "type": "number",
+      "description": "Rate in \u20ac/sat"
+    },
+    "years_experience": {
+      "type": "number",
+      "description": "Years of childcare experience"
+    },
+    "rating": {
+      "type": "number",
+      "description": "Average rating 0-5"
+    },
+    "review_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Total number of reviews"
+    },
+    "specialties": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Specialties e.g. Montessori metode"
+    },
+    "languages": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Languages spoken"
+    },
+    "availability": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Values from: Jutro, Poslijepodne, Ve\u010der, Vikend, No\u0107no \u010duvanje"
+    },
+    "age_groups": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Values from: Bebe, Mala djeca, Pred\u0161kolska, \u0160kolska"
+    },
+    "certifications": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "e.g. Potvr\u0111en ID, Video, Provjera pozadine, Reference"
+    },
+    "is_featured": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether to show on homepage"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether visible in search"
+    },
+    "video_url": {
+      "type": "string",
+      "description": "Optional intro video URL"
+    }
+  },
+  "required": [
+    "first_name",
+    "last_name",
+    "hourly_rate"
+  ]
+}

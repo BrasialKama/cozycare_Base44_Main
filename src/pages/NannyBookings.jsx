@@ -12,11 +12,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 
 const statusStyles = {
-  pending: 'bg-peach/50 text-peach-dark',
-  confirmed: 'bg-sage/30 text-sage-foreground',
-  in_progress: 'bg-primary/10 text-primary',
-  completed: 'bg-muted text-muted-foreground',
-  cancelled: 'bg-destructive/10 text-destructive',
+  'Na čekanju': 'bg-peach/50 text-peach-dark',
+  'Potvrđeno': 'bg-sage/30 text-sage-foreground',
+  'Završeno': 'bg-muted text-muted-foreground',
+  'Otkazano': 'bg-destructive/10 text-destructive',
 };
 
 export default function NannyBookings() {
@@ -25,7 +24,7 @@ export default function NannyBookings() {
 
   const { data: bookings = [] } = useQuery({
     queryKey: ['nannyBookingsAll', user?.email],
-    queryFn: () => base44.entities.Booking.filter({ nanny_email: user?.email }, '-date'),
+    queryFn: () => base44.entities.Booking.list('-date', 100),
     enabled: !!user?.email,
   });
 
@@ -37,16 +36,16 @@ export default function NannyBookings() {
     },
   });
 
-  const pending = bookings.filter(b => b.status === 'pending');
-  const upcoming = bookings.filter(b => ['confirmed', 'in_progress'].includes(b.status));
-  const past = bookings.filter(b => ['completed', 'cancelled'].includes(b.status));
+  const pending = bookings.filter(b => b.status === 'Na čekanju');
+  const upcoming = bookings.filter(b => b.status === 'Potvrđeno');
+  const past = bookings.filter(b => ['Završeno', 'Otkazano'].includes(b.status));
 
   const BookingCard = ({ booking, showActions }) => (
     <Card className="p-4 border-border/60">
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
-            <h3 className="font-semibold text-sm">{booking.parent_name || 'Obitelj'}</h3>
+            <h3 className="font-semibold text-sm">{booking.family_name || 'Obitelj'}</h3>
             <Badge className={`text-[11px] ${statusStyles[booking.status]} border-0`}>
               {booking.status?.replace('_', ' ')}
             </Badge>
@@ -57,18 +56,18 @@ export default function NannyBookings() {
           <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
             <Clock className="w-3 h-3" /> {booking.start_time} - {booking.end_time}
           </p>
-          {booking.children_names && (
-            <p className="text-xs text-muted-foreground mt-1">Djeca: {booking.children_names}</p>
+          {booking.special_notes && (
+            <p className="text-xs text-muted-foreground mt-1">Djeca: {booking.special_notes}</p>
           )}
         </div>
         <div className="text-right">
-          <p className="font-display font-semibold text-primary">€{booking.nanny_payout?.toFixed(2)}</p>
-          {showActions && booking.status === 'pending' && (
+          <p className="font-display font-semibold text-primary">€{booking.total_price?.toFixed(2)}</p>
+          {showActions && booking.status === 'Na čekanju' && (
             <div className="flex gap-1.5 mt-2">
               <Button
                 size="sm"
                 className="h-7 px-2.5 text-xs"
-                onClick={() => updateMutation.mutate({ id: booking.id, data: { status: 'confirmed' } })}
+                onClick={() => updateMutation.mutate({ id: booking.id, data: { status: 'Potvrđeno' } })}
               >
                 <Check className="w-3 h-3 mr-1" /> Prihvati
               </Button>
@@ -76,18 +75,18 @@ export default function NannyBookings() {
                 size="sm"
                 variant="outline"
                 className="h-7 px-2.5 text-xs text-destructive"
-                onClick={() => updateMutation.mutate({ id: booking.id, data: { status: 'cancelled' } })}
+                onClick={() => updateMutation.mutate({ id: booking.id, data: { status: 'Otkazano' } })}
               >
                 <X className="w-3 h-3 mr-1" /> Odbij
               </Button>
             </div>
           )}
-          {booking.status === 'confirmed' && (
+          {booking.status === 'Potvrđeno' && (
             <Button
               size="sm"
               variant="outline"
               className="h-7 px-2.5 text-xs mt-2"
-              onClick={() => updateMutation.mutate({ id: booking.id, data: { status: 'completed', arrival_confirmed: true, departure_confirmed: true } })}
+              onClick={() => updateMutation.mutate({ id: booking.id, data: { status: 'Završeno' } })}
             >
               Označi završenim
             </Button>

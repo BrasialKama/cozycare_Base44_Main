@@ -4,7 +4,7 @@ import { X } from 'lucide-react';
 export default function VideoPreviewModal({ nanny, onClose }) {
   if (!nanny) return null;
 
-  const videoUrl = nanny.intro_video_url;
+  const videoUrl = nanny.video_url;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
@@ -17,7 +17,7 @@ export default function VideoPreviewModal({ nanny, onClose }) {
         <div className="flex items-center justify-between p-4 border-b border-border/50">
           <div>
             <h3 className="font-display font-bold text-lg text-foreground">
-              {nanny.display_name || nanny.full_name}
+              {nanny.first_name} {nanny.last_name}
             </h3>
             <p className="text-xs text-muted-foreground">Video verifikacija</p>
           </div>

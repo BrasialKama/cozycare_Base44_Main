@@ -5,13 +5,13 @@ import { DollarSign, ArrowRight } from 'lucide-react';
 export default function PortalEarningsCard({ bookings }) {
   const now = new Date();
   const thisMonth = bookings.filter(b => {
-    if (b.status !== 'completed') return false;
+    if (b.status !== 'Završeno') return false;
     const d = new Date(b.date);
     return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
   });
 
-  const monthTotal = thisMonth.reduce((sum, b) => sum + (b.nanny_payout || 0), 0);
-  const allTimeTotal = bookings.filter(b => b.status === 'completed').reduce((sum, b) => sum + (b.nanny_payout || 0), 0);
+  const monthTotal = thisMonth.reduce((sum, b) => sum + (b.total_price || 0), 0);
+  const allTimeTotal = bookings.filter(b => b.status === 'Završeno').reduce((sum, b) => sum + (b.total_price || 0), 0);
 
   return (
     <div className="bg-card border border-border/50 rounded-2xl p-6">

@@ -22,12 +22,12 @@ export default function AdminDashboard() {
     queryFn: () => base44.entities.Report.list(),
   });
 
-  const pendingApps = nannies.filter(n => n.status === 'pending').length;
-  const approvedNannies = nannies.filter(n => n.status === 'approved').length;
-  const completedBookings = bookings.filter(b => b.status === 'completed').length;
+  const pendingApps = nannies.filter(n => !n.is_active).length;
+  const approvedNannies = nannies.filter(n => n.is_active).length;
+  const completedBookings = bookings.filter(b => b.status === 'Završeno').length;
   const totalRevenue = bookings
-    .filter(b => b.status === 'completed')
-    .reduce((sum, b) => sum + (b.platform_fee || 0), 0);
+    .filter(b => b.status === 'Završeno')
+    .reduce((sum, b) => sum + (b.total_price || 0) * 0.15, 0);
   const openReports = reports.filter(r => r.status === 'open').length;
 
   const stats = [

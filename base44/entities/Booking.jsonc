@@ -1,0 +1,75 @@
+{
+  "name": "Booking",
+  "type": "object",
+  "properties": {
+    "nanny_id": {
+      "type": "string",
+      "description": "ID of the NannyProfile"
+    },
+    "nanny_name": {
+      "type": "string",
+      "description": "Denormalised nanny name for display"
+    },
+    "family_name": {
+      "type": "string",
+      "description": "Family display name"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "ISO date e.g. 2026-04-10"
+    },
+    "start_time": {
+      "type": "string",
+      "description": "Start time e.g. 08:00"
+    },
+    "end_time": {
+      "type": "string",
+      "description": "End time e.g. 13:00"
+    },
+    "duration_hours": {
+      "type": "number",
+      "description": "Total hours"
+    },
+    "total_price": {
+      "type": "number",
+      "description": "Calculated: duration \u00d7 hourly_rate"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Na \u010dekanju",
+        "Potvr\u0111eno",
+        "Otkazano",
+        "Zavr\u0161eno"
+      ],
+      "default": "Na \u010dekanju",
+      "description": "Booking status"
+    },
+    "message": {
+      "type": "string",
+      "description": "Optional message from family to nanny"
+    },
+    "address": {
+      "type": "string",
+      "description": "Where the care takes place"
+    },
+    "children_count": {
+      "type": "number",
+      "description": "Number of children"
+    },
+    "special_notes": {
+      "type": "string",
+      "description": "Any special needs or instructions"
+    }
+  },
+  "required": [
+    "nanny_id",
+    "nanny_name",
+    "family_name",
+    "date",
+    "start_time",
+    "end_time",
+    "status"
+  ]
+}

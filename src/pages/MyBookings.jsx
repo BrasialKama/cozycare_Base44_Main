@@ -9,11 +9,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 
 const STATUS_STYLES = {
-  pending: 'bg-peach/50 text-peach-dark',
-  confirmed: 'bg-sage/30 text-sage-foreground',
-  in_progress: 'bg-primary/10 text-primary',
-  completed: 'bg-muted text-muted-foreground',
-  cancelled: 'bg-destructive/10 text-destructive',
+  'Na čekanju': 'bg-peach/50 text-peach-dark',
+  'Potvrđeno': 'bg-sage/30 text-sage-foreground',
+  'Završeno': 'bg-muted text-muted-foreground',
+  'Otkazano': 'bg-destructive/10 text-destructive',
 };
 
 function BookingCard({ booking, onCancel }) {
@@ -35,7 +34,7 @@ function BookingCard({ booking, onCancel }) {
                 </span>
               </div>
               <p className="font-display font-bold text-primary text-lg flex-shrink-0">
-                €{booking.total_cost?.toFixed(2)}
+                €{booking.total_price?.toFixed(2)}
               </p>
             </div>
 
@@ -45,13 +44,13 @@ function BookingCard({ booking, onCancel }) {
               </span>
               <span className="flex items-center gap-1.5 bg-muted/50 px-2.5 py-1 rounded-lg">
                 <Clock className="w-3 h-3" /> {booking.start_time}–{booking.end_time}
-                {booking.hours ? ` (${booking.hours}h)` : ''}
+                {booking.duration_hours ? ` (${booking.duration_hours}h)` : ''}
               </span>
             </div>
 
-            {booking.notes && (
+            {booking.message && (
               <p className="text-xs text-muted-foreground mt-2.5 italic line-clamp-1 leading-relaxed">
-                "{booking.notes}"
+                "{booking.message}"
               </p>
             )}
           </div>
@@ -59,9 +58,9 @@ function BookingCard({ booking, onCancel }) {
       </div>
 
       {/* Actions */}
-      {(booking.status === 'pending' || booking.status === 'completed') && (
+      {(booking.status === 'Na čekanju' || booking.status === 'Završeno') && (
         <div className="border-t border-border/40 px-5 py-3 flex justify-end gap-2 bg-muted/20">
-          {booking.status === 'pending' && (
+          {booking.status === 'Na čekanju' && (
             <Button
               variant="ghost"
               size="sm"
@@ -71,7 +70,7 @@ function BookingCard({ booking, onCancel }) {
               Otkaži rezervaciju
             </Button>
           )}
-          {booking.status === 'completed' && (
+          {booking.status === 'Završeno' && (
             <Link to={`/LeaveReview?booking_id=${booking.id}`}>
               <Button variant="ghost" size="sm" className="text-xs text-primary hover:bg-primary/8 rounded-xl">
                 <Star className="w-3 h-3 mr-1.5 fill-current" /> Ostavi recenziju
@@ -90,20 +89,20 @@ export default function MyBookings() {
 
   const { data: bookings = [], isLoading } = useQuery({
     queryKey: ['parentBookings', user?.email],
-    queryFn: () => base44.entities.Booking.filter({ parent_email: user?.email }, '-date'),
+    queryFn: () => base44.entities.Booking.filter({ created_by: user?.email }, '-date'),
     enabled: !!user?.email,
   });
 
   const cancelMutation = useMutation({
-    mutationFn: (id) => base44.entities.Booking.update(id, { status: 'cancelled' }),
+    mutationFn: (id) => base44.entities.Booking.update(id, { status: 'Otkazano' }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['parentBookings'] });
       toast.success('Rezervacija otkazana');
     },
   });
 
-  const upcoming = bookings.filter(b => ['pending', 'confirmed', 'in_progress'].includes(b.status));
-  const past = bookings.filter(b => ['completed', 'cancelled'].includes(b.status));
+  const upcoming = bookings.filter(b => ['Na čekanju', 'Potvrđeno'].includes(b.status));
+  const past = bookings.filter(b => ['Završeno', 'Otkazano'].includes(b.status));
 
   return (
     <div className="space-y-8 pb-8">

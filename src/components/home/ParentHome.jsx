@@ -20,12 +20,12 @@ export default function ParentHome() {
 
   const { data: topNannies = [] } = useQuery({
     queryKey: ['topNannies'],
-    queryFn: () => base44.entities.NannyProfile.filter({ status: 'approved' }, '-avg_rating', 6),
+    queryFn: () => base44.entities.NannyProfile.filter({ is_active: true }, '-rating', 6),
   });
 
   const { data: myBookings = [] } = useQuery({
     queryKey: ['myBookings', user?.email],
-    queryFn: () => base44.entities.Booking.filter({ parent_email: user?.email, status: 'confirmed' }, '-date', 3),
+    queryFn: () => base44.entities.Booking.filter({ created_by: user?.email, status: 'Potvrđeno' }, '-date', 3),
     enabled: !!user?.email,
   });
 

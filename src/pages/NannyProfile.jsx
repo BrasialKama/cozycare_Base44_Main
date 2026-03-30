@@ -8,15 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { TrustBadgeRow } from '@/components/shared/TrustBadge';
 import { toast } from 'sonner';
-
-const STATUS_CONFIG = {
-  approved: { label: 'Aktivan — vidljiv obiteljima', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-  pending: { label: 'Na pregledu · 24–48 h', color: 'bg-peach/50 text-peach-dark border-peach/30' },
-  rejected: { label: 'Nije odobren', color: 'bg-destructive/10 text-destructive border-destructive/20' },
-  suspended: { label: 'Suspendiran', color: 'bg-muted text-muted-foreground border-border' },
-};
 
 function SectionLabel({ children }) {
   return (
@@ -30,29 +22,28 @@ export default function NannyProfile() {
 
   const { data: profiles = [], isLoading } = useQuery({
     queryKey: ['myNannyProfile', user?.email],
-    queryFn: () => base44.entities.NannyProfile.filter({ user_email: user?.email }),
+    queryFn: () => base44.entities.NannyProfile.filter({ created_by: user?.email }),
     enabled: !!user?.email,
   });
 
   const profile = profiles[0];
 
   const [form, setForm] = useState({
-    display_name: '', bio: '', hourly_rate: 25, service_area: '',
-    education: '', languages: '', specialties: '', certifications: '', emergency_contact: '',
+    first_name: '', last_name: '', bio: '', hourly_rate: 25, location: '',
+    languages: '', specialties: '', certifications: '',
   });
 
   useEffect(() => {
     if (profile) {
       setForm({
-        display_name: profile.display_name || '',
+        first_name: profile.first_name || '',
+        last_name: profile.last_name || '',
         bio: profile.bio || '',
         hourly_rate: profile.hourly_rate || 25,
-        service_area: profile.service_area || '',
-        education: profile.education || '',
+        location: profile.location || '',
         languages: (profile.languages || []).join(', '),
         specialties: (profile.specialties || []).join(', '),
         certifications: (profile.certifications || []).join(', '),
-        emergency_contact: profile.emergency_contact || '',
       });
     }
   }, [profile]);
@@ -70,15 +61,14 @@ export default function NannyProfile() {
   const saveMutation = useMutation({
     mutationFn: async () => {
       await base44.entities.NannyProfile.update(profile.id, {
-        display_name: form.display_name,
+        first_name: form.first_name,
+        last_name: form.last_name,
         bio: form.bio,
         hourly_rate: Number(form.hourly_rate),
-        service_area: form.service_area,
-        education: form.education,
+        location: form.location,
         languages: form.languages.split(',').map(s => s.trim()).filter(Boolean),
         specialties: form.specialties.split(',').map(s => s.trim()).filter(Boolean),
         certifications: form.certifications.split(',').map(s => s.trim()).filter(Boolean),
-        emergency_contact: form.emergency_contact,
       });
     },
     onSuccess: () => {
@@ -100,8 +90,8 @@ export default function NannyProfile() {
     );
   }
 
-  const statusCfg = STATUS_CONFIG[profile.status] || STATUS_CONFIG.pending;
-  const initial = (profile.display_name || profile.full_name || '?')[0];
+  const name = `${profile.first_name} ${profile.last_name}`;
+  const initial = (profile.first_name || '?')[0];
 
   return (
     <div className="max-w-xl mx-auto pb-12 space-y-6">
@@ -117,24 +107,14 @@ export default function NannyProfile() {
 
       {/* Status & stats strip */}
       <div className="bg-card border border-border/40 rounded-2xl p-5 flex flex-wrap items-center gap-4">
-        <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border ${statusCfg.color}`}>
-          <CheckCircle2 className="w-3 h-3" /> {statusCfg.label}
+        <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border ${profile.is_active ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-peach/50 text-peach-dark border-peach/30'}`}>
+          <CheckCircle2 className="w-3 h-3" /> {profile.is_active ? 'Aktivan — vidljiv obiteljima' : 'Neaktivan'}
         </span>
-        {profile.avg_rating > 0 && (
+        {profile.rating > 0 && (
           <span className="flex items-center gap-1.5 text-sm text-foreground font-semibold">
-            <Star className="w-4 h-4 text-amber-400 fill-amber-400" /> {profile.avg_rating.toFixed(1)}
-            <span className="font-normal text-muted-foreground text-xs">({profile.total_reviews} recenzija)</span>
+            <Star className="w-4 h-4 text-amber-400 fill-amber-400" /> {profile.rating.toFixed(1)}
+            <span className="font-normal text-muted-foreground text-xs">({profile.review_count} recenzija)</span>
           </span>
-        )}
-        {profile.total_bookings > 0 && (
-          <span className="flex items-center gap-1.5 text-sm text-foreground font-semibold">
-            <Clock className="w-4 h-4 text-primary/60" /> {profile.total_bookings} termina
-          </span>
-        )}
-        {profile.badges?.length > 0 && (
-          <div className="w-full pt-2 border-t border-border/40">
-            <TrustBadgeRow badges={profile.badges} size="md" />
-          </div>
         )}
       </div>
 
@@ -172,17 +152,23 @@ export default function NannyProfile() {
         <h2 className="font-display font-semibold text-lg">Osnovni podaci</h2>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <SectionLabel>Prikazano ime</SectionLabel>
-            <Input value={form.display_name} onChange={e => update('display_name', e.target.value)} className="rounded-xl" />
+            <SectionLabel>Ime</SectionLabel>
+            <Input value={form.first_name} onChange={e => update('first_name', e.target.value)} className="rounded-xl" />
           </div>
+          <div>
+            <SectionLabel>Prezime</SectionLabel>
+            <Input value={form.last_name} onChange={e => update('last_name', e.target.value)} className="rounded-xl" />
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
           <div>
             <SectionLabel>Satnica (€)</SectionLabel>
             <Input type="number" value={form.hourly_rate} onChange={e => update('hourly_rate', e.target.value)} className="rounded-xl" />
           </div>
-        </div>
-        <div>
-          <SectionLabel>Područje rada</SectionLabel>
-          <Input value={form.service_area} onChange={e => update('service_area', e.target.value)} placeholder="npr. Gornji Grad, Zagreb" className="rounded-xl" />
+          <div>
+            <SectionLabel>Lokacija</SectionLabel>
+            <Input value={form.location} onChange={e => update('location', e.target.value)} placeholder="npr. Gornji Grad, Zagreb" className="rounded-xl" />
+          </div>
         </div>
         <div>
           <SectionLabel>O meni</SectionLabel>
@@ -196,10 +182,6 @@ export default function NannyProfile() {
           <Shield className="w-4.5 h-4.5 text-primary" /> Kvalifikacije
         </h2>
         <div>
-          <SectionLabel>Obrazovanje</SectionLabel>
-          <Input value={form.education} onChange={e => update('education', e.target.value)} placeholder="npr. Prvostupnica ranog odgoja" className="rounded-xl" />
-        </div>
-        <div>
           <SectionLabel>Jezici <span className="normal-case font-normal">(odvojeno zarezima)</span></SectionLabel>
           <Input value={form.languages} onChange={e => update('languages', e.target.value)} placeholder="Hrvatski, Engleski" className="rounded-xl" />
         </div>
@@ -209,14 +191,8 @@ export default function NannyProfile() {
         </div>
         <div>
           <SectionLabel>Certifikati <span className="normal-case font-normal">(odvojeno zarezima)</span></SectionLabel>
-          <Input value={form.certifications} onChange={e => update('certifications', e.target.value)} placeholder="CPR, First Aid, Montessori" className="rounded-xl" />
+          <Input value={form.certifications} onChange={e => update('certifications', e.target.value)} placeholder="Potvrđen ID, Provjera pozadine, Reference" className="rounded-xl" />
         </div>
-      </div>
-
-      {/* Emergency contact */}
-      <div className="bg-card border border-border/40 rounded-3xl p-6">
-        <h2 className="font-display font-semibold text-lg mb-4">Kontakt za hitne slučajeve</h2>
-        <Input value={form.emergency_contact} onChange={e => update('emergency_contact', e.target.value)} placeholder="Ime i broj telefona" className="rounded-xl" />
       </div>
 
       <Button

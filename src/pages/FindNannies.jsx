@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import NannyCard from '@/components/shared/NannyCard';
 import VideoPreviewModal from '@/components/shared/VideoPreviewModal';
 import EmptyState from '@/components/shared/EmptyState';
-import NannyFilters, { AVAILABILITY_OPTIONS, AGE_OPTIONS, LANGUAGE_OPTIONS } from '@/components/search/NannyFilters';
+import NannyFilters from '@/components/search/NannyFilters';
 
 const DEFAULT_FILTERS = {
   availability: [],
@@ -27,44 +27,28 @@ function countActive(filters) {
   return c;
 }
 
-// Map filter values to nanny specialties/keywords for matching
-const AVAILABILITY_KEYWORDS = {
-  jutro: ['jutro', 'morning'],
-  poslijepodne: ['poslijepodne', 'afternoon'],
-  vecer: ['vecer', 'evening', 'večer'],
-  vikend: ['vikend', 'weekend'],
-  nocno: ['nocno čuvanje', 'nocno cuvanje', 'noćno čuvanje', 'night'],
+// Map filter values to entity field values
+const AVAILABILITY_MAP = {
+  jutro: 'Jutro',
+  poslijepodne: 'Poslijepodne',
+  vecer: 'Večer',
+  vikend: 'Vikend',
+  nocno: 'Noćno čuvanje',
 };
 
-const AGE_KEYWORDS = {
-  bebe: ['bebe', 'dojenčad', 'dojenčadi', 'novorođenčad', 'infant', 'njega dojenčadi', 'njega dojencadi'],
-  mala_djeca: ['mala djeca', 'toddler', 'aktivnosti za malu djecu'],
-  predskolska: ['predškolska', 'predskolska', 'montessori', 'preschool'],
-  skolska: ['školska', 'skolska', 'school'],
+const AGE_MAP = {
+  bebe: 'Bebe',
+  mala_djeca: 'Mala djeca',
+  predskolska: 'Predškolska',
+  skolska: 'Školska',
 };
 
 const LANGUAGE_MAP = {
-  hrvatski: 'hrvatski',
-  engleski: 'engleski',
-  njemacki: 'njemacki',
-  talijanski: 'talijanski',
+  hrvatski: 'Hrvatski',
+  engleski: 'Engleski',
+  njemacki: 'Njemački',
+  talijanski: 'Talijanski',
 };
-
-function matchesMultiFilter(nannyText, filterValues, keywordMap) {
-  if (!filterValues.length) return true;
-  const norm = normalize(nannyText);
-  return filterValues.some(fv => {
-    const keywords = keywordMap[fv] || [fv];
-    return keywords.some(kw => norm.includes(normalize(kw)));
-  });
-}
-
-function matchesLanguage(nannyLangs, filterLangs) {
-  if (!filterLangs.length) return true;
-  if (!nannyLangs || !nannyLangs.length) return false;
-  const normLangs = nannyLangs.map(l => normalize(l));
-  return filterLangs.some(fl => normLangs.some(nl => nl.includes(normalize(LANGUAGE_MAP[fl] || fl))));
-}
 
 export default function FindNannies() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -75,48 +59,54 @@ export default function FindNannies() {
   const [videoNanny, setVideoNanny] = useState(null);
 
   const activeCount = countActive(filters);
-
   const clearAll = () => setFilters({ ...DEFAULT_FILTERS });
 
   const { data: nannies = [], isLoading } = useQuery({
-    queryKey: ['approvedNannies'],
-    queryFn: async () => {
-      const approved = await base44.entities.NannyProfile.filter({ status: 'approved' }, '-avg_rating', 100);
-      if (approved.length > 0) return approved;
-      const all = await base44.entities.NannyProfile.list('-avg_rating', 100);
-      return all.filter(n => n.status === 'approved');
-    },
+    queryKey: ['activeNannies'],
+    queryFn: () => base44.entities.NannyProfile.filter({ is_active: true }, '-rating', 100),
   });
 
   const filtered = useMemo(() => {
     let result = nannies.filter(n => {
+      const fullName = `${n.first_name} ${n.last_name}`;
+
       // Text search
       const q = normalize(search);
       const matchesSearch = !search ||
-        normalize(n.display_name).includes(q) ||
-        normalize(n.full_name).includes(q) ||
+        normalize(fullName).includes(q) ||
         normalize(n.bio).includes(q) ||
-        normalize(n.service_area).includes(q) ||
+        normalize(n.location).includes(q) ||
         n.specialties?.some(s => normalize(s).includes(q));
 
       // Price
       const rate = n.hourly_rate || 0;
       const matchesPrice = rate >= filters.priceRange[0] && rate <= filters.priceRange[1];
 
-      // Availability — match against bio + specialties text
-      const nannyAvailText = [n.bio, ...(n.specialties || [])].join(' ');
-      const matchesAvail = matchesMultiFilter(nannyAvailText, filters.availability, AVAILABILITY_KEYWORDS);
+      // Availability — match against the availability array field
+      const matchesAvail = filters.availability.length === 0 ||
+        filters.availability.some(fv => {
+          const label = AVAILABILITY_MAP[fv];
+          return (n.availability || []).some(a => normalize(a) === normalize(label));
+        });
 
-      // Child age — match against specialties + bio
-      const matchesAge = matchesMultiFilter(nannyAvailText, filters.childAge, AGE_KEYWORDS);
+      // Child age — match against the age_groups array field
+      const matchesAge = filters.childAge.length === 0 ||
+        filters.childAge.some(fv => {
+          const label = AGE_MAP[fv];
+          return (n.age_groups || []).some(a => normalize(a) === normalize(label));
+        });
 
-      // Language
-      const matchesLang = matchesLanguage(n.languages, filters.languages);
+      // Language — match against the languages array field
+      const matchesLang = filters.languages.length === 0 ||
+        filters.languages.some(fv => {
+          const label = LANGUAGE_MAP[fv];
+          return (n.languages || []).some(l => normalize(l) === normalize(label));
+        });
 
       return matchesSearch && matchesPrice && matchesAvail && matchesAge && matchesLang;
     });
 
-    if (sortBy === 'rating') result.sort((a, b) => (b.avg_rating || 0) - (a.avg_rating || 0));
+    if (sortBy === 'rating') result.sort((a, b) => (b.rating || 0) - (a.rating || 0));
     else if (sortBy === 'rate_low') result.sort((a, b) => (a.hourly_rate || 0) - (b.hourly_rate || 0));
     else if (sortBy === 'rate_high') result.sort((a, b) => (b.hourly_rate || 0) - (a.hourly_rate || 0));
     else if (sortBy === 'experience') result.sort((a, b) => (b.years_experience || 0) - (a.years_experience || 0));

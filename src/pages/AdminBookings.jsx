@@ -8,11 +8,10 @@ import PageHeader from '@/components/shared/PageHeader';
 import EmptyState from '@/components/shared/EmptyState';
 
 const statusStyles = {
-  pending: 'bg-peach/50 text-peach-dark',
-  confirmed: 'bg-sage/30 text-sage-foreground',
-  in_progress: 'bg-primary/10 text-primary',
-  completed: 'bg-muted text-muted-foreground',
-  cancelled: 'bg-destructive/10 text-destructive',
+  'Na čekanju': 'bg-peach/50 text-peach-dark',
+  'Potvrđeno': 'bg-sage/30 text-sage-foreground',
+  'Završeno': 'bg-muted text-muted-foreground',
+  'Otkazano': 'bg-destructive/10 text-destructive',
 };
 
 export default function AdminBookings() {
@@ -39,7 +38,7 @@ export default function AdminBookings() {
                     </Badge>
                   </div>
                   <p className="text-sm">
-                    <span className="font-semibold">{b.parent_name || 'Roditelj'}</span>
+                    <span className="font-semibold">{b.family_name || 'Obitelj'}</span>
                     <span className="text-muted-foreground"> → </span>
                     <span className="font-semibold">{b.nanny_name || 'Dadilja'}</span>
                   </p>
@@ -49,9 +48,7 @@ export default function AdminBookings() {
                   </p>
                 </div>
                 <div className="text-right text-xs space-y-0.5">
-                  <p className="font-semibold">Ukupno: €{b.total_cost?.toFixed(2)}</p>
-                  <p className="text-muted-foreground">Naknada: €{b.platform_fee?.toFixed(2)}</p>
-                  <p className="text-muted-foreground">Isplata: €{b.nanny_payout?.toFixed(2)}</p>
+                  <p className="font-semibold">Ukupno: €{b.total_price?.toFixed(2)}</p>
                 </div>
               </div>
             </Card>
