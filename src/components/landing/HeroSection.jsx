@@ -1,9 +1,22 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Star } from 'lucide-react';
+import { ArrowRight, Star, Search } from 'lucide-react';
+
+const KVARTOVI = ['Gornji Grad', 'Maksimir', 'Trešnjevka', 'Črnomerec', 'Trnje', 'Novi Zagreb', 'Sesvete'];
 
 export default function HeroSection() {
+  const [query, setQuery] = useState('');
+  const navigate = useNavigate();
+
+  const handleSearch = () => {
+    if (query.trim()) {
+      navigate(`/FindNannies?q=${encodeURIComponent(query.trim())}`);
+    } else {
+      navigate('/FindNannies');
+    }
+  };
+
   return (
     <section className="relative min-h-[85vh] min-h-[620px] overflow-hidden pt-16">
       {/* Background image */}
@@ -82,7 +95,54 @@ export default function HeroSection() {
             </p>
           </div>
 
-          <div className="mt-10 flex flex-col sm:flex-row gap-4">
+          {/* Location search bar */}
+          <div className="mt-8">
+            <div
+              className="flex items-center rounded-full shadow-lg shadow-foreground/5 overflow-hidden"
+              style={{
+                background: 'rgba(255,255,255,0.92)',
+                border: '1px solid rgba(200,142,142,0.18)',
+                backdropFilter: 'blur(12px)',
+              }}
+            >
+              <Search className="w-5 h-5 text-muted-foreground ml-5 flex-shrink-0" />
+              <input
+                type="text"
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSearch()}
+                placeholder="Unesite kvart ili dio grada..."
+                className="flex-1 h-14 px-4 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none"
+              />
+              <button
+                onClick={handleSearch}
+                className="h-14 px-7 bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors flex-shrink-0"
+              >
+                Traži
+              </button>
+            </div>
+
+            <div className="flex flex-wrap gap-2 mt-4">
+              {KVARTOVI.map(k => (
+                <button
+                  key={k}
+                  onClick={() => { setQuery(k); navigate(`/FindNannies?q=${encodeURIComponent(k)}`); }}
+                  className="text-xs px-3.5 py-1.5 rounded-full font-medium border transition-all"
+                  style={{
+                    background: 'rgba(255,255,255,0.55)',
+                    borderColor: 'rgba(200,142,142,0.22)',
+                    backdropFilter: 'blur(8px)',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(200,142,142,0.45)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(200,142,142,0.22)'; }}
+                >
+                  {k}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-8 flex flex-col sm:flex-row gap-4">
             <Button
               size="lg"
               asChild

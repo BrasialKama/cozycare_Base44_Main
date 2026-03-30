@@ -15,7 +15,8 @@ import EmptyState from '@/components/shared/EmptyState';
 const SPECIALTIES = ['Njega dojenčadi', 'Aktivnosti za malu djecu', 'Posebne potrebe', 'Montessori', 'Dvojezična', 'Noćno čuvanje'];
 
 export default function FindNannies() {
-  const [search, setSearch] = useState('');
+  const urlParams = new URLSearchParams(window.location.search);
+  const [search, setSearch] = useState(urlParams.get('q') || '');
   const [sortBy, setSortBy] = useState('rating');
   const [maxRate, setMaxRate] = useState([80]);
   const [minExperience, setMinExperience] = useState([0]);
