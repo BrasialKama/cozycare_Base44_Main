@@ -13,7 +13,7 @@ export default function LandingHeader() {
   const navItems = [
     { label: 'Pronađi dadilju', to: '/FindNannies' },
     { label: 'Pretraži dadilje', to: '/FindNannies', highlight: true },
-    { label: 'Portal za dadilje', to: '/NannyOnboarding' },
+    { label: 'Portal za dadilje', to: '/NannyPortal' },
     { label: 'Moj profil', to: '/FamilySettings' },
   ];
 

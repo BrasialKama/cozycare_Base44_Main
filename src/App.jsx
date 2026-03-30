@@ -26,6 +26,7 @@ import AdminApplications from '@/pages/AdminApplications';
 import AdminBookings from '@/pages/AdminBookings';
 import AdminReports from '@/pages/AdminReports';
 import Landing from '@/pages/Landing';
+import NannyPortal from '@/pages/NannyPortal';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -74,6 +75,7 @@ const AuthenticatedApp = () => {
         <Route path="/AdminApplications" element={<AdminApplications />} />
         <Route path="/AdminBookings" element={<AdminBookings />} />
         <Route path="/AdminReports" element={<AdminReports />} />
+        <Route path="/NannyPortal" element={<NannyPortal />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
