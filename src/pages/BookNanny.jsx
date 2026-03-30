@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
@@ -39,18 +39,39 @@ export default function BookNanny() {
 
   const update = (key, val) => setForm(prev => ({ ...prev, [key]: val }));
 
-  const { hours, timeError } = useMemo(() => {
-    if (!form.start_time || !form.end_time) return { hours: 0, timeError: null };
-    const [sh, sm] = form.start_time.split(':').map(Number);
-    const [eh, em] = form.end_time.split(':').map(Number);
-    const diff = (eh + em / 60) - (sh + sm / 60);
-    if (diff <= 0) return { hours: 0, timeError: 'Vrijeme završetka mora biti nakon vremena početka' };
-    return { hours: diff, timeError: null };
-  }, [form.start_time, form.end_time]);
+  // Calculate duration and price whenever times change
+  const calculateDuration = (start, end) => {
+    if (!start || !end) return 0;
+    try {
+      const normalize = (t) => {
+        const s = String(t).replace(/\s/g, '');
+        const m12 = s.match(/^(\d{1,2}):(\d{2})(AM|PM)$/i);
+        if (m12) {
+          let h = parseInt(m12[1]);
+          const min = parseInt(m12[2]);
+          if (/pm/i.test(m12[3]) && h !== 12) h += 12;
+          if (/am/i.test(m12[3]) && h === 12) h = 0;
+          return h * 60 + min;
+        }
+        const m24 = s.match(/^(\d{1,2}):(\d{2})$/);
+        if (m24) return parseInt(m24[1]) * 60 + parseInt(m24[2]);
+        return null;
+      };
+      const startMins = normalize(start);
+      const endMins = normalize(end);
+      if (startMins === null || endMins === null) return 0;
+      const diff = endMins - startMins;
+      return diff > 0 ? +(diff / 60).toFixed(2) : 0;
+    } catch (e) {
+      return 0;
+    }
+  };
 
+  const durationHours = calculateDuration(form.start_time, form.end_time);
   const rate = nanny?.hourly_rate || 0;
-  const totalPrice = Math.round(hours * rate * 100) / 100;
-  const canBook = form.date && form.start_time && form.end_time && form.address.trim() && hours > 0 && !timeError;
+  const totalPrice = +(durationHours * rate).toFixed(2);
+  const timeError = form.start_time && form.end_time && durationHours <= 0 ? 'Vrijeme završetka mora biti nakon vremena početka' : null;
+  const canBook = form.date && form.start_time && form.end_time && form.address.trim() && durationHours > 0;
 
   const nannyName = nanny ? `${nanny.first_name} ${nanny.last_name}` : '';
 
@@ -62,7 +83,7 @@ export default function BookNanny() {
       date: form.date,
       start_time: form.start_time,
       end_time: form.end_time,
-      duration_hours: hours,
+      duration_hours: durationHours,
       total_price: totalPrice,
       status: 'Na čekanju',
       address: form.address,
@@ -165,9 +186,9 @@ export default function BookNanny() {
               </div>
             )}
 
-            {hours > 0 && !timeError && (
+            {durationHours > 0 && !timeError && (
               <div className="inline-flex items-center gap-2 bg-sage/15 text-sage-foreground text-sm px-3.5 py-2 rounded-xl font-medium">
-                <Clock className="w-3.5 h-3.5" /> {hours % 1 === 0 ? hours : hours.toFixed(1)} sati × €{rate}/sat = <span className="font-bold">€{totalPrice.toFixed(2)} ukupno</span>
+                <Clock className="w-3.5 h-3.5" /> {durationHours % 1 === 0 ? durationHours : durationHours.toFixed(1)} sati × €{rate}/sat = <span className="font-bold">€{totalPrice.toFixed(2)} ukupno</span>
               </div>
             )}
           </div>
@@ -207,7 +228,7 @@ export default function BookNanny() {
         <div className="bg-gradient-to-br from-ivory to-rose-light/30 rounded-2xl p-5 space-y-3">
           <h3 className="font-display font-semibold text-base">Pregled cijene</h3>
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">{hours > 0 ? `${hours % 1 === 0 ? hours : hours.toFixed(1)} sati` : '0 sati'} × €{rate}/sat</span>
+            <span className="text-muted-foreground">{durationHours > 0 ? `${durationHours % 1 === 0 ? durationHours : durationHours.toFixed(1)} sati` : '0 sati'} × €{rate}/sat</span>
             <span className="font-medium">€{totalPrice.toFixed(2)}</span>
           </div>
           <Separator className="opacity-40" />
@@ -225,20 +246,29 @@ export default function BookNanny() {
           </p>
         </div>
 
-        <Button
-          onClick={() => bookMutation.mutate()}
-          disabled={!canBook || bookMutation.isPending}
-          className="w-full text-base font-semibold rounded-2xl shadow-lg shadow-primary/20"
-          style={{ height: '3.25rem' }}
-        >
-          {bookMutation.isPending ? (
-            <span className="flex items-center gap-2"><div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" /> Šaljem zahtjev…</span>
-          ) : canBook ? (
-            <span className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4" /> Rezerviraj · €{totalPrice.toFixed(2)}</span>
-          ) : (
-            'Ispunite sva polja za nastavak'
-          )}
-        </Button>
+        {canBook ? (
+          <Button
+            onClick={() => bookMutation.mutate()}
+            disabled={bookMutation.isPending}
+            className="w-full text-base font-semibold rounded-2xl shadow-lg shadow-primary/20"
+            style={{ height: '3.25rem' }}
+          >
+            {bookMutation.isPending ? (
+              <span className="flex items-center gap-2"><div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" /> Šaljem zahtjev…</span>
+            ) : (
+              <span className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4" /> Potvrdi rezervaciju</span>
+            )}
+          </Button>
+        ) : (
+          <Button
+            disabled
+            variant="secondary"
+            className="w-full text-base font-semibold rounded-2xl"
+            style={{ height: '3.25rem' }}
+          >
+            Ispunite sva polja za nastavak
+          </Button>
+        )}
       </div>
     </div>
   );
