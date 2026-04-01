@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { base44 } from '@/api/base44Client';
+import useUnreadMessages from '@/hooks/useUnreadMessages';
 
 const Logo = () => (
   <Link to="/" className="flex items-center gap-3 px-1 group">
@@ -43,7 +44,7 @@ const navItems = {
   ],
 };
 
-function NavLink({ item, active, onClick }) {
+function NavLink({ item, active, onClick, badge }) {
   return (
     <Link
       to={item.path}
@@ -54,7 +55,14 @@ function NavLink({ item, active, onClick }) {
           : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
       }`}
     >
-      <item.icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-primary' : ''}`} />
+      <span className="relative flex-shrink-0">
+        <item.icon className={`w-4 h-4 ${active ? 'text-primary' : ''}`} />
+        {badge > 0 && (
+          <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-1 flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold leading-none">
+            {badge > 99 ? '99+' : badge}
+          </span>
+        )}
+      </span>
       {item.label}
     </Link>
   );
@@ -89,6 +97,7 @@ export default function AppLayout() {
   const role = user?.role || 'parent';
   const items = navItems[role] || navItems.parent;
   const mobileTabItems = mobileTabNav[role] || mobileTabNav.parent;
+  const { unreadCount } = useUnreadMessages();
 
   return (
     <div className="min-h-screen bg-background flex overflow-x-hidden w-full max-w-full">
@@ -109,6 +118,7 @@ export default function AppLayout() {
                 key={item.path}
                 item={item}
                 active={active}
+                badge={item.path === '/Messages' ? unreadCount : 0}
               />
             );
           })}
@@ -157,7 +167,14 @@ export default function AppLayout() {
                   active ? 'text-primary' : 'text-muted-foreground'
                 }`}
               >
-                <item.icon className={`w-5 h-5 mb-0.5 ${active ? 'text-primary' : 'text-muted-foreground/70'}`} />
+                <span className="relative">
+                  <item.icon className={`w-5 h-5 mb-0.5 ${active ? 'text-primary' : 'text-muted-foreground/70'}`} />
+                  {item.path === '/Messages' && unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1.5 min-w-[14px] h-3.5 px-0.5 flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold leading-none">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
+                </span>
                 <span className="truncate">{item.label}</span>
               </Link>
             );

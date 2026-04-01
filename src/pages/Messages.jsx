@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { MessageCircle, Send, ArrowLeft, Heart } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import useUnreadMessages from '@/hooks/useUnreadMessages';
 
 export default function Messages() {
   const params = new URLSearchParams(window.location.search);
@@ -14,6 +15,12 @@ export default function Messages() {
   const [activeConv, setActiveConv] = useState(initialConvId || null);
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef(null);
+  const { markAllRead } = useUnreadMessages();
+
+  // Mark unread messages as read when page opens
+  useEffect(() => {
+    if (user?.email) markAllRead();
+  }, [user?.email]);
 
   const { data: conversations = [] } = useQuery({
     queryKey: ['conversations', user?.email],
