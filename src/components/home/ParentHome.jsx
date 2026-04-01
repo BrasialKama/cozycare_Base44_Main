@@ -33,22 +33,24 @@ export default function ParentHome() {
     <div className="space-y-14 pb-8">
 
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-rose-light via-peach/70 to-ivory border border-primary/10 shadow-sm">
-        <div className="absolute -top-16 -right-16 w-72 h-72 rounded-full bg-primary/6 blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-12 -left-12 w-56 h-56 rounded-full bg-sage/15 blur-3xl pointer-events-none" />
-        {/* decorative dots */}
-        <div className="absolute top-8 right-8 grid grid-cols-4 gap-1.5 opacity-20">
-          {Array.from({ length: 16 }).map((_, i) => (
-            <div key={i} className="w-1 h-1 rounded-full bg-primary" />
-          ))}
+      <section className="relative rounded-3xl bg-gradient-to-br from-rose-light via-peach/70 to-ivory border border-primary/10 shadow-sm">
+        <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
+          <div className="absolute -top-16 -right-16 w-72 h-72 rounded-full bg-primary/6 blur-3xl" />
+          <div className="absolute -bottom-12 -left-12 w-56 h-56 rounded-full bg-sage/15 blur-3xl" />
+          <div className="absolute top-8 right-8 grid grid-cols-4 gap-1.5 opacity-20">
+            {Array.from({ length: 16 }).map((_, i) => (
+              <div key={i} className="w-1 h-1 rounded-full bg-primary" />
+            ))}
+          </div>
         </div>
-        <div className="relative px-8 py-12 lg:px-16 lg:py-16">
+        <div className="relative px-8 py-12 lg:px-16 lg:py-16 w-full">
           <p className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-widest uppercase text-primary/70 mb-5">
             <Sparkles className="w-3.5 h-3.5" />
             Pouzdana obiteljska skrb
           </p>
-          <h1 className="font-display text-4xl lg:text-5xl font-bold text-foreground leading-[1.12] max-w-xl">
-            {greetingTime()},&nbsp;
+          <h1 className="font-display text-4xl lg:text-5xl font-bold text-foreground leading-[1.12] max-w-xl break-words">
+            {greetingTime()},
+            <br />
             <span className="text-primary italic">{firstName}.</span>
             <br />
             <span className="text-foreground/60 font-medium">Vaša obitelj zaslužuje samo najbolje.</span>
