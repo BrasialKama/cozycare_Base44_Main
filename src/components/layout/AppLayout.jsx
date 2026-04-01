@@ -91,7 +91,7 @@ export default function AppLayout() {
   const mobileTabItems = mobileTabNav[role] || mobileTabNav.parent;
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-background flex overflow-x-hidden w-full max-w-full">
 
       {/* ── Desktop Sidebar ── */}
       <aside className="hidden lg:flex flex-col w-64 border-r border-border/60 bg-card/70 backdrop-blur-sm fixed inset-y-0 left-0 z-30">
@@ -166,8 +166,8 @@ export default function AppLayout() {
       </div>
 
       {/* ── Main content ── */}
-      <main className="flex-1 lg:ml-64 pt-14 lg:pt-0 pb-24 lg:pb-8">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-7 lg:py-12">
+      <main className="flex-1 min-w-0 lg:ml-64 pt-14 lg:pt-0 pb-24 lg:pb-8">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-7 lg:py-12 w-full">
           <Outlet />
         </div>
       </main>
