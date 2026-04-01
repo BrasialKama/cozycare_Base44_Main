@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
-import { Heart, Baby, Sparkles, ArrowRight, Shield, Star, CheckCircle2 } from 'lucide-react';
+import { Heart, Baby, Sparkles, ArrowRight, ArrowLeft, Shield, Star, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 
@@ -37,6 +37,14 @@ export default function Onboarding() {
         transition={{ duration: 0.4, ease: 'easeOut' }}
         className="w-full max-w-md relative"
       >
+        {/* Back button */}
+        <button
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors group"
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" /> Natrag
+        </button>
+
         {/* Brand */}
         <div className="text-center mb-10">
           <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary/20 to-peach/60 flex items-center justify-center mx-auto mb-5 shadow-lg shadow-primary/10">
