@@ -289,7 +289,7 @@ export default function BookNanny() {
             <Input type="number" min="1" max="10" value={form.children_count} onChange={e => update('children_count', e.target.value)} className="rounded-xl w-24" />
           </div>
           <div>
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Poruka dadinji</Label>
+            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Poruka dadilji</Label>
             <Textarea value={form.notes} onChange={e => update('notes', e.target.value)} placeholder="Predstavite se, opišite svoju obitelj…" rows={2} className="rounded-xl resize-none" />
           </div>
           <div>
