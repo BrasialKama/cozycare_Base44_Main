@@ -81,7 +81,7 @@ export default function LandingNannyCard({ nanny }) {
           asChild
           className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-5 h-9 text-sm font-semibold"
         >
-          <Link to={`/BookNanny?nannyId=${nanny.id}`}>Rezerviraj</Link>
+          <Link to={`/BookNanny?nanny_id=${nanny.id}`}>Rezerviraj</Link>
         </Button>
       </div>
     </div>
