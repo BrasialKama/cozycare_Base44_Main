@@ -84,11 +84,14 @@ export default function FamilySettings() {
         schedule_preferences: form.schedule_preferences,
         special_requirements: form.special_requirements,
         preferred_languages: form.preferred_languages.split(',').map(s => s.trim()).filter(Boolean),
-        children: form.children.filter(c => c.name),
+        children: form.children.filter(c => c.name).map(c => ({
+          ...c,
+          age: c.age !== '' ? Number(c.age) : undefined,
+        })),
       };
 
       // Always re-fetch from DB to determine create vs update
-      const profiles = await base44.entities.FamilyProfile.filter({ created_by: user.email });
+      const profiles = await base44.entities.FamilyProfile.list();
       const isNew = profiles.length === 0;
 
       if (profiles.length > 0) {
