@@ -29,8 +29,48 @@ export default function NannyBookings() {
     enabled: !!user?.email,
   });
 
+  const sendBookingMessage = async (booking, newStatus) => {
+    const parentEmail = booking.created_by;
+    const nannyEmail = user.email;
+    const nannyName = user.full_name || 'Dadilja';
+    const statusText = newStatus === 'Potvrđeno' ? 'potvrđena' : 'otkazana';
+    const content = `Vaša rezervacija za ${booking.date} je ${statusText}.`;
+
+    // Find existing conversation between nanny and parent
+    const conversations = await base44.entities.Conversation.filter({ participant_emails: parentEmail });
+    let conv = conversations.find(c => c.participant_emails?.includes(nannyEmail));
+
+    if (!conv) {
+      conv = await base44.entities.Conversation.create({
+        participant_emails: [nannyEmail, parentEmail],
+        participant_names: [nannyName, booking.family_name || 'Roditelj'],
+        last_message: content,
+        last_message_date: new Date().toISOString(),
+        unread_count: 1,
+      });
+    } else {
+      await base44.entities.Conversation.update(conv.id, {
+        last_message: content,
+        last_message_date: new Date().toISOString(),
+        unread_count: (conv.unread_count || 0) + 1,
+      });
+    }
+
+    await base44.entities.Message.create({
+      conversation_id: String(conv.id),
+      sender_email: nannyEmail,
+      sender_name: nannyName,
+      receiver_email: parentEmail,
+      content,
+      read: false,
+    });
+  };
+
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Booking.update(id, data),
+    mutationFn: async ({ id, data, booking }) => {
+      await base44.entities.Booking.update(id, data);
+      await sendBookingMessage(booking, data.status);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['nannyBookingsAll'] });
       toast.success('Rezervacija ažurirana');
@@ -68,7 +108,7 @@ export default function NannyBookings() {
               <Button
                 size="sm"
                 className="h-7 px-2.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
-                onClick={() => updateMutation.mutate({ id: booking.id, data: { status: 'Potvrđeno' } })}
+                onClick={() => updateMutation.mutate({ id: booking.id, data: { status: 'Potvrđeno' }, booking })}
               >
                 <Check className="w-3 h-3 mr-1" /> Prihvati
               </Button>
@@ -93,7 +133,7 @@ export default function NannyBookings() {
                     <AlertDialogCancel>Odustani</AlertDialogCancel>
                     <AlertDialogAction
                       className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
-                      onClick={() => updateMutation.mutate({ id: booking.id, data: { status: 'Otkazano' } })}
+                      onClick={() => updateMutation.mutate({ id: booking.id, data: { status: 'Otkazano' }, booking })}
                     >
                       Odbij rezervaciju
                     </AlertDialogAction>
