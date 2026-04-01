@@ -19,7 +19,7 @@ export default function FamilySettings() {
 
   const { data: profiles = [] } = useQuery({
     queryKey: ['familyProfile', user?.email],
-    queryFn: () => base44.entities.FamilyProfile.filter({ user_email: user?.email }),
+    queryFn: () => base44.entities.FamilyProfile.filter({ created_by: user?.email }),
     enabled: !!user?.email,
   });
 
