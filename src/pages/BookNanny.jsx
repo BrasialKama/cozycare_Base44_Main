@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function BookNanny() {
   const params = new URLSearchParams(window.location.search);
@@ -252,21 +253,33 @@ export default function BookNanny() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Početak</Label>
-                <input
-                  type="time"
-                  value={form.start_time}
-                  onChange={e => update('start_time', e.target.value)}
-                  className="w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
-                />
+                <Select value={form.start_time} onValueChange={val => update('start_time', val)}>
+                  <SelectTrigger className="rounded-xl">
+                    <SelectValue placeholder="Odaberi" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: 48 }, (_, i) => {
+                      const h = String(Math.floor(i / 2)).padStart(2, '0');
+                      const m = i % 2 === 0 ? '00' : '30';
+                      return <SelectItem key={`s-${i}`} value={`${h}:${m}`}>{h}:{m}</SelectItem>;
+                    })}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Završetak</Label>
-                <input
-                  type="time"
-                  value={form.end_time}
-                  onChange={e => update('end_time', e.target.value)}
-                  className="w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
-                />
+                <Select value={form.end_time} onValueChange={val => update('end_time', val)}>
+                  <SelectTrigger className="rounded-xl">
+                    <SelectValue placeholder="Odaberi" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Array.from({ length: 48 }, (_, i) => {
+                      const h = String(Math.floor(i / 2)).padStart(2, '0');
+                      const m = i % 2 === 0 ? '00' : '30';
+                      return <SelectItem key={`e-${i}`} value={`${h}:${m}`}>{h}:{m}</SelectItem>;
+                    })}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
