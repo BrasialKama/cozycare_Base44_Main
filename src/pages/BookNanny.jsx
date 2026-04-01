@@ -256,10 +256,6 @@ export default function BookNanny() {
               </div>
             </div>
 
-            <div className="text-xs text-red-500 font-mono p-2 bg-red-50 rounded">
-              DEBUG: start="{form.start_time}" end="{form.end_time}" duration={durationHours} rate={rate}
-            </div>
-
             {timeError && (
               <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/8 px-3.5 py-2 rounded-xl">
                 <AlertCircle className="w-4 h-4 flex-shrink-0" /> {timeError}
