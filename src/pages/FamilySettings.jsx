@@ -76,7 +76,6 @@ export default function FamilySettings() {
   const saveMutation = useMutation({
     mutationFn: async () => {
       const data = {
-        user_email: user.email,
         family_name: form.family_name,
         address: form.address,
         neighborhood: form.neighborhood,
@@ -87,21 +86,32 @@ export default function FamilySettings() {
         preferred_languages: form.preferred_languages.split(',').map(s => s.trim()).filter(Boolean),
         children: form.children.filter(c => c.name),
       };
-      if (existing) {
-        await base44.entities.FamilyProfile.update(existing.id, data);
+
+      // Always re-fetch from DB to determine create vs update
+      const profiles = await base44.entities.FamilyProfile.filter({ created_by: user.email });
+      const isNew = profiles.length === 0;
+
+      if (profiles.length > 0) {
+        await base44.entities.FamilyProfile.update(profiles[0].id, data);
       } else {
-        await base44.entities.FamilyProfile.create(data);
+        await base44.entities.FamilyProfile.create({ ...data, user_email: user.email });
       }
+
       await base44.auth.updateMe({
         onboarding_complete: true,
         display_name: form.family_name || user?.full_name,
         phone: form.phone,
       });
+
+      return { isNew };
     },
-    onSuccess: () => {
+    onSuccess: ({ isNew }) => {
       queryClient.invalidateQueries({ queryKey: ['familyProfile'] });
-      toast.success('Profil obitelji spremljen!');
-      if (!existing) navigate('/Home');
+      toast.success('Profil spremljen ✓');
+      if (isNew) navigate('/Home');
+    },
+    onError: (error) => {
+      toast.error('Greška pri spremanju: ' + (error?.message || 'Nepoznata greška'));
     },
   });
 
