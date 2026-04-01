@@ -26,7 +26,7 @@ export default function Messages() {
 
   const { data: messages = [], refetch: refetchMessages } = useQuery({
     queryKey: ['messages', activeConv],
-    queryFn: () => base44.entities.Message.filter({ conversation_id: activeConv }, 'created_date', 100),
+    queryFn: () => base44.entities.Message.filter({ conversation_id: String(activeConv) }, 'created_date', 100),
     enabled: !!activeConv,
     refetchInterval: 5000,
   });

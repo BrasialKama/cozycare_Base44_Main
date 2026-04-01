@@ -109,8 +109,8 @@ export default function BookNanny() {
       }).catch(() => {});
 
       // 2. In-app confirmation message to parent
-      const convId = `booking-${Date.now()}`;
-      await base44.entities.Conversation.create({
+      const botMessage = `✅ Vaša rezervacija s dadiljom ${nanny.first_name} ${nanny.last_name} za ${bookingData.date} od ${bookingData.start_time} do ${bookingData.end_time} je zaprimljena. Ukupno: €${bookingData.total_price}. Dadilja će potvrditi u najkraćem roku.`;
+      const conv = await base44.entities.Conversation.create({
         participant_emails: ['bot@cozycare.hr', user.email],
         participant_names: ['CozyCare Bot', user.full_name || 'Roditelj'],
         last_message: `Rezervacija s dadiljom ${nanny.first_name} zaprimljena.`,
@@ -118,11 +118,11 @@ export default function BookNanny() {
         unread_count: 1,
       });
       await base44.entities.Message.create({
-        conversation_id: convId + '-parent',
+        conversation_id: String(conv.id),
         sender_email: 'bot@cozycare.hr',
         sender_name: 'CozyCare Bot',
         receiver_email: user.email,
-        content: `✅ Vaša rezervacija s dadiljom ${nanny.first_name} ${nanny.last_name} za ${bookingData.date} od ${bookingData.start_time} do ${bookingData.end_time} je zaprimljena. Ukupno: €${bookingData.total_price}. Dadilja će potvrditi u najkraćem roku.`,
+        content: botMessage,
         read: false,
       });
     },
