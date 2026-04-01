@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
@@ -39,6 +39,20 @@ export default function BookNanny() {
     children_count: 1,
     special_notes: '',
   });
+
+  // Pre-fill address from FamilyProfile
+  const { data: familyProfiles } = useQuery({
+    queryKey: ['familyProfile', user?.email],
+    queryFn: () => base44.entities.FamilyProfile.filter({ created_by: user?.email }),
+    enabled: !!user?.email,
+  });
+
+  useEffect(() => {
+    const addr = familyProfiles?.[0]?.address;
+    if (addr && !form.address) {
+      setForm(prev => ({ ...prev, address: addr }));
+    }
+  }, [familyProfiles]);
 
   const update = (key, val) => {
     console.log(`Field update: ${key} =`, JSON.stringify(val));
