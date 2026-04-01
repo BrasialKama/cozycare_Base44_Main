@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { Calendar, Clock, Check, X } from 'lucide-react';
+import { Calendar, Clock, Check, X, AlertTriangle } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +10,7 @@ import PageHeader from '@/components/shared/PageHeader';
 import EmptyState from '@/components/shared/EmptyState';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 const statusStyles = {
   'Na čekanju': 'bg-peach/50 text-peach-dark',
@@ -62,34 +63,44 @@ export default function NannyBookings() {
         </div>
         <div className="text-right">
           <p className="font-display font-semibold text-primary">€{booking.total_price?.toFixed(2)}</p>
-          {showActions && booking.status === 'Na čekanju' && (
+          {booking.status === 'Na čekanju' && (
             <div className="flex gap-1.5 mt-2">
               <Button
                 size="sm"
-                className="h-7 px-2.5 text-xs"
+                className="h-7 px-2.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
                 onClick={() => updateMutation.mutate({ id: booking.id, data: { status: 'Potvrđeno' } })}
               >
                 <Check className="w-3 h-3 mr-1" /> Prihvati
               </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-7 px-2.5 text-xs text-destructive"
-                onClick={() => updateMutation.mutate({ id: booking.id, data: { status: 'Otkazano' } })}
-              >
-                <X className="w-3 h-3 mr-1" /> Odbij
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 px-2.5 text-xs border-destructive/40 text-destructive hover:bg-destructive/10"
+                  >
+                    <X className="w-3 h-3 mr-1" /> Odbij
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Jesi li siguran/sigurna?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Ova rezervacija će biti odbijena i obitelj će biti obaviještena.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Odustani</AlertDialogCancel>
+                    <AlertDialogAction
+                      className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                      onClick={() => updateMutation.mutate({ id: booking.id, data: { status: 'Otkazano' } })}
+                    >
+                      Odbij rezervaciju
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
-          )}
-          {booking.status === 'Potvrđeno' && (
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-7 px-2.5 text-xs mt-2"
-              onClick={() => updateMutation.mutate({ id: booking.id, data: { status: 'Završeno' } })}
-            >
-              Označi završenim
-            </Button>
           )}
         </div>
       </div>
