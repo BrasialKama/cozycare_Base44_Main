@@ -104,6 +104,14 @@ export default function NannyOnboarding() {
     <div className="min-h-screen bg-gradient-to-br from-ivory via-background to-rose-light/20 flex items-center justify-center p-4">
       <div className="w-full max-w-lg">
 
+        {/* Back button */}
+        <button
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors group"
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" /> Natrag
+        </button>
+
         {/* Header */}
         <div className="text-center mb-10">
           <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-primary/20 to-peach/50 flex items-center justify-center mx-auto mb-4 shadow-md">
