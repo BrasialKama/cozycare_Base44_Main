@@ -18,11 +18,14 @@ export default function BookNanny() {
   const queryClient = useQueryClient();
   const [submitted, setSubmitted] = useState(false);
 
-  const { data: nanny } = useQuery({
+  const { data: nanny, isLoading, isError } = useQuery({
     queryKey: ['nannyProfile', nannyId],
     queryFn: async () => {
-      const profiles = await base44.entities.NannyProfile.filter({ id: nannyId });
-      return profiles[0];
+      console.log('BookNanny: fetching nanny with id =', nannyId);
+      const all = await base44.entities.NannyProfile.list();
+      const found = all.find(p => String(p.id) === String(nannyId));
+      console.log('BookNanny: found nanny =', found ? `${found.first_name} ${found.last_name}` : 'NOT FOUND');
+      return found || null;
     },
     enabled: !!nannyId,
   });
@@ -129,10 +132,36 @@ export default function BookNanny() {
     },
   });
 
-  if (!nanny) {
+  if (!nannyId) {
+    return (
+      <div className="max-w-lg mx-auto pt-16 text-center">
+        <AlertCircle className="w-10 h-10 text-destructive mx-auto mb-4" />
+        <h2 className="font-display text-xl font-bold mb-2">Dadilja nije odabrana</h2>
+        <p className="text-muted-foreground mb-6">Niste odabrali dadilju za rezervaciju.</p>
+        <Link to="/FindNannies">
+          <Button className="rounded-2xl px-8">Pronađi dadilje</Button>
+        </Link>
+      </div>
+    );
+  }
+
+  if (isLoading) {
     return (
       <div className="h-96 flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-muted border-t-primary rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!nanny) {
+    return (
+      <div className="max-w-lg mx-auto pt-16 text-center">
+        <AlertCircle className="w-10 h-10 text-destructive mx-auto mb-4" />
+        <h2 className="font-display text-xl font-bold mb-2">Dadilja nije pronađena</h2>
+        <p className="text-muted-foreground mb-6">Profil dadilje nije dostupan. Pokušajte ponovo.</p>
+        <Link to="/FindNannies">
+          <Button className="rounded-2xl px-8">Pronađi dadilje</Button>
+        </Link>
       </div>
     );
   }
