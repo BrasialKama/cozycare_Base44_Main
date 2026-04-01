@@ -22,14 +22,14 @@ const Logo = () => (
 
 const navItems = {
   parent: [
-    { path: '/', icon: Home, label: 'Početna' },
+    { path: '/Home', icon: Home, label: 'Početna' },
     { path: '/FindNannies', icon: Search, label: 'Pretraži dadilje' },
     { path: '/MyBookings', icon: Calendar, label: 'Rezervacije' },
     { path: '/Messages', icon: MessageCircle, label: 'Poruke' },
     { path: '/FamilySettings', icon: User, label: 'Moja obitelj' },
   ],
   nanny: [
-    { path: '/', icon: Home, label: 'Početna' },
+    { path: '/Home', icon: Home, label: 'Početna' },
     { path: '/NannyBookings', icon: Calendar, label: 'Moje rezervacije' },
     { path: '/Messages', icon: MessageCircle, label: 'Poruke' },
     { path: '/Earnings', icon: DollarSign, label: 'Zarada' },
@@ -62,14 +62,14 @@ function NavLink({ item, active, onClick }) {
 
 const mobileTabNav = {
   parent: [
-    { path: '/', icon: Home, label: 'Početna' },
+    { path: '/Home', icon: Home, label: 'Početna' },
     { path: '/FindNannies', icon: Search, label: 'Pretraži' },
     { path: '/MyBookings', icon: Calendar, label: 'Rezervacije' },
     { path: '/Messages', icon: MessageCircle, label: 'Poruke' },
     { path: '/FamilySettings', icon: User, label: 'Profil' },
   ],
   nanny: [
-    { path: '/', icon: Home, label: 'Početna' },
+    { path: '/Home', icon: Home, label: 'Početna' },
     { path: '/NannyBookings', icon: Calendar, label: 'Rezervacije' },
     { path: '/Messages', icon: MessageCircle, label: 'Poruke' },
     { path: '/Earnings', icon: DollarSign, label: 'Zarada' },
@@ -101,7 +101,7 @@ export default function AppLayout() {
 
         <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
           {items.map((item) => {
-            const active = item.path === '/'
+            const active = item.path === '/Home'
               ? location.pathname === '/' || location.pathname === '/Home'
               : location.pathname === item.path;
             return (
@@ -146,7 +146,7 @@ export default function AppLayout() {
       <div className="lg:hidden fixed bottom-0 inset-x-0 bg-card/97 backdrop-blur-md border-t border-border/60 z-30">
         <div className="flex items-center justify-around py-2">
           {mobileTabItems.map((item) => {
-            const active = item.path === '/'
+            const active = item.path === '/Home'
               ? location.pathname === '/' || location.pathname === '/Home'
               : location.pathname === item.path;
             return (
