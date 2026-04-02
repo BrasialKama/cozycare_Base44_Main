@@ -10,8 +10,8 @@ import { base44 } from '@/api/base44Client';
 import useUnreadMessages from '@/hooks/useUnreadMessages';
 
 const Logo = () => (
-  <Link to="/Landing" className="flex items-center gap-3 py-2.5 px-3 -mx-2 rounded-xl group hover:bg-muted/40 transition-colors">
-    <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-primary/25 to-peach/60 flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
+  <Link to="/Landing" className="flex items-center gap-3 h-full px-3 -mx-2 group hover:bg-muted/40 transition-colors">
+    <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-primary/25 to-peach/60 flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow flex-shrink-0">
       <Heart className="w-4 h-4 text-primary" fill="currentColor" />
     </div>
     <div>
@@ -152,7 +152,7 @@ export default function AppLayout() {
         {user ? (
           <Button
             variant="ghost"
-            className="text-xs text-muted-foreground hover:text-foreground rounded-xl gap-1.5 min-h-[40px] px-4 py-2.5"
+            className="text-xs text-muted-foreground hover:text-foreground rounded-none gap-1.5 h-full px-4"
             onClick={() => base44.auth.logout('/')}
           >
             <LogOut className="w-4 h-4" />
@@ -161,7 +161,7 @@ export default function AppLayout() {
         ) : (
           <Button
             variant="ghost"
-            className="text-xs text-muted-foreground hover:text-foreground rounded-xl min-h-[40px] px-4 py-2.5"
+            className="text-xs text-muted-foreground hover:text-foreground rounded-none h-full px-4"
             onClick={() => base44.auth.redirectToLogin(window.location.pathname)}
           >
             Prijava
