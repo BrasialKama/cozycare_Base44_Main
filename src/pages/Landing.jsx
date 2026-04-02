@@ -11,7 +11,7 @@ import LandingFooter from '@/components/landing/LandingFooter';
 
 export default function Landing() {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col -mx-4 sm:-mx-6 lg:-mx-8 overflow-x-hidden">
       <LandingHeader />
       <HeroSection />
       <HowItWorks />

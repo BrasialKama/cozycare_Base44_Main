@@ -18,7 +18,7 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="relative min-h-[85vh] min-h-[620px] overflow-hidden pt-16">
+    <section className="relative min-h-[85vh] min-h-[620px] overflow-hidden pt-16 max-w-full">
       {/* Background image */}
       <div className="absolute inset-0 z-0">
         <img
@@ -44,8 +44,8 @@ export default function HeroSection() {
         />
       </div>
 
-      <div className="relative z-10 flex h-full items-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-xl">
+      <div className="relative z-10 flex h-full items-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-hidden">
+        <div className="max-w-xl min-w-0">
           {/* Social proof pill */}
           <div
             className="mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary"
@@ -73,7 +73,7 @@ export default function HeroSection() {
               }}
             />
             <h1
-              className="font-display text-5xl md:text-7xl font-bold leading-[1.08] tracking-tight text-foreground"
+              className="font-display text-4xl sm:text-5xl md:text-7xl font-bold leading-[1.08] tracking-tight text-foreground break-words"
               style={{
                 textShadow:
                   '0 1px 12px rgba(255,253,248,0.85), 0 0 32px rgba(255,253,248,0.6)',
