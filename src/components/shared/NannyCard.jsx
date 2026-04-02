@@ -16,7 +16,16 @@ export default function NannyCard({ nanny, onWatchVideo }) {
   const initial = (nanny.first_name || '?')[0];
 
   return (
-    <div className="bg-card border border-border/50 rounded-2xl p-5 hover:shadow-lg hover:border-primary/15 transition-all duration-300">
+    <div
+      className="rounded-2xl p-5 hover:shadow-lg transition-all duration-300"
+      style={{
+        background: 'rgba(255,255,255,0.7)',
+        border: '1px solid rgba(255,255,255,0.4)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+      }}
+    >
       <div className="flex gap-4">
         <Link to={`/NannyDetail?id=${nanny.id}`} className="flex-shrink-0">
           <div className="w-20 h-20 rounded-xl overflow-hidden border border-border/30">

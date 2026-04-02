@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Star, Search } from 'lucide-react';
+import { ArrowRight, Search } from 'lucide-react';
 
 const KVARTOVI = ['Gornji Grad', 'Maksimir', 'Trešnjevka', 'Črnomerec', 'Trnje', 'Novi Zagreb', 'Sesvete'];
 
@@ -18,7 +18,7 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="relative min-h-[85vh] min-h-[620px] overflow-hidden pt-16 max-w-full">
+    <section className="relative min-h-[85vh] min-h-[620px] overflow-hidden pt-0 max-w-full">
       {/* Background image */}
       <div className="absolute inset-0 z-0">
         <img
@@ -44,22 +44,8 @@ export default function HeroSection() {
         />
       </div>
 
-      <div className="relative z-10 flex h-full items-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <div className="relative z-10 flex h-full items-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-hidden pt-20 pb-12">
         <div className="max-w-xl min-w-0">
-          {/* Social proof pill */}
-          <div
-            className="mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary"
-            style={{
-              background: 'rgba(200,142,142,0.10)',
-              border: '1px solid rgba(200,142,142,0.25)',
-              backdropFilter: 'blur(10px)',
-              WebkitBackdropFilter: 'blur(10px)',
-            }}
-          >
-            <Star className="h-3.5 w-3.5 fill-current" />
-            217 provjerenih dadilja u Zagrebu · Vjeruju nam obitelji
-          </div>
-
           {/* Frosted content veil */}
           <div className="relative rounded-2xl p-1" style={{ isolation: 'isolate' }}>
             <div
@@ -98,11 +84,13 @@ export default function HeroSection() {
           {/* Location search bar */}
           <div className="mt-8">
             <div
-              className="flex items-center rounded-full shadow-lg shadow-foreground/5 overflow-hidden"
+              className="flex items-center rounded-full overflow-hidden"
               style={{
-                background: 'rgba(255,255,255,0.92)',
-                border: '1px solid rgba(200,142,142,0.18)',
+                background: 'rgba(255,255,255,0.6)',
+                border: '1px solid rgba(255,255,255,0.4)',
                 backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                boxShadow: '0 4px 24px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
               }}
             >
               <Search className="w-5 h-5 text-muted-foreground ml-5 flex-shrink-0" />
@@ -127,14 +115,14 @@ export default function HeroSection() {
                 <button
                   key={k}
                   onClick={() => { setQuery(k); navigate(`/FindNannies?q=${encodeURIComponent(k)}`); }}
-                  className="text-xs px-3.5 py-1.5 rounded-full font-medium border transition-all"
+                  className="text-xs px-3.5 py-1.5 rounded-full font-medium transition-all hover:scale-105"
                   style={{
-                    background: 'rgba(255,255,255,0.55)',
-                    borderColor: 'rgba(200,142,142,0.22)',
-                    backdropFilter: 'blur(8px)',
+                    background: 'rgba(255,255,255,0.6)',
+                    border: '1px solid rgba(255,255,255,0.4)',
+                    backdropFilter: 'blur(12px)',
+                    WebkitBackdropFilter: 'blur(12px)',
+                    boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(200,142,142,0.45)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(200,142,142,0.22)'; }}
                 >
                   {k}
                 </button>

@@ -170,7 +170,15 @@ export default function AppLayout() {
       </div>
 
       {/* ── Mobile bottom tab bar ── */}
-      <div className="lg:hidden fixed bottom-0 inset-x-0 bg-card/97 backdrop-blur-md border-t border-border/60 z-30">
+      <div
+        className="lg:hidden fixed bottom-0 inset-x-0 z-30"
+        style={{
+          background: 'rgba(255,255,255,0.75)',
+          borderTop: '1px solid rgba(255,255,255,0.4)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+        }}
+      >
         <div className="flex items-center justify-around py-2">
           {mobileTabItems.map((item) => {
             const active = item.path === '/Home'

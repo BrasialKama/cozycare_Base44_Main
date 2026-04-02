@@ -33,7 +33,16 @@ function StepCard({ step, isLast }) {
       )}
 
       {/* Emoji circle */}
-      <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/10 to-peach/30 border border-primary/10 flex items-center justify-center text-3xl mb-5 shadow-sm">
+      <div
+        className="w-20 h-20 rounded-2xl flex items-center justify-center text-3xl mb-5"
+        style={{
+          background: 'rgba(255,255,255,0.7)',
+          border: '1px solid rgba(255,255,255,0.4)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+        }}
+      >
         {step.emoji}
       </div>
 

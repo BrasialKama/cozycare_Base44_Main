@@ -20,7 +20,16 @@ export default function LandingNannyCard({ nanny }) {
   const certs = (nanny.certifications || []).slice(0, 3);
 
   return (
-    <div className="bg-card border border-border/50 rounded-2xl p-6 hover:shadow-lg transition-shadow duration-300">
+    <div
+      className="rounded-2xl p-6 hover:shadow-lg transition-all duration-300"
+      style={{
+        background: 'rgba(255,255,255,0.7)',
+        border: '1px solid rgba(255,255,255,0.4)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+      }}
+    >
       <div className="flex gap-4 mb-4">
         <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 border border-border/30">
           {nanny.photo_url ? (

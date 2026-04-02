@@ -28,7 +28,16 @@ const PILLARS = [
 
 function PillarCard({ pillar }) {
   return (
-    <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-sm border border-white/60 flex flex-col items-start">
+    <div
+      className="rounded-2xl p-6 flex flex-col items-start"
+      style={{
+        background: 'rgba(255,255,255,0.7)',
+        border: '1px solid rgba(255,255,255,0.4)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+      }}
+    >
       <span className="text-3xl mb-4">{pillar.emoji}</span>
       <h3 className="font-display text-base font-bold text-foreground mb-2">{pillar.title}</h3>
       <p className="text-sm text-muted-foreground leading-relaxed">{pillar.description}</p>
@@ -58,7 +67,16 @@ export default function SafetySection() {
         </div>
 
         {/* Callout banner */}
-        <div className="mt-12 bg-white/70 backdrop-blur-sm rounded-2xl border border-white/60 shadow-sm p-8 lg:p-10 text-center">
+        <div
+          className="mt-12 rounded-2xl p-8 lg:p-10 text-center"
+          style={{
+            background: 'rgba(255,255,255,0.65)',
+            border: '1px solid rgba(255,255,255,0.4)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            boxShadow: '0 4px 24px rgba(0,0,0,0.05)',
+          }}
+        >
           <p className="text-foreground font-body text-sm lg:text-base leading-relaxed max-w-xl mx-auto mb-6">
             <span className="font-semibold">217 provjerenih dadilja</span> čeka vas u Zagrebu.
             Bez skrivenih troškova — pregledavanje je uvijek besplatno.
