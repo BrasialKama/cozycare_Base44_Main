@@ -29,7 +29,7 @@ import Landing from '@/pages/Landing';
 import NannyPortal from '@/pages/NannyPortal';
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const { isLoadingAuth, isLoadingPublicSettings, isAuthenticated, authError, navigateToLogin } = useAuth();
 
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (
@@ -57,7 +57,7 @@ const AuthenticatedApp = () => {
       <Route path="/NannyOnboarding" element={<NannyOnboarding />} />
 
       {/* Landing page — outside AppLayout, shown to unauthenticated users */}
-      <Route path="/" element={authError ? <Landing /> : <Navigate to="/Home" replace />} />
+      <Route path="/" element={!isAuthenticated ? <Landing /> : <Navigate to="/Home" replace />} />
 
       {/* Routes inside AppLayout */}
       <Route element={<AppLayout />}>
