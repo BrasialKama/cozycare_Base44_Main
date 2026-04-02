@@ -10,7 +10,7 @@ import { base44 } from '@/api/base44Client';
 import useUnreadMessages from '@/hooks/useUnreadMessages';
 
 const Logo = () => (
-  <Link to="/" className="flex items-center gap-3 px-1 group">
+  <Link to="/Landing" className="flex items-center gap-3 px-1 group">
     <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-primary/25 to-peach/60 flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
       <Heart className="w-4 h-4 text-primary" fill="currentColor" />
     </div>

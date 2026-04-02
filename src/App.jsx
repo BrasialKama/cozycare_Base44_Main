@@ -58,6 +58,7 @@ const AuthenticatedApp = () => {
 
       {/* Landing page — outside AppLayout, shown to unauthenticated users */}
       <Route path="/" element={!isAuthenticated ? <Landing /> : <Navigate to="/Home" replace />} />
+      <Route path="/Landing" element={<Landing />} />
 
       {/* Routes inside AppLayout */}
       <Route element={<AppLayout />}>
