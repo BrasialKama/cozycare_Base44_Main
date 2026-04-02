@@ -7,11 +7,11 @@ function FooterSection({ title, links }) {
     <div>
       <h4 className="font-display text-sm font-bold uppercase tracking-wider text-foreground mb-4">{title}</h4>
       <ul className="space-y-3">
-        {links.map(({ label, to }) => (
+        {links.map(({ label }) => (
           <li key={label}>
-            <Link to={to} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <span className="text-sm text-muted-foreground opacity-50 cursor-default">
               {label}
-            </Link>
+            </span>
           </li>
         ))}
       </ul>
@@ -35,24 +35,24 @@ export default function LandingFooter() {
             Boutique tržište za čuvanje djece. Svaka dadilja na CozyCare-u ima potvrđen identitet, provjeru pozadine i provjerene reference.
           </p>
           {/* Social icons */}
-          <div className="flex items-center gap-4">
-            <a href="#" aria-label="Instagram" className="text-muted-foreground hover:text-foreground transition-colors">
+          <div className="flex items-center gap-4 opacity-50">
+            <span aria-label="Instagram" className="text-muted-foreground cursor-default">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <rect x="2" y="2" width="20" height="20" rx="5" />
                 <circle cx="12" cy="12" r="5" />
                 <circle cx="17.5" cy="6.5" r="1.5" fill="currentColor" stroke="none" />
               </svg>
-            </a>
-            <a href="#" aria-label="Facebook" className="text-muted-foreground hover:text-foreground transition-colors">
+            </span>
+            <span aria-label="Facebook" className="text-muted-foreground cursor-default">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" />
               </svg>
-            </a>
-            <a href="#" aria-label="Twitter" className="text-muted-foreground hover:text-foreground transition-colors">
+            </span>
+            <span aria-label="Twitter" className="text-muted-foreground cursor-default">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z" />
               </svg>
-            </a>
+            </span>
           </div>
         </div>
 
