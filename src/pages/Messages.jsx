@@ -2,9 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { MessageCircle, Send, ArrowLeft, Heart } from 'lucide-react';
+import { MessageCircle, Send, ArrowLeft, Heart, Pencil } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import useUnreadMessages from '@/hooks/useUnreadMessages';
 import SwipeableConversationItem from '@/components/messages/SwipeableConversationItem';
 
@@ -15,8 +16,31 @@ export default function Messages() {
   const queryClient = useQueryClient();
   const [activeConv, setActiveConv] = useState(initialConvId || null);
   const [newMessage, setNewMessage] = useState('');
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [showBulkConfirm, setShowBulkConfirm] = useState(false);
   const messagesEndRef = useRef(null);
   const { markAllRead } = useUnreadMessages();
+
+  const toggleSelection = (id) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const exitSelectionMode = () => {
+    setSelectionMode(false);
+    setSelectedIds(new Set());
+  };
+
+  const hideBulk = async () => {
+    const ids = [...selectedIds];
+    await Promise.all(ids.map(id => hideConversation(id)));
+    exitSelectionMode();
+  };
 
   // Mark unread messages as read when page opens
   useEffect(() => {
@@ -134,18 +158,51 @@ export default function Messages() {
               </p>
             </div>
           ) : (
-            <div className="space-y-2 overflow-y-auto">
-              {conversations.map(conv => (
-                <SwipeableConversationItem
-                  key={conv.id}
-                  conv={conv}
-                  isActive={activeConv === conv.id}
-                  otherName={getOtherName(conv)}
-                  onSelect={setActiveConv}
-                  onHide={hideConversation}
-                />
-              ))}
-            </div>
+            <>
+              {/* Selection toolbar or Uredi button */}
+              <div className="flex items-center justify-between mb-2">
+                {selectionMode ? (
+                  <div className="flex items-center gap-2 w-full">
+                    <span className="text-sm font-semibold text-foreground">{selectedIds.size} odabrano</span>
+                    <div className="ml-auto flex items-center gap-2">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="rounded-xl text-xs"
+                        disabled={selectedIds.size === 0}
+                        onClick={() => setShowBulkConfirm(true)}
+                      >
+                        Sakrij odabrano
+                      </Button>
+                      <Button variant="ghost" size="sm" className="rounded-xl text-xs" onClick={exitSelectionMode}>
+                        Odustani
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="ml-auto">
+                    <Button variant="ghost" size="sm" className="rounded-xl text-xs text-muted-foreground" onClick={() => setSelectionMode(true)}>
+                      <Pencil className="w-3.5 h-3.5 mr-1.5" />
+                      Uredi
+                    </Button>
+                  </div>
+                )}
+              </div>
+              <div className="space-y-2 overflow-y-auto">
+                {conversations.map(conv => (
+                  <SwipeableConversationItem
+                    key={conv.id}
+                    conv={conv}
+                    isActive={activeConv === conv.id}
+                    otherName={getOtherName(conv)}
+                    onSelect={selectionMode ? toggleSelection : setActiveConv}
+                    onHide={hideConversation}
+                    selectionMode={selectionMode}
+                    selected={selectedIds.has(conv.id)}
+                  />
+                ))}
+              </div>
+            </>
           )}
         </div>
 
@@ -224,6 +281,27 @@ export default function Messages() {
           )}
         </div>
       </div>
+
+      {/* Bulk hide confirmation */}
+      <AlertDialog open={showBulkConfirm} onOpenChange={setShowBulkConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Sakriti {selectedIds.size} razgovora?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Odabrani razgovori će biti skriveni iz vašeg popisa. Ako vam osoba pošalje novu poruku, razgovor će se ponovo pojaviti.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Odustani</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+              onClick={hideBulk}
+            >
+              Da
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

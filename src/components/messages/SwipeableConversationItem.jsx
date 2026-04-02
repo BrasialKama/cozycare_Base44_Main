@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
-export default function SwipeableConversationItem({ conv, isActive, otherName, onSelect, onHide }) {
+export default function SwipeableConversationItem({ conv, isActive, otherName, onSelect, onHide, selectionMode = false, selected = false }) {
   const startX = useRef(0);
   const [offsetX, setOffsetX] = useState(0);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -28,6 +28,10 @@ export default function SwipeableConversationItem({ conv, isActive, otherName, o
   };
 
   const handleClick = () => {
+    if (selectionMode) {
+      onSelect(conv.id);
+      return;
+    }
     if (offsetX > 0) {
       setOffsetX(0);
     } else {
@@ -61,7 +65,14 @@ export default function SwipeableConversationItem({ conv, isActive, otherName, o
         onClick={handleClick}
       >
         <div className="flex items-center gap-3">
-          <div className={`w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 ${isActive ? 'bg-primary/15' : 'bg-gradient-to-br from-rose-light to-peach/60'}`}>
+          {selectionMode && (
+            <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors ${selected ? 'bg-primary border-primary' : 'border-border'}`}>
+              {selected && (
+                <svg className="w-3 h-3 text-primary-foreground" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 6l2.5 2.5 4.5-5" /></svg>
+              )}
+            </div>
+          )}
+          <div className={`w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 ${isActive && !selectionMode ? 'bg-primary/15' : 'bg-gradient-to-br from-rose-light to-peach/60'}`}>
             <span className="text-sm font-bold text-primary">{otherName[0]}</span>
           </div>
           <div className="flex-1 min-w-0">
