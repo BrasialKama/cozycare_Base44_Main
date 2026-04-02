@@ -74,6 +74,16 @@
       },
       "description": "e.g. Potvr\u0111en ID, Video, Provjera pozadine, Reference"
     },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "default": "pending",
+      "description": "Admin approval status"
+    },
     "is_featured": {
       "type": "boolean",
       "default": false,
