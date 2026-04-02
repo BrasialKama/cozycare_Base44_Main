@@ -10,7 +10,7 @@ import { base44 } from '@/api/base44Client';
 import useUnreadMessages from '@/hooks/useUnreadMessages';
 
 const Logo = () => (
-  <Link to="/Landing" className="flex items-center gap-3 px-1 group">
+  <Link to="/Landing" className="flex items-center gap-3 py-2.5 px-3 -mx-2 rounded-xl group hover:bg-muted/40 transition-colors">
     <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-primary/25 to-peach/60 flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
       <Heart className="w-4 h-4 text-primary" fill="currentColor" />
     </div>
@@ -137,11 +137,10 @@ export default function AppLayout() {
           </div>
           <Button
             variant="ghost"
-            size="sm"
-            className="w-full justify-start text-muted-foreground hover:text-foreground text-xs rounded-xl"
+            className="w-full justify-start text-muted-foreground hover:text-foreground text-xs rounded-xl min-h-[40px] px-4 py-2.5"
             onClick={() => base44.auth.logout('/')}
           >
-            <LogOut className="w-3.5 h-3.5 mr-2" />
+            <LogOut className="w-4 h-4 mr-2" />
             Odjava
           </Button>
         </div>
@@ -153,18 +152,16 @@ export default function AppLayout() {
         {user ? (
           <Button
             variant="ghost"
-            size="sm"
-            className="text-xs text-muted-foreground hover:text-foreground rounded-xl gap-1.5"
+            className="text-xs text-muted-foreground hover:text-foreground rounded-xl gap-1.5 min-h-[40px] px-4 py-2.5"
             onClick={() => base44.auth.logout('/')}
           >
-            <LogOut className="w-3.5 h-3.5" />
+            <LogOut className="w-4 h-4" />
             Odjava
           </Button>
         ) : (
           <Button
             variant="ghost"
-            size="sm"
-            className="text-xs text-muted-foreground hover:text-foreground rounded-xl"
+            className="text-xs text-muted-foreground hover:text-foreground rounded-xl min-h-[40px] px-4 py-2.5"
             onClick={() => base44.auth.redirectToLogin(window.location.pathname)}
           >
             Prijava

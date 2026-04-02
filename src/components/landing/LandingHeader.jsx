@@ -26,7 +26,7 @@ export default function LandingHeader() {
         }}
       >
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2.5">
+        <Link to="/" className="flex items-center gap-2.5 py-2.5 px-3 -mx-3 rounded-xl hover:bg-black/5 transition-colors">
           <div className="w-9 h-9 rounded-full bg-primary/90 flex items-center justify-center">
             <Heart className="w-4.5 h-4.5 text-white fill-white" />
           </div>
@@ -34,19 +34,19 @@ export default function LandingHeader() {
         </Link>
 
         {/* Desktop nav — hidden on mobile, landing page only shows these links */}
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden md:flex items-center gap-2">
           {navItems.map((item) => (
             <Link
               key={item.label}
               to={item.to}
-              className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors"
+              className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors px-4 py-2.5 rounded-xl hover:bg-black/5 min-h-[40px] flex items-center"
             >
               {item.label}
             </Link>
           ))}
           <button
             onClick={handleSignOut}
-            className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors"
+            className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors px-4 py-2.5 rounded-xl hover:bg-black/5 min-h-[40px]"
           >
             Odjava
           </button>
