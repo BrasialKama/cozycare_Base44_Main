@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { MessageCircle, Send, ArrowLeft, Heart, Pencil } from 'lucide-react';
+import { MessageCircle, Send, ArrowLeft, Heart, Pencil, Search } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -153,9 +154,15 @@ export default function Messages() {
                 <MessageCircle className="w-7 h-7 text-primary/50" />
               </div>
               <p className="font-display font-semibold text-foreground mb-1">Još nema poruka</p>
-              <p className="text-sm text-muted-foreground max-w-[16rem]">
-                Posjetite profil dadilje i pošaljite joj poruku za početak.
+              <p className="text-sm text-muted-foreground max-w-[16rem] mb-5">
+                Posjetite profil dadilje i pošaljite joj prvu poruku.
               </p>
+              <Button asChild className="rounded-2xl px-6 h-10 font-semibold shadow-md shadow-primary/15">
+                <Link to="/FindNannies">
+                  <Search className="w-4 h-4 mr-2" />
+                  Pronađi dadilju
+                </Link>
+              </Button>
             </div>
           ) : (
             <>
