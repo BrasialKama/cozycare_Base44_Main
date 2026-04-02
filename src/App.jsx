@@ -56,9 +56,11 @@ const AuthenticatedApp = () => {
       <Route path="/Onboarding" element={<Onboarding />} />
       <Route path="/NannyOnboarding" element={<NannyOnboarding />} />
 
+      {/* Landing page — outside AppLayout, shown to unauthenticated users */}
+      <Route path="/" element={authError ? <Landing /> : <Navigate to="/Home" replace />} />
+
       {/* Routes inside AppLayout */}
       <Route element={<AppLayout />}>
-        <Route path="/" element={authError ? <Landing /> : <Navigate to="/Home" replace />} />
         <Route path="/Home" element={<Home />} />
         <Route path="/FindNannies" element={<FindNannies />} />
         <Route path="/NannyDetail" element={<NannyDetail />} />
