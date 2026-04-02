@@ -139,7 +139,7 @@ export default function AppLayout() {
             variant="ghost"
             size="sm"
             className="w-full justify-start text-muted-foreground hover:text-foreground text-xs rounded-xl"
-            onClick={() => base44.auth.logout()}
+            onClick={() => base44.auth.logout('/')}
           >
             <LogOut className="w-3.5 h-3.5 mr-2" />
             Odjava
@@ -147,9 +147,29 @@ export default function AppLayout() {
         </div>
       </aside>
 
-      {/* ── Mobile header (logo only, no hamburger/drawer) ── */}
-      <div className="lg:hidden fixed top-0 inset-x-0 h-14 bg-card/95 backdrop-blur-md border-b border-border/60 z-30 flex items-center px-4">
+      {/* ── Mobile header ── */}
+      <div className="lg:hidden fixed top-0 inset-x-0 h-14 bg-card/95 backdrop-blur-md border-b border-border/60 z-30 flex items-center justify-between px-4">
         <Logo />
+        {user ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-xs text-muted-foreground hover:text-foreground rounded-xl gap-1.5"
+            onClick={() => base44.auth.logout('/')}
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            Odjava
+          </Button>
+        ) : (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-xs text-muted-foreground hover:text-foreground rounded-xl"
+            onClick={() => base44.auth.redirectToLogin(window.location.pathname)}
+          >
+            Prijava
+          </Button>
+        )}
       </div>
 
       {/* ── Mobile bottom tab bar ── */}
