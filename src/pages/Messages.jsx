@@ -9,7 +9,7 @@ import useUnreadMessages from '@/hooks/useUnreadMessages';
 
 export default function Messages() {
   const params = new URLSearchParams(window.location.search);
-  const initialConvId = params.get('conversation');
+  const initialConvId = params.get('conversation_id') || params.get('conversation');
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [activeConv, setActiveConv] = useState(initialConvId || null);
@@ -52,6 +52,7 @@ export default function Messages() {
         receiver_email: receiverEmail,
         content: newMessage,
         sender_name: user.display_name || user.full_name,
+        read: false,
       });
       await base44.entities.Conversation.update(activeConv, {
         last_message: newMessage,
