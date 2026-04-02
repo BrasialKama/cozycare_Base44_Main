@@ -306,20 +306,27 @@ export default function NannyDetail() {
                 <p className="text-sm text-muted-foreground mt-1.5">po satu</p>
               </div>
               <Separator className="mb-6 opacity-40" />
-              {user?.role === 'parent' && (
-                <div className="space-y-2.5">
+              <div className="space-y-2.5">
+                {user?.role === 'parent' && (
                   <Link to={`/BookNanny?nanny_id=${nanny.id}`} className="block">
                     <Button className="w-full h-12 font-semibold rounded-2xl text-sm shadow-md shadow-primary/25">
                       <Calendar className="w-4 h-4 mr-2" />
                       Rezerviraj termin
                     </Button>
                   </Link>
+                )}
+                {user ? (
                   <Button variant="outline" className="w-full h-12 rounded-2xl text-sm border-border/60" onClick={handleMessage}>
                     <MessageCircle className="w-4 h-4 mr-2" />
                     Pošalji poruku
                   </Button>
-                </div>
-              )}
+                ) : (
+                  <Button variant="outline" className="w-full h-12 rounded-2xl text-sm border-border/60" onClick={() => base44.auth.redirectToLogin(window.location.pathname + window.location.search)}>
+                    <MessageCircle className="w-4 h-4 mr-2" />
+                    Prijavi se za slanje poruke
+                  </Button>
+                )}
+              </div>
               <div className="mt-6 pt-5 border-t border-border/40">
                 <div className="flex items-start gap-3">
                   <div className="w-9 h-9 rounded-xl bg-sage/25 flex items-center justify-center flex-shrink-0">
