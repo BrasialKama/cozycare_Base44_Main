@@ -1,0 +1,44 @@
+{
+  "name": "Conversation",
+  "type": "object",
+  "properties": {
+    "participant_emails": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Emails of participants"
+    },
+    "participant_names": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Display names of participants"
+    },
+    "last_message": {
+      "type": "string",
+      "description": "Preview of last message"
+    },
+    "last_message_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When last message was sent"
+    },
+    "unread_count": {
+      "type": "number",
+      "default": 0
+    },
+    "hidden_for": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "Emails of users who have hidden this conversation"
+    }
+  },
+  "required": [
+    "participant_emails"
+  ]
+}

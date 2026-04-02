@@ -6,6 +6,7 @@ import { MessageCircle, Send, ArrowLeft, Heart } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import useUnreadMessages from '@/hooks/useUnreadMessages';
+import SwipeableConversationItem from '@/components/messages/SwipeableConversationItem';
 
 export default function Messages() {
   const params = new URLSearchParams(window.location.search);
@@ -26,7 +27,10 @@ export default function Messages() {
     queryKey: ['conversations', user?.email],
     queryFn: async () => {
       const all = await base44.entities.Conversation.list('-updated_date');
-      return all.filter(c => c.participant_emails?.includes(user?.email));
+      return all.filter(c =>
+        c.participant_emails?.includes(user?.email) &&
+        !(c.hidden_for || []).includes(user?.email)
+      );
     },
     enabled: !!user?.email,
   });
@@ -54,9 +58,13 @@ export default function Messages() {
         sender_name: user.display_name || user.full_name,
         read: false,
       });
+      // Unhide conversation for receiver if they had hidden it
+      const currentHidden = conv?.hidden_for || [];
+      const updatedHidden = currentHidden.filter(e => e !== receiverEmail);
       await base44.entities.Conversation.update(activeConv, {
         last_message: newMessage,
         last_message_date: new Date().toISOString(),
+        hidden_for: updatedHidden,
       });
     },
     onSuccess: () => {
@@ -73,6 +81,16 @@ export default function Messages() {
 
   const getOtherName = (conv) =>
     conv.participant_names?.find((n, i) => conv.participant_emails[i] !== user?.email) || 'User';
+
+  const hideConversation = async (convId) => {
+    const conv = conversations.find(c => c.id === convId);
+    const currentHidden = conv?.hidden_for || [];
+    await base44.entities.Conversation.update(convId, {
+      hidden_for: [...currentHidden, user.email],
+    });
+    if (activeConv === convId) setActiveConv(null);
+    queryClient.invalidateQueries({ queryKey: ['conversations'] });
+  };
 
   return (
     <div className="flex flex-col h-[calc(100vh-10rem)] lg:h-[calc(100vh-8rem)]">
@@ -117,31 +135,16 @@ export default function Messages() {
             </div>
           ) : (
             <div className="space-y-2 overflow-y-auto">
-              {conversations.map(conv => {
-                const other = getOtherName(conv);
-                const isActive = activeConv === conv.id;
-                return (
-                  <button
-                    key={conv.id}
-                    onClick={() => setActiveConv(conv.id)}
-                    className={`w-full text-left p-4 rounded-2xl transition-all ${
-                      isActive
-                        ? 'bg-primary/8 border border-primary/20 shadow-sm'
-                        : 'bg-card border border-border/50 hover:border-primary/15 hover:shadow-sm'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 ${isActive ? 'bg-primary/15' : 'bg-gradient-to-br from-rose-light to-peach/60'}`}>
-                        <span className="text-sm font-bold text-primary">{other[0]}</span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-foreground truncate">{other}</p>
-                        <p className="text-xs text-muted-foreground truncate mt-0.5">{conv.last_message || 'Započnite razgovor…'}</p>
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
+              {conversations.map(conv => (
+                <SwipeableConversationItem
+                  key={conv.id}
+                  conv={conv}
+                  isActive={activeConv === conv.id}
+                  otherName={getOtherName(conv)}
+                  onSelect={setActiveConv}
+                  onHide={hideConversation}
+                />
+              ))}
             </div>
           )}
         </div>
