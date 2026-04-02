@@ -91,7 +91,7 @@ export default function NannyCard({ nanny, onWatchVideo }) {
       </div>
 
       {nanny.video_url && onWatchVideo && (
-        <div className="mt-3 pt-3 border-t border-border/40">
+        <div className="mt-3">
           <button
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); onWatchVideo(nanny); }}
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary/80 transition-colors"
@@ -101,6 +101,22 @@ export default function NannyCard({ nanny, onWatchVideo }) {
           </button>
         </div>
       )}
+
+      {/* Action buttons */}
+      <div className="mt-4 pt-3.5 border-t border-border/40 flex items-center justify-between">
+        <Link
+          to={`/NannyDetail?id=${nanny.id}`}
+          className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
+        >
+          Pogledaj profil
+        </Link>
+        <Link
+          to={`/BookNanny?nanny_id=${nanny.id}`}
+          className="text-sm font-semibold text-primary-foreground bg-primary hover:bg-primary/90 px-5 py-2 rounded-full transition-colors"
+        >
+          Rezerviraj
+        </Link>
+      </div>
     </div>
   );
 }
