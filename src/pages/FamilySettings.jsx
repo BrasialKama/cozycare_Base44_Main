@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { LogOut } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 
@@ -90,19 +88,6 @@ export default function FamilySettings() {
         <ProfileView profile={existing} onEdit={() => setEditing(true)} />
       )}
 
-      {/* Logout */}
-      {!editing && (
-        <>
-          <Separator className="my-6 opacity-40" />
-          <Button
-            variant="ghost"
-            onClick={() => base44.auth.logout('/')}
-            className="w-full text-muted-foreground hover:text-destructive h-11 font-medium"
-          >
-            <LogOut className="w-4 h-4 mr-2" /> Odjava
-          </Button>
-        </>
-      )}
     </div>
   );
 }
