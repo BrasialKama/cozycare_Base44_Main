@@ -14,8 +14,8 @@ export default function TrustPillars() {
             Zlatni standard povjerenja
           </h2>
           <p className="mt-4 text-muted-foreground text-lg leading-relaxed">
-            Svaka dadilja na CozyCare-u prolazi naš rigorozan postupak provjere
-            — kako biste pregledavali s potpunim povjerenjem.
+            Svaka dadilja prolazi provjeru identiteta, reference i osobni razgovor
+            — jer vaš mir je naša briga.
           </p>
         </div>
 

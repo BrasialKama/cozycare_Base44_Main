@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Clock, Award, CheckCircle2, Star, Video } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import NannyTrustBadges from '@/components/shared/NannyTrustBadges';
 
 const CERT_STYLE = {
   'Potvrđen ID': 'text-primary bg-primary/8',
@@ -84,19 +85,10 @@ export default function NannyCard({ nanny, onWatchVideo }) {
         )}
       </div>
 
-      {nanny.certifications?.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mt-3">
-          {nanny.certifications.slice(0, 3).map(c => {
-            const color = CERT_STYLE[c] || 'text-muted-foreground bg-muted/50';
-            return (
-              <span key={c} className={`inline-flex items-center gap-1 text-[10px] font-semibold ${color} px-2.5 py-1 rounded-full`}>
-                <CheckCircle2 className="w-2.5 h-2.5" />
-                {c}
-              </span>
-            );
-          })}
-        </div>
-      )}
+      {/* Trust & scarcity badges */}
+      <div className="mt-3">
+        <NannyTrustBadges nanny={nanny} />
+      </div>
 
       {nanny.video_url && onWatchVideo && (
         <div className="mt-3 pt-3 border-t border-border/40">

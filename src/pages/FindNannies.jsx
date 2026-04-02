@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Search, X, Sparkles } from 'lucide-react';
+import { Search, X, Sparkles, ShieldCheck } from 'lucide-react';
 import { normalize } from '@/lib/normalize';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -122,11 +122,15 @@ export default function FindNannies() {
           Provjerene dadilje
         </p>
         <h1 className="font-display text-3xl lg:text-4xl font-bold text-foreground leading-tight">
-          Pronađite savršenu dadilju
+          Pronađite dadilju kojoj vjerujete
         </h1>
         <p className="mt-1.5 text-muted-foreground text-sm max-w-lg">
-          Svaka dadilja na CozyCare platformi je provjerena, s potvrđenim referencama i recenzijama stvarnih obitelji.
+          Svaka dadilja prolazi provjeru identiteta, reference i osobni razgovor. Jer vaš mir je naša briga.
         </p>
+        <div className="mt-3 inline-flex items-center gap-2 bg-sage/15 text-sage-foreground text-xs font-semibold px-3.5 py-2 rounded-full">
+          <ShieldCheck className="w-3.5 h-3.5" />
+          217 provjerenih dadilja u Zagrebu
+        </div>
       </div>
 
       {/* Search + sort row */}

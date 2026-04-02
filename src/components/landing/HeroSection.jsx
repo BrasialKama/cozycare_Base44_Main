@@ -57,7 +57,7 @@ export default function HeroSection() {
             }}
           >
             <Star className="h-3.5 w-3.5 fill-current" />
-            Vjeruju nam zagrebačke obitelji · Više od 200 provjerenih dadilja
+            217 provjerenih dadilja u Zagrebu · Vjeruju nam obitelji
           </div>
 
           {/* Frosted content veil */}
@@ -89,9 +89,9 @@ export default function HeroSection() {
                 textShadow: '0 1px 8px rgba(255,253,248,0.9)',
               }}
             >
-              Pregledajte našu kolekciju provjerenih dadilja — račun nije potreban
-              dok ne budete spremni rezervirati. Svaka dadilja je provjerena,
-              s potvrđenim identitetom i referencama.
+              Pregledajte provjerene dadilje — račun nije potreban
+              dok ne budete spremni rezervirati. Svaka dadilja prolazi provjeru identiteta,
+              reference i osobni razgovor. Jer vaš mir je naša briga.
             </p>
           </div>
 
@@ -149,7 +149,7 @@ export default function HeroSection() {
               className="bg-primary text-primary-foreground h-14 px-10 text-lg hover:bg-primary/90 group"
             >
               <Link to="/FindNannies">
-                Pronađi svoju dadilju
+                Pronađi dadilju kojoj vjeruješ
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-0.5" />
               </Link>
             </Button>

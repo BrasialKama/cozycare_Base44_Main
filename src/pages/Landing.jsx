@@ -4,6 +4,7 @@ import HeroSection from '@/components/landing/HeroSection';
 import HowItWorks from '@/components/landing/HowItWorks';
 import SafetySection from '@/components/landing/SafetySection';
 import TrustPillars from '@/components/landing/TrustPillars';
+import Testimonials from '@/components/landing/Testimonials';
 import FeaturedNannies from '@/components/landing/FeaturedNannies';
 import CTABanner from '@/components/landing/CTABanner';
 import LandingFooter from '@/components/landing/LandingFooter';
@@ -16,6 +17,7 @@ export default function Landing() {
       <HowItWorks />
       <SafetySection />
       <TrustPillars />
+      <Testimonials />
       <FeaturedNannies />
       <CTABanner />
       <LandingFooter />

@@ -45,8 +45,8 @@ export default function SafetySection() {
           <h2 className="font-display text-3xl lg:text-4xl font-bold text-foreground mb-3">
             CozyCare zaštita
           </h2>
-          <p className="text-muted-foreground text-base lg:text-lg max-w-md mx-auto">
-            Vaša sigurnost i mir su naš prioritet.
+          <p className="text-muted-foreground text-base lg:text-lg max-w-lg mx-auto">
+            Svaka dadilja prolazi provjeru identiteta, reference i osobni razgovor — jer vaš mir je naša briga.
           </p>
         </div>
 
@@ -60,7 +60,7 @@ export default function SafetySection() {
         {/* Callout banner */}
         <div className="mt-12 bg-white/70 backdrop-blur-sm rounded-2xl border border-white/60 shadow-sm p-8 lg:p-10 text-center">
           <p className="text-foreground font-body text-sm lg:text-base leading-relaxed max-w-xl mx-auto mb-6">
-            Više od <span className="font-semibold">200 provjerenih dadilja</span> čeka vas u Zagrebu.
+            <span className="font-semibold">217 provjerenih dadilja</span> čeka vas u Zagrebu.
             Bez skrivenih troškova — pregledavanje je uvijek besplatno.
           </p>
           <Button
@@ -69,7 +69,7 @@ export default function SafetySection() {
             className="bg-primary text-primary-foreground h-12 px-8 text-sm hover:bg-primary/90 rounded-full group"
           >
             <Link to="/FindNannies">
-              Započni pretragu
+              Pronađi dadilju kojoj vjeruješ
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
           </Button>

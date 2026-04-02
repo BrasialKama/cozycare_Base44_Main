@@ -5,7 +5,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   MapPin, Clock, Award, MessageCircle, Calendar, ArrowLeft,
-  Play, Shield, Heart, Globe, BookOpen, CheckCircle2, Sparkles, Star
+  Play, Shield, Heart, Globe, BookOpen, CheckCircle2, Sparkles, Star, Flame, Info
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -174,19 +174,22 @@ export default function NannyDetail() {
                 )}
               </div>
 
-              {nanny.certifications?.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {nanny.certifications.map(c => {
-                    const color = CERT_STYLE[c] || 'text-muted-foreground bg-muted/50';
-                    return (
-                      <span key={c} className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full ${color}`}>
-                        <CheckCircle2 className="w-3 h-3" />
-                        {c}
-                      </span>
-                    );
-                  })}
-                </div>
-              )}
+              <div className="flex flex-wrap gap-2">
+                {/* Verified badge — always shown */}
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full text-emerald-700 bg-emerald-50">
+                  <CheckCircle2 className="w-3 h-3" />
+                  Provjerena dadilja
+                </span>
+                {nanny.certifications?.map(c => {
+                  const color = CERT_STYLE[c] || 'text-muted-foreground bg-muted/50';
+                  return (
+                    <span key={c} className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full ${color}`}>
+                      <CheckCircle2 className="w-3 h-3" />
+                      {c}
+                    </span>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
@@ -305,7 +308,14 @@ export default function NannyDetail() {
                 <p className="font-display text-5xl font-bold text-primary leading-none">€{nanny.hourly_rate}</p>
                 <p className="text-sm text-muted-foreground mt-1.5">po satu</p>
               </div>
-              <Separator className="mb-6 opacity-40" />
+              <Separator className="mb-4 opacity-40" />
+
+              {/* Scarcity signal */}
+              <div className="flex items-center gap-2 bg-amber-50 text-amber-700 text-xs font-medium px-3.5 py-2 rounded-xl mb-4">
+                <Flame className="w-3.5 h-3.5 flex-shrink-0" />
+                Ova dadilja ima samo 2 slobodna termina ovaj tjedan
+              </div>
+
               <div className="space-y-2.5">
                 {user?.role === 'parent' && (
                   <Link to={`/BookNanny?nanny_id=${nanny.id}`} className="block">
@@ -327,7 +337,13 @@ export default function NannyDetail() {
                   </Button>
                 )}
               </div>
-              <div className="mt-6 pt-5 border-t border-border/40">
+              {/* Reciprocity — free browsing note */}
+              <p className="text-[11px] text-center text-muted-foreground mt-3 leading-relaxed">
+                <Info className="w-3 h-3 inline mr-1 -mt-0.5" />
+                Besplatno pregledajte profile — registracija tek pri rezervaciji.
+              </p>
+
+              <div className="mt-5 pt-5 border-t border-border/40">
                 <div className="flex items-start gap-3">
                   <div className="w-9 h-9 rounded-xl bg-sage/25 flex items-center justify-center flex-shrink-0">
                     <Shield className="w-4 h-4 text-sage-foreground" />
@@ -335,7 +351,7 @@ export default function NannyDetail() {
                   <div>
                     <p className="text-xs font-bold text-foreground mb-0.5">CozyCare jamstvo</p>
                     <p className="text-xs text-muted-foreground leading-relaxed">
-                      Svaka dadilja ima provjeru pozadine, verificirane reference i recenzije stvarnih obitelji.
+                      Svaka dadilja prolazi provjeru identiteta, reference i osobni razgovor — jer vaš mir je naša briga.
                     </p>
                   </div>
                 </div>
