@@ -11,21 +11,35 @@ const CERT_STYLE = {
   'Video': 'text-muted-foreground bg-muted/60',
 };
 
+const LIFESTYLE_IMAGES = [
+  'https://images.unsplash.com/photo-1555252333-9f8e92e65df9?w=800&q=60',
+  'https://images.unsplash.com/photo-1519340241574-2cec6aef0c01?w=800&q=60',
+  'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&q=60',
+  'https://images.unsplash.com/photo-1484665754804-74b091211472?w=800&q=60',
+  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=60',
+];
+
+const dailyImageUrl = LIFESTYLE_IMAGES[Math.floor(Date.now() / 86400000) % LIFESTYLE_IMAGES.length];
+
 export default function NannyCard({ nanny, onWatchVideo }) {
   const name = `${nanny.first_name} ${nanny.last_name}`;
   const initial = (nanny.first_name || '?')[0];
 
   return (
     <div
-      className="rounded-2xl p-5 hover:shadow-lg transition-all duration-300"
+      className="relative rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300"
       style={{
-        background: 'rgba(255,255,255,0.7)',
         border: '1px solid rgba(255,255,255,0.4)',
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
         boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
       }}
     >
+      {/* Background lifestyle image */}
+      <div className="absolute inset-0 z-0">
+        <img src={dailyImageUrl} alt="" className="w-full h-full object-cover" loading="lazy" />
+        <div className="absolute inset-0" style={{ background: 'rgba(255,255,255,0.84)' }} />
+      </div>
+      {/* Card content */}
+      <div className="relative z-10 p-5">
       <div className="flex gap-4">
         <Link to={`/NannyDetail?id=${nanny.id}`} className="flex-shrink-0">
           <div className="w-20 h-20 rounded-xl overflow-hidden border border-border/30">
@@ -125,6 +139,7 @@ export default function NannyCard({ nanny, onWatchVideo }) {
         >
           Rezerviraj
         </Link>
+      </div>
       </div>
     </div>
   );
