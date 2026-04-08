@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Search, X, Sparkles, ShieldCheck } from 'lucide-react';
@@ -51,8 +52,8 @@ const LANGUAGE_MAP = {
 };
 
 export default function FindNannies() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const [search, setSearch] = useState(urlParams.get('q') || '');
+  const [searchParams] = useSearchParams();
+  const [search, setSearch] = useState(searchParams.get('q') || '');
   const [sortBy, setSortBy] = useState('rating');
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);

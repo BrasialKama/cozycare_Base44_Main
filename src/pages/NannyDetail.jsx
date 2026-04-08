@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import {
   MapPin, Clock, Award, MessageCircle, Calendar, ArrowLeft,
   Play, Shield, Heart, Globe, BookOpen, CheckCircle2, Sparkles, Star, Flame, Info
@@ -63,8 +63,8 @@ function ReviewCard({ review, isFirst }) {
 }
 
 export default function NannyDetail() {
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get('id');
+  const [searchParams] = useSearchParams();
+  const id = searchParams.get('id');
   const { user } = useAuth();
   const navigate = useNavigate();
 

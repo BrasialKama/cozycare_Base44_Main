@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { MessageCircle, Send, ArrowLeft, Heart, Pencil, Search } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -11,8 +11,8 @@ import useUnreadMessages from '@/hooks/useUnreadMessages';
 import SwipeableConversationItem from '@/components/messages/SwipeableConversationItem';
 
 export default function Messages() {
-  const params = new URLSearchParams(window.location.search);
-  const initialConvId = params.get('conversation_id') || params.get('conversation');
+  const [searchParams] = useSearchParams();
+  const initialConvId = searchParams.get('conversation_id') || searchParams.get('conversation');
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [activeConv, setActiveConv] = useState(initialConvId || null);
@@ -58,13 +58,18 @@ export default function Messages() {
       );
     },
     enabled: !!user?.email,
+    refetchInterval: 10000,
+    refetchOnWindowFocus: true,
   });
 
+  // TODO: Replace polling with Base44 real-time subscriptions or WebSockets
+  // when the platform supports them, to reduce unnecessary network requests.
   const { data: messages = [], refetch: refetchMessages } = useQuery({
     queryKey: ['messages', activeConv],
     queryFn: () => base44.entities.Message.filter({ conversation_id: String(activeConv) }, 'created_date', 100),
     enabled: !!activeConv,
-    refetchInterval: 5000,
+    refetchInterval: activeConv ? 4000 : false,
+    refetchOnWindowFocus: true,
   });
 
   useEffect(() => {

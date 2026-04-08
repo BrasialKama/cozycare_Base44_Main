@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
@@ -12,8 +12,8 @@ import StarRating from '@/components/shared/StarRating';
 import { toast } from 'sonner';
 
 export default function LeaveReview() {
-  const params = new URLSearchParams(window.location.search);
-  const bookingId = params.get('booking_id');
+  const [searchParams] = useSearchParams();
+  const bookingId = searchParams.get('booking_id');
   const { user } = useAuth();
   const navigate = useNavigate();
 

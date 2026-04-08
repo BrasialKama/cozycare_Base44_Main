@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
@@ -10,10 +10,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { config } from '@/lib/config';
 
 export default function BookNanny() {
-  const params = new URLSearchParams(window.location.search);
-  const nannyId = params.get('nanny_id');
+  const [searchParams] = useSearchParams();
+  const nannyId = searchParams.get('nanny_id');
   const { user } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -22,11 +23,13 @@ export default function BookNanny() {
   const { data: nanny, isLoading, isError } = useQuery({
     queryKey: ['nannyProfile', nannyId],
     queryFn: async () => {
-      console.log('BookNanny: fetching nanny with id =', nannyId);
-      const all = await base44.entities.NannyProfile.list();
-      const found = all.find(p => String(p.id) === String(nannyId));
-      console.log('BookNanny: found nanny =', found ? `${found.first_name} ${found.last_name}` : 'NOT FOUND');
-      return found || null;
+      try {
+        const profile = await base44.entities.NannyProfile.get(nannyId);
+        return profile || null;
+      } catch (e) {
+        console.error('BookNanny: failed to fetch nanny', nannyId, e);
+        return null;
+      }
     },
     enabled: !!nannyId,
   });
@@ -116,26 +119,26 @@ export default function BookNanny() {
 
       await base44.entities.Booking.create(bookingData);
 
-      // 1. Email notification (fire-and-forget)
-      fetch('https://eutow-7c2f3dd9.base44.app/functions/bookingNotification', {
+      // 1. Email notification (fire-and-forget, but log errors)
+      fetch(config.notificationApiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ booking: bookingData }),
-      }).catch(() => {});
+      }).catch(err => console.error('Booking notification failed:', err));
 
       // 2. In-app confirmation message to parent
       const botMessage = `✅ Vaša rezervacija s dadiljom ${nanny.first_name} ${nanny.last_name} za ${bookingData.date} od ${bookingData.start_time} do ${bookingData.end_time} je zaprimljena. Ukupno: €${bookingData.total_price}. Dadilja će potvrditi u najkraćem roku.`;
       const conv = await base44.entities.Conversation.create({
-        participant_emails: ['bot@cozycare.hr', user.email],
-        participant_names: ['CozyCare Bot', user.full_name || 'Roditelj'],
+        participant_emails: [config.bot.email, user.email],
+        participant_names: [config.bot.name, user.full_name || 'Roditelj'],
         last_message: `Rezervacija s dadiljom ${nanny.first_name} zaprimljena.`,
         last_message_date: new Date().toISOString(),
         unread_count: 1,
       });
       await base44.entities.Message.create({
         conversation_id: String(conv.id),
-        sender_email: 'bot@cozycare.hr',
-        sender_name: 'CozyCare Bot',
+        sender_email: config.bot.email,
+        sender_name: config.bot.name,
         receiver_email: user.email,
         content: botMessage,
         read: false,

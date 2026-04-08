@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { BarChart3, Users, Calendar, Shield, DollarSign, ClipboardList, ArrowRight } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import PageHeader from '@/components/shared/PageHeader';
+import { config } from '@/lib/config';
 
 export default function AdminDashboard() {
   const { data: nannies = [] } = useQuery({
@@ -27,7 +28,7 @@ export default function AdminDashboard() {
   const completedBookings = bookings.filter(b => b.status === 'Završeno').length;
   const totalRevenue = bookings
     .filter(b => b.status === 'Završeno')
-    .reduce((sum, b) => sum + (b.total_price || 0) * 0.15, 0);
+    .reduce((sum, b) => sum + (b.total_price || 0) * config.platformFeeRate, 0);
   const openReports = reports.filter(r => r.status === 'open').length;
 
   const stats = [

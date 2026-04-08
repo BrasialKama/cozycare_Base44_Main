@@ -64,8 +64,35 @@ export default function NannyOnboarding() {
   const [photoFile, setPhotoFile] = useState(null);
   const [videoFile, setVideoFile] = useState(null);
   const [idFile, setIdFile] = useState(null);
+  const [stepErrors, setStepErrors] = useState([]);
 
   const update = (key, val) => setForm(prev => ({ ...prev, [key]: val }));
+
+  /** Returns array of error messages for the given step, or empty if valid */
+  const validateStep = (s) => {
+    const errors = [];
+    if (s === 0) {
+      if (!form.full_name.trim()) errors.push('Unesite puno ime');
+      if (!form.phone.trim()) errors.push('Unesite broj telefona');
+      if (!form.service_area.trim()) errors.push('Unesite područje rada');
+    }
+    if (s === 1) {
+      if (!form.hourly_rate || Number(form.hourly_rate) <= 0) errors.push('Unesite valjanu satnicu');
+      if (!form.languages.trim()) errors.push('Unesite barem jedan jezik');
+    }
+    if (s === 2) {
+      if (!photoFile) errors.push('Dodajte profilnu fotografiju');
+    }
+    return errors;
+  };
+
+  const tryAdvance = () => {
+    const errors = validateStep(step);
+    setStepErrors(errors);
+    if (errors.length === 0) {
+      setStep(s => s + 1);
+    }
+  };
 
   const createMutation = useMutation({
     mutationFn: async () => {
@@ -74,21 +101,30 @@ export default function NannyOnboarding() {
       if (videoFile) intro_video_url = (await base44.integrations.Core.UploadFile({ file: videoFile })).file_url;
       if (idFile) id_document_url = (await base44.integrations.Core.UploadFile({ file: idFile })).file_url;
 
+      const nameParts = form.full_name.trim().split(/\s+/);
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+
       await base44.entities.NannyProfile.create({
-        user_email: user.email,
-        full_name: form.full_name,
+        first_name: firstName,
+        last_name: lastName,
         display_name: form.display_name || form.full_name,
+        user_email: user.email,
         bio: form.bio,
         hourly_rate: Number(form.hourly_rate),
         years_experience: Number(form.years_experience),
         service_area: form.service_area,
+        location: form.service_area,
         education: form.education,
         languages: form.languages.split(',').map(s => s.trim()).filter(Boolean),
         specialties: form.specialties.split(',').map(s => s.trim()).filter(Boolean),
         certifications: form.certifications.split(',').map(s => s.trim()).filter(Boolean),
         emergency_contact: form.emergency_contact,
-        photo_url, intro_video_url, id_document_url,
-        status: 'pending', badges: [], avg_rating: 0, total_reviews: 0, total_bookings: 0,
+        photo_url,
+        intro_video_url,
+        video_url: intro_video_url,
+        id_document_url,
+        status: 'pending', badges: [], rating: 0, review_count: 0, total_bookings: 0,
       });
 
       await base44.auth.updateMe({
@@ -281,18 +317,29 @@ export default function NannyOnboarding() {
             </motion.div>
           </AnimatePresence>
 
+          {/* Validation errors */}
+          {stepErrors.length > 0 && (
+            <div className="mx-7 mb-2 bg-destructive/8 border border-destructive/20 rounded-xl px-4 py-3 space-y-1">
+              {stepErrors.map((err, i) => (
+                <p key={i} className="text-xs text-destructive font-medium flex items-center gap-1.5">
+                  <span className="w-1 h-1 rounded-full bg-destructive flex-shrink-0" /> {err}
+                </p>
+              ))}
+            </div>
+          )}
+
           {/* Navigation */}
           <div className="flex justify-between px-7 pb-7 pt-2 border-t border-border/40">
             <Button
               variant="ghost"
-              onClick={() => setStep(s => s - 1)}
+              onClick={() => { setStepErrors([]); setStep(s => s - 1); }}
               disabled={step === 0}
               className="rounded-xl"
             >
               <ArrowLeft className="w-4 h-4 mr-2" /> Natrag
             </Button>
             {step < 3 ? (
-              <Button onClick={() => setStep(s => s + 1)} className="rounded-xl">
+              <Button onClick={tryAdvance} className="rounded-xl">
                 Dalje <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             ) : (

@@ -27,6 +27,8 @@ import AdminBookings from '@/pages/AdminBookings';
 import AdminReports from '@/pages/AdminReports';
 import Landing from '@/pages/Landing';
 import NannyPortal from '@/pages/NannyPortal';
+import RequireRole from '@/components/auth/RequireRole';
+import ErrorBoundary from '@/components/shared/ErrorBoundary';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, isAuthenticated, authError, navigateToLogin } = useAuth();
@@ -46,41 +48,46 @@ const AuthenticatedApp = () => {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
     }
-    // For auth_required, still allow public browsing routes
-    // Only redirect to login for protected routes
   }
 
   return (
     <Routes>
       {/* Public routes — always accessible */}
-      <Route path="/Onboarding" element={<Onboarding />} />
-      <Route path="/NannyOnboarding" element={<NannyOnboarding />} />
+      <Route path="/Onboarding" element={<ErrorBoundary><Onboarding /></ErrorBoundary>} />
+      <Route path="/NannyOnboarding" element={<ErrorBoundary><NannyOnboarding /></ErrorBoundary>} />
 
       {/* Landing page — outside AppLayout, shown to unauthenticated users */}
       <Route path="/" element={!isAuthenticated ? <Landing /> : <Navigate to="/Home" replace />} />
-      {/* Landing for non-authenticated: no nav */}
       {!isAuthenticated && <Route path="/Landing" element={<Landing />} />}
 
-      {/* Routes inside AppLayout */}
+      {/* Routes inside AppLayout — ErrorBoundary keeps the nav alive on page crash */}
       <Route element={<AppLayout />}>
         {isAuthenticated && <Route path="/Landing" element={<Landing />} />}
-        <Route path="/Home" element={<Home />} />
-        <Route path="/FindNannies" element={<FindNannies />} />
-        <Route path="/NannyDetail" element={<NannyDetail />} />
-        <Route path="/BookNanny" element={<BookNanny />} />
-        <Route path="/MyBookings" element={<MyBookings />} />
-        <Route path="/NannyBookings" element={<NannyBookings />} />
-        <Route path="/Messages" element={<Messages />} />
-        <Route path="/FamilySettings" element={<FamilySettings />} />
-        <Route path="/NannyProfile" element={<NannyProfile />} />
-        <Route path="/LeaveReview" element={<LeaveReview />} />
-        <Route path="/Earnings" element={<Earnings />} />
-        <Route path="/SafetyCenter" element={<SafetyCenter />} />
-        <Route path="/AdminDashboard" element={<AdminDashboard />} />
-        <Route path="/AdminApplications" element={<AdminApplications />} />
-        <Route path="/AdminBookings" element={<AdminBookings />} />
-        <Route path="/AdminReports" element={<AdminReports />} />
-        <Route path="/NannyPortal" element={<NannyPortal />} />
+        <Route path="/Home" element={<ErrorBoundary><Home /></ErrorBoundary>} />
+        <Route path="/FindNannies" element={<ErrorBoundary><FindNannies /></ErrorBoundary>} />
+        <Route path="/NannyDetail" element={<ErrorBoundary><NannyDetail /></ErrorBoundary>} />
+        <Route path="/BookNanny" element={<ErrorBoundary><BookNanny /></ErrorBoundary>} />
+        <Route path="/MyBookings" element={<ErrorBoundary><MyBookings /></ErrorBoundary>} />
+        <Route path="/Messages" element={<ErrorBoundary><Messages /></ErrorBoundary>} />
+        <Route path="/FamilySettings" element={<ErrorBoundary><FamilySettings /></ErrorBoundary>} />
+        <Route path="/LeaveReview" element={<ErrorBoundary><LeaveReview /></ErrorBoundary>} />
+        <Route path="/SafetyCenter" element={<ErrorBoundary><SafetyCenter /></ErrorBoundary>} />
+
+        {/* Admin-only routes */}
+        <Route element={<RequireRole allowed={['admin']} />}>
+          <Route path="/AdminDashboard" element={<AdminDashboard />} />
+          <Route path="/AdminApplications" element={<AdminApplications />} />
+          <Route path="/AdminBookings" element={<AdminBookings />} />
+          <Route path="/AdminReports" element={<AdminReports />} />
+        </Route>
+
+        {/* Nanny-only routes */}
+        <Route element={<RequireRole allowed={['nanny']} />}>
+          <Route path="/NannyPortal" element={<NannyPortal />} />
+          <Route path="/NannyProfile" element={<NannyProfile />} />
+          <Route path="/NannyBookings" element={<NannyBookings />} />
+          <Route path="/Earnings" element={<Earnings />} />
+        </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
@@ -89,14 +96,16 @@ const AuthenticatedApp = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <QueryClientProvider client={queryClientInstance}>
-        <Router>
-          <AuthenticatedApp />
-        </Router>
-        <Toaster />
-      </QueryClientProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <QueryClientProvider client={queryClientInstance}>
+          <Router>
+            <AuthenticatedApp />
+          </Router>
+          <Toaster />
+        </QueryClientProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   )
 }
 

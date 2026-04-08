@@ -10,6 +10,14 @@
       "type": "string",
       "description": "Last name"
     },
+    "display_name": {
+      "type": "string",
+      "description": "Public-facing display name"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Email address from auth"
+    },
     "photo_url": {
       "type": "string",
       "description": "Profile photo URL"
@@ -22,6 +30,10 @@
       "type": "string",
       "description": "Zagreb neighbourhood, e.g. \u010crnomerec, Zagreb"
     },
+    "service_area": {
+      "type": "string",
+      "description": "Broader area where nanny works"
+    },
     "hourly_rate": {
       "type": "number",
       "description": "Rate in \u20ac/sat"
@@ -29,6 +41,10 @@
     "years_experience": {
       "type": "number",
       "description": "Years of childcare experience"
+    },
+    "education": {
+      "type": "string",
+      "description": "Education background"
     },
     "rating": {
       "type": "number",
@@ -38,6 +54,11 @@
       "type": "number",
       "default": 0,
       "description": "Total number of reviews"
+    },
+    "total_bookings": {
+      "type": "number",
+      "default": 0,
+      "description": "Lifetime completed bookings"
     },
     "specialties": {
       "type": "array",
@@ -74,6 +95,14 @@
       },
       "description": "e.g. Potvr\u0111en ID, Video, Provjera pozadine, Reference"
     },
+    "badges": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "Trust badges"
+    },
     "status": {
       "type": "string",
       "enum": [
@@ -97,6 +126,18 @@
     "video_url": {
       "type": "string",
       "description": "Optional intro video URL"
+    },
+    "intro_video_url": {
+      "type": "string",
+      "description": "Onboarding intro video URL"
+    },
+    "id_document_url": {
+      "type": "string",
+      "description": "Uploaded ID document (private, admin only)"
+    },
+    "emergency_contact": {
+      "type": "string",
+      "description": "Emergency contact info"
     }
   },
   "required": [
