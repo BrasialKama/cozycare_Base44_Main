@@ -6,9 +6,21 @@
       "type": "string",
       "description": "ID of the NannyProfile"
     },
+    "nanny_user_email": {
+      "type": "string",
+      "description": "Owner email of the nanny account"
+    },
     "nanny_name": {
       "type": "string",
       "description": "Denormalised nanny name for display"
+    },
+    "family_user_email": {
+      "type": "string",
+      "description": "Owner email of the parent/family account"
+    },
+    "family_profile_id": {
+      "type": "string",
+      "description": "Linked FamilyProfile id"
     },
     "family_name": {
       "type": "string",
@@ -33,7 +45,7 @@
     },
     "total_price": {
       "type": "number",
-      "description": "Calculated: duration \u00d7 hourly_rate"
+      "description": "Calculated total"
     },
     "status": {
       "type": "string",
@@ -65,7 +77,9 @@
   },
   "required": [
     "nanny_id",
+    "nanny_user_email",
     "nanny_name",
+    "family_user_email",
     "family_name",
     "date",
     "start_time",
