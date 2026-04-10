@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 
 import ProfileHeader from '@/components/profile/ProfileHeader';
@@ -12,17 +10,21 @@ import ProfileEditForm from '@/components/profile/ProfileEditForm';
 
 export default function FamilySettings() {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState(false);
 
-  const { data: profiles = [], isLoading } = useQuery({
+  const { data: existing = null, isLoading } = useQuery({
     queryKey: ['familyProfile', user?.email],
-    queryFn: () => base44.entities.FamilyProfile.list(),
+    queryFn: async () => {
+      const profiles = await base44.entities.FamilyProfile.filter(
+        { user_email: user?.email },
+        '-created_date',
+        1
+      );
+      return profiles?.[0] || null;
+    },
     enabled: !!user?.email,
   });
-
-  const existing = profiles[0] || null;
 
   const saveMutation = useMutation({
     mutationFn: async (form) => {
@@ -34,19 +36,31 @@ export default function FamilySettings() {
         emergency_contact: form.emergency_contact,
         schedule_preferences: form.schedule_preferences,
         special_requirements: form.special_requirements,
-        preferred_languages: form.preferred_languages.split(',').map(s => s.trim()).filter(Boolean),
-        children: form.children.filter(c => c.name).map(c => ({
-          ...c,
-          age: c.age !== '' ? Number(c.age) : undefined,
-        })),
+        preferred_languages: String(form.preferred_languages || '')
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean),
+        children: (form.children || [])
+          .filter(c => c.name)
+          .map(c => ({
+            ...c,
+            age: c.age !== '' ? Number(c.age) : undefined,
+          })),
       };
 
-      const currentProfiles = await base44.entities.FamilyProfile.list();
+      const currentProfiles = await base44.entities.FamilyProfile.filter(
+        { user_email: user?.email },
+        '-created_date',
+        1
+      );
 
       if (currentProfiles.length > 0) {
         await base44.entities.FamilyProfile.update(currentProfiles[0].id, data);
       } else {
-        await base44.entities.FamilyProfile.create({ ...data, user_email: user.email });
+        await base44.entities.FamilyProfile.create({
+          ...data,
+          user_email: user.email,
+        });
       }
 
       await base44.auth.updateMe({
@@ -56,7 +70,7 @@ export default function FamilySettings() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['familyProfile'] });
+      queryClient.invalidateQueries({ queryKey: ['familyProfile', user?.email] });
       toast.success('Profil spremljen ✓');
       setEditing(false);
     },
@@ -87,7 +101,6 @@ export default function FamilySettings() {
       ) : (
         <ProfileView profile={existing} onEdit={() => setEditing(true)} />
       )}
-
     </div>
   );
 }
