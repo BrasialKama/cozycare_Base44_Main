@@ -64,7 +64,10 @@ export default function FindNannies() {
 
   const { data: nannies = [], isLoading } = useQuery({
     queryKey: ['activeNannies'],
-    queryFn: () => base44.entities.NannyProfile.filter({ status: 'approved' }, '-rating', 100),
+    queryFn: async () => {
+      const approved = await base44.entities.NannyProfile.filter({ status: 'approved' }, '-rating', 100);
+      return approved.filter(n => n.is_active !== false);
+    },
   });
 
   const filtered = useMemo(() => {
@@ -130,7 +133,7 @@ export default function FindNannies() {
         </p>
         <div className="mt-3 inline-flex items-center gap-2 bg-sage/15 text-sage-foreground text-xs font-semibold px-3.5 py-2 rounded-full">
           <ShieldCheck className="w-3.5 h-3.5" />
-          217 provjerenih dadilja u Zagrebu
+          {filtered.length} provjerenih dadilja u Zagrebu
         </div>
       </div>
 
