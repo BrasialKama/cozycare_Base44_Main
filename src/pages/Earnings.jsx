@@ -14,7 +14,7 @@ export default function Earnings() {
   const { data: nannyProfile } = useQuery({
     queryKey: ['nannyProfileForEarnings', user?.email],
     queryFn: async () => {
-      const profiles = await base44.entities.NannyProfile.filter({ created_by: user?.email });
+      const profiles = await base44.entities.NannyProfile.filter({ user_email: user?.email }, '-created_date', 1);
       return profiles[0] || null;
     },
     enabled: !!user?.email,
@@ -24,12 +24,12 @@ export default function Earnings() {
 
   // Then fetch only bookings that belong to this nanny AND are completed
   const { data: bookings = [] } = useQuery({
-    queryKey: ['nannyEarnings', nannyProfile?.id],
+    queryKey: ['nannyEarnings', user?.email],
     queryFn: async () => {
-      const all = await base44.entities.Booking.filter({ nanny_id: String(nannyProfile.id) }, '-date');
+      const all = await base44.entities.Booking.filter({ nanny_user_email: user?.email }, '-date');
       return all.filter(b => b.status === 'Završeno');
     },
-    enabled: !!nannyProfile?.id,
+    enabled: !!user?.email,
   });
 
   const totalEarnings = bookings.reduce((sum, b) => sum + (b.total_price || 0), 0);
