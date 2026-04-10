@@ -63,10 +63,14 @@ export default function FindNannies() {
   const clearAll = () => setFilters({ ...DEFAULT_FILTERS });
 
   const { data: nannies = [], isLoading } = useQuery({
-    queryKey: ['activePublicNannies'],
+    queryKey: ['publicNannies'],
     queryFn: async () => {
-      const approved = await base44.entities.PublicNannyProfile.filter({ status: 'approved' }, '-rating', 100);
-      return approved.filter(n => n.is_active !== false);
+      const approved = await base44.entities.PublicNannyProfile.filter(
+        { status: 'approved' },
+        '-rating',
+        100
+      );
+      return approved.filter(n => n.is_active === true);
     },
   });
 
