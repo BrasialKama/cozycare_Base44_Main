@@ -2,6 +2,10 @@
   "name": "Conversation",
   "type": "object",
   "properties": {
+    "conversation_key": {
+      "type": "string",
+      "description": "Deterministic unique key built from the two participant emails"
+    },
     "participant_emails": {
       "type": "array",
       "items": {
@@ -25,10 +29,6 @@
       "format": "date-time",
       "description": "When last message was sent"
     },
-    "unread_count": {
-      "type": "number",
-      "default": 0
-    },
     "hidden_for": {
       "type": "array",
       "items": {
@@ -39,6 +39,7 @@
     }
   },
   "required": [
+    "conversation_key",
     "participant_emails"
   ]
 }
