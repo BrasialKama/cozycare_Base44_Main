@@ -1,0 +1,70 @@
+{
+  "name": "FamilyProfile",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email of the parent user"
+    },
+    "family_name": {
+      "type": "string",
+      "description": "Family display name"
+    },
+    "photo_url": {
+      "type": "string",
+      "description": "Family photo URL"
+    },
+    "address": {
+      "type": "string",
+      "description": "Home address"
+    },
+    "neighborhood": {
+      "type": "string",
+      "description": "Neighborhood/area"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Contact phone number"
+    },
+    "emergency_contact": {
+      "type": "string",
+      "description": "Emergency contact info"
+    },
+    "schedule_preferences": {
+      "type": "string",
+      "description": "Typical schedule needs"
+    },
+    "special_requirements": {
+      "type": "string",
+      "description": "Any special requirements"
+    },
+    "preferred_languages": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Preferred nanny languages"
+    },
+    "children": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "age": {
+            "type": "number"
+          },
+          "needs": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Children details"
+    }
+  },
+  "required": [
+    "user_email"
+  ]
+}
