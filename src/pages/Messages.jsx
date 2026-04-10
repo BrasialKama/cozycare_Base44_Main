@@ -51,11 +51,13 @@ export default function Messages() {
   const { data: conversations = [] } = useQuery({
     queryKey: ['conversations', user?.email],
     queryFn: async () => {
-      const all = await base44.entities.Conversation.list('-updated_date');
-      return all.filter(c =>
-        c.participant_emails?.includes(user?.email) &&
-        !(c.hidden_for || []).includes(user?.email)
+      const mine = await base44.entities.Conversation.filter(
+        { participant_emails: user?.email },
+        '-last_message_date',
+        100
       );
+
+      return mine.filter(c => !(c.hidden_for || []).includes(user?.email));
     },
     enabled: !!user?.email,
     refetchInterval: 10000,
