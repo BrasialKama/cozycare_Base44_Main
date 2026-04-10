@@ -22,25 +22,21 @@ export default function BookNanny() {
 
   const publicId = searchParams.get('public_id');
 
-  // Fetch internal NannyProfile for booking data (user_email etc)
+  // Fetch PublicNannyProfile for display
   const { data: nanny, isLoading } = useQuery({
-    queryKey: ['nannyProfileForBooking', nannyId],
+    queryKey: ['publicNannyForBooking', nannyId],
     queryFn: async () => {
-      const profile = await base44.entities.NannyProfile.get(nannyId);
-      return profile || null;
+      const results = await base44.entities.PublicNannyProfile.filter(
+        { nanny_profile_id: nannyId },
+        '-created_date',
+        1
+      );
+      return results?.[0] || null;
     },
     enabled: !!nannyId,
   });
 
-  // Fetch PublicNannyProfile for display info
-  const { data: publicNanny } = useQuery({
-    queryKey: ['publicNannyForBooking', publicId],
-    queryFn: () => base44.entities.PublicNannyProfile.get(publicId),
-    enabled: !!publicId,
-  });
-
-  // Use public profile for display, internal for booking data
-  const displayNanny = publicNanny || nanny;
+  const displayNanny = nanny;
 
   const [form, setForm] = useState({
     date: '',
@@ -111,10 +107,13 @@ export default function BookNanny() {
     mutationFn: async () => {
       const familyProfile = familyProfiles?.[0] || null;
 
+      // Resolve private NannyProfile at booking time
+      const privateNanny = await base44.entities.NannyProfile.get(nanny.nanny_profile_id);
+
       const bookingData = {
-        nanny_id: nanny.id,
-        nanny_user_email: nanny.user_email,
-        nanny_name: nannyName,
+        nanny_id: privateNanny.id,
+        nanny_user_email: privateNanny.user_email,
+        nanny_name: privateNanny.display_name || `${privateNanny.first_name} ${privateNanny.last_name}`,
         family_user_email: user.email,
         family_profile_id: familyProfile?.id || '',
         family_name: user.full_name || '',
@@ -153,19 +152,19 @@ export default function BookNanny() {
           conversation_key: botConversationKey,
           participant_emails: [config.bot.email, user.email],
           participant_names: [config.bot.name, user.full_name || 'Roditelj'],
-          last_message: `Rezervacija s dadiljom ${nanny.first_name} zaprimljena.`,
+          last_message: `Rezervacija s dadiljom ${privateNanny.first_name} zaprimljena.`,
           last_message_date: new Date().toISOString(),
           hidden_for: [],
         });
       } else {
         await base44.entities.Conversation.update(conv.id, {
-          last_message: `Rezervacija s dadiljom ${nanny.first_name} zaprimljena.`,
+          last_message: `Rezervacija s dadiljom ${privateNanny.first_name} zaprimljena.`,
           last_message_date: new Date().toISOString(),
           hidden_for: (conv.hidden_for || []).filter(e => e !== user.email),
         });
       }
 
-      const botMessage = `✅ Vaša rezervacija s dadiljom ${nanny.first_name} ${nanny.last_name} za ${bookingData.date} od ${bookingData.start_time} do ${bookingData.end_time} je zaprimljena. Ukupno: €${bookingData.total_price}. Dadilja će potvrditi u najkraćem roku.`;
+      const botMessage = `✅ Vaša rezervacija s dadiljom ${privateNanny.first_name} ${privateNanny.last_name} za ${bookingData.date} od ${bookingData.start_time} do ${bookingData.end_time} je zaprimljena. Ukupno: €${bookingData.total_price}. Dadilja će potvrditi u najkraćem roku.`; od ${bookingData.start_time} do ${bookingData.end_time} je zaprimljena. Ukupno: €${bookingData.total_price}. Dadilja će potvrditi u najkraćem roku.`; od ${bookingData.start_time} do ${bookingData.end_time} je zaprimljena. Ukupno: €${bookingData.total_price}. Dadilja će potvrditi u najkraćem roku.`;
 
       await base44.entities.Message.create({
         conversation_id: String(conv.id),
