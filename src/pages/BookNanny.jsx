@@ -60,7 +60,6 @@ export default function BookNanny() {
   }, [familyProfiles]);
 
   const update = (key, val) => {
-    console.log(`Field update: ${key} =`, JSON.stringify(val));
     setForm(prev => ({ ...prev, [key]: val }));
   };
 
