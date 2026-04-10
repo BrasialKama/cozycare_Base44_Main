@@ -124,7 +124,9 @@ export default function NannyOnboarding() {
         intro_video_url,
         video_url: intro_video_url,
         id_document_url,
-        status: 'pending', badges: [], rating: 0, review_count: 0, total_bookings: 0,
+        status: 'pending',
+        is_active: false,
+        badges: [], rating: 0, review_count: 0, total_bookings: 0,
       });
 
       await base44.auth.updateMe({
