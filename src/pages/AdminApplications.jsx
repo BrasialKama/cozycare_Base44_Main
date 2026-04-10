@@ -96,7 +96,7 @@ export default function AdminApplications() {
             <Button
               size="sm"
               className="h-8 text-xs"
-              onClick={() => updateMutation.mutate({ id: nanny.id, data: { is_active: true } })}
+              onClick={() => updateMutation.mutate({ id: nanny.id, data: { status: 'approved', is_active: true } })}
             >
               <Check className="w-3 h-3 mr-1" /> Aktiviraj
             </Button>
