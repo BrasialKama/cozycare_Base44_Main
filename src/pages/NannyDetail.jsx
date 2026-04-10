@@ -10,6 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { buildConversationKey } from '@/lib/chat';
 
 const HERO_IMAGES = [
   'https://images.unsplash.com/photo-1519689680058-324335c77eba?w=800&q=80',
@@ -71,8 +72,7 @@ export default function NannyDetail() {
   const { data: nanny, isLoading } = useQuery({
     queryKey: ['nannyProfile', id],
     queryFn: async () => {
-      const profiles = await base44.entities.NannyProfile.filter({ id });
-      return profiles[0];
+      return await base44.entities.NannyProfile.get(id);
     },
     enabled: !!id,
   });
@@ -84,24 +84,34 @@ export default function NannyDetail() {
   });
 
   const handleMessage = async () => {
-    if (!nanny) return;
-    const nannyEmail = nanny.created_by;
-    const existing = await base44.entities.Conversation.filter({});
-    const found = existing.find(c =>
-      c.participant_emails?.includes(user.email) &&
-      c.participant_emails?.includes(nannyEmail)
+    if (!nanny || !user?.email) return;
+
+    const nannyEmail = nanny.user_email;
+    const conversationKey = buildConversationKey(user.email, nannyEmail);
+
+    const existing = await base44.entities.Conversation.filter(
+      { conversation_key: conversationKey },
+      '-updated_date',
+      1
     );
-    if (found) {
-      navigate(`/Messages?conversation=${found.id}`);
-    } else {
-      const name = `${nanny.first_name} ${nanny.last_name}`;
-      const conv = await base44.entities.Conversation.create({
-        participant_emails: [user.email, nannyEmail],
-        participant_names: [user.display_name || user.full_name, name],
-        last_message: '',
-      });
-      navigate(`/Messages?conversation=${conv.id}`);
+
+    if (existing?.[0]) {
+      navigate(`/Messages?conversation=${existing[0].id}`);
+      return;
     }
+
+    const name = `${nanny.first_name} ${nanny.last_name}`;
+
+    const conv = await base44.entities.Conversation.create({
+      conversation_key: conversationKey,
+      participant_emails: [user.email, nannyEmail],
+      participant_names: [user.display_name || user.full_name, name],
+      last_message: '',
+      last_message_date: new Date().toISOString(),
+      hidden_for: [],
+    });
+
+    navigate(`/Messages?conversation=${conv.id}`);
   };
 
   const heroImage = useMemo(() => HERO_IMAGES[Math.floor(Math.random() * HERO_IMAGES.length)], [id]);
