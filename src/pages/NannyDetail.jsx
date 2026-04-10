@@ -70,8 +70,15 @@ export default function NannyDetail() {
   const navigate = useNavigate();
 
   const { data: nanny, isLoading } = useQuery({
-    queryKey: ['publicNannyProfile', id],
-    queryFn: () => base44.entities.PublicNannyProfile.get(id),
+    queryKey: ['publicNanny', id],
+    queryFn: async () => {
+      const results = await base44.entities.PublicNannyProfile.filter(
+        { nanny_profile_id: id },
+        '-created_date',
+        1
+      );
+      return results?.[0] || null;
+    },
     enabled: !!id,
   });
 
