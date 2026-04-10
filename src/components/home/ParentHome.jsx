@@ -22,14 +22,14 @@ export default function ParentHome() {
     queryKey: ['topPublicNannies'],
     queryFn: async () => {
       const all = await base44.entities.PublicNannyProfile.filter({ status: 'approved' }, '-rating', 6);
-      return all.filter((n) => n.is_active !== false);
-    }
+      return all.filter(n => n.is_active !== false);
+    },
   });
 
   const { data: myBookings = [] } = useQuery({
     queryKey: ['myBookings', user?.email],
     queryFn: () => base44.entities.Booking.filter({ family_user_email: user?.email, status: 'Potvrđeno' }, '-date', 3),
-    enabled: !!user?.email
+    enabled: !!user?.email,
   });
 
   return (
@@ -41,9 +41,9 @@ export default function ParentHome() {
           <div className="absolute -top-16 -right-16 w-72 h-72 rounded-full bg-primary/6 blur-3xl" />
           <div className="absolute -bottom-12 -left-12 w-56 h-56 rounded-full bg-sage/15 blur-3xl" />
           <div className="absolute top-8 right-8 grid grid-cols-4 gap-1.5 opacity-20">
-            {Array.from({ length: 16 }).map((_, i) =>
-            <div key={i} className="w-1 h-1 rounded-full bg-primary" />
-            )}
+            {Array.from({ length: 16 }).map((_, i) => (
+              <div key={i} className="w-1 h-1 rounded-full bg-primary" />
+            ))}
           </div>
         </div>
         <div className="relative px-8 py-12 lg:px-16 lg:py-16 w-full">
@@ -56,7 +56,7 @@ export default function ParentHome() {
             <br />
             <span className="text-primary italic">{firstName}.</span>
             <br />
-            <span className="text-foreground/60 text-lg font-medium">Vaša obitelj zaslužuje samo najbolje.</span>
+            <span className="text-foreground/60 font-medium">Vaša obitelj zaslužuje samo najbolje.</span>
           </h1>
           <p className="mt-5 text-base text-muted-foreground max-w-md leading-relaxed">
             Otkrijte tople, provjerene dadilje koje se osjećaju kao obitelj — odabrane za povjerenje, ljubav i pouzdanost.
@@ -82,11 +82,11 @@ export default function ParentHome() {
       <section>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
-          { icon: Shield, label: 'Provjera pozadine', desc: 'Svaka dadilja prolazi kompletnu provjeru prije pridruživanja' },
-          { icon: Star, label: 'Provjerene reference', desc: 'Reference osobno pregledava naš tim za kvalitetu skrbi' },
-          { icon: Heart, label: 'Ocjene obitelji', desc: 'Stvarne recenzije stvarnih obitelji — iskrene, detaljne i provjerene' }].
-          map(({ icon: Icon, label, desc }) =>
-          <div key={label} className="flex items-start gap-4 bg-card border border-border/50 rounded-2xl p-5 shadow-sm">
+            { icon: Shield, label: 'Provjera pozadine', desc: 'Svaka dadilja prolazi kompletnu provjeru prije pridruživanja' },
+            { icon: Star, label: 'Provjerene reference', desc: 'Reference osobno pregledava naš tim za kvalitetu skrbi' },
+            { icon: Heart, label: 'Ocjene obitelji', desc: 'Stvarne recenzije stvarnih obitelji — iskrene, detaljne i provjerene' },
+          ].map(({ icon: Icon, label, desc }) => (
+            <div key={label} className="flex items-start gap-4 bg-card border border-border/50 rounded-2xl p-5 shadow-sm">
               <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                 <Icon className="w-5 h-5 text-primary" />
               </div>
@@ -95,13 +95,13 @@ export default function ParentHome() {
                 <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
               </div>
             </div>
-          )}
+          ))}
         </div>
       </section>
 
       {/* ── Upcoming care ── */}
-      {myBookings.length > 0 &&
-      <section>
+      {myBookings.length > 0 && (
+        <section>
           <div className="flex items-center justify-between mb-5">
             <h2 className="font-display text-2xl font-semibold text-foreground">Nadolazeća skrb</h2>
             <Link to="/MyBookings" className="text-sm text-primary font-medium flex items-center gap-1 hover:underline">
@@ -109,8 +109,8 @@ export default function ParentHome() {
             </Link>
           </div>
           <div className="space-y-3">
-            {myBookings.map((b) =>
-          <div key={b.id} className="flex items-center justify-between bg-card border border-border/50 rounded-2xl px-5 py-4 shadow-sm">
+            {myBookings.map((b) => (
+              <div key={b.id} className="flex items-center justify-between bg-card border border-border/50 rounded-2xl px-5 py-4 shadow-sm">
                 <div className="flex items-center gap-4">
                   <div className="w-11 h-11 rounded-xl bg-sage/20 flex items-center justify-center flex-shrink-0">
                     <Calendar className="w-4.5 h-4.5 text-sage-foreground" />
@@ -127,22 +127,22 @@ export default function ParentHome() {
                   {b.status}
                 </span>
               </div>
-          )}
+            ))}
           </div>
         </section>
-      }
+      )}
 
       {/* ── Quick access ── */}
       <section>
         <h2 className="font-display text-2xl font-semibold text-foreground mb-5">Sve što trebate</h2>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[
-          { icon: Search, label: 'Pretraži dadilje', sub: 'Pregledaj dadilje', path: '/FindNannies', bg: 'bg-rose-light', fg: 'text-primary' },
-          { icon: Calendar, label: 'Rezervacije', sub: 'Upravljaj terminima', path: '/MyBookings', bg: 'bg-peach/60', fg: 'text-peach-dark' },
-          { icon: MessageCircle, label: 'Poruke', sub: 'Razgovaraj s dadiljama', path: '/Messages', bg: 'bg-sage/25', fg: 'text-sage-foreground' },
-          { icon: Shield, label: 'Sigurnost', sub: 'Naše mjere zaštite', path: '/SafetyCenter', bg: 'bg-powder-blue/40', fg: 'text-foreground/60' }].
-          map((item) =>
-          <Link key={item.path} to={item.path}>
+            { icon: Search, label: 'Pretraži dadilje', sub: 'Pregledaj dadilje', path: '/FindNannies', bg: 'bg-rose-light', fg: 'text-primary' },
+            { icon: Calendar, label: 'Rezervacije', sub: 'Upravljaj terminima', path: '/MyBookings', bg: 'bg-peach/60', fg: 'text-peach-dark' },
+            { icon: MessageCircle, label: 'Poruke', sub: 'Razgovaraj s dadiljama', path: '/Messages', bg: 'bg-sage/25', fg: 'text-sage-foreground' },
+            { icon: Shield, label: 'Sigurnost', sub: 'Naše mjere zaštite', path: '/SafetyCenter', bg: 'bg-powder-blue/40', fg: 'text-foreground/60' },
+          ].map((item) => (
+            <Link key={item.path} to={item.path}>
               <div className="bg-card border border-border/50 rounded-2xl p-5 hover:shadow-md hover:border-primary/20 transition-all duration-200 cursor-pointer group h-full">
                 <div className={`w-11 h-11 rounded-xl ${item.bg} flex items-center justify-center mb-4`}>
                   <item.icon className={`w-5 h-5 ${item.fg}`} />
@@ -151,13 +151,13 @@ export default function ParentHome() {
                 <p className="text-xs text-muted-foreground mt-0.5">{item.sub}</p>
               </div>
             </Link>
-          )}
+          ))}
         </div>
       </section>
 
       {/* ── Featured nannies ── */}
-      {topNannies.length > 0 &&
-      <section>
+      {topNannies.length > 0 && (
+        <section>
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="font-display text-2xl font-semibold text-foreground">Najbolje ocijenjene dadilje</h2>
@@ -168,16 +168,16 @@ export default function ParentHome() {
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {topNannies.map((nanny) =>
-          <NannyCard key={nanny.id} nanny={nanny} />
-          )}
+            {topNannies.map((nanny) => (
+              <NannyCard key={nanny.id} nanny={nanny} />
+            ))}
           </div>
         </section>
-      }
+      )}
 
       {/* ── Empty nanny state ── */}
-      {topNannies.length === 0 &&
-      <section className="text-center py-16 bg-card border border-dashed border-border/60 rounded-3xl">
+      {topNannies.length === 0 && (
+        <section className="text-center py-16 bg-card border border-dashed border-border/60 rounded-3xl">
           <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
             <Heart className="w-8 h-8 text-primary/60" />
           </div>
@@ -189,7 +189,7 @@ export default function ParentHome() {
             <Button className="rounded-full px-8">Pretraži dadilje</Button>
           </Link>
         </section>
-      }
-    </div>);
-
+      )}
+    </div>
+  );
 }
