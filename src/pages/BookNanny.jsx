@@ -101,9 +101,14 @@ export default function BookNanny() {
 
   const bookMutation = useMutation({
     mutationFn: async () => {
+      const familyProfile = familyProfiles?.[0] || null;
+
       const bookingData = {
         nanny_id: nanny.id,
+        nanny_user_email: nanny.user_email,
         nanny_name: nannyName,
+        family_user_email: user.email,
+        family_profile_id: familyProfile?.id || '',
         family_name: user.full_name || '',
         date: form.date,
         start_time: form.start_time,
@@ -117,24 +122,43 @@ export default function BookNanny() {
         special_notes: form.special_notes,
       };
 
-      await base44.entities.Booking.create(bookingData);
+      const booking = await base44.entities.Booking.create(bookingData);
 
-      // 1. Email notification (fire-and-forget, but log errors)
+      // Optional notification call: only send booking id, not full private payload
       fetch(config.notificationApiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ booking: bookingData }),
+        body: JSON.stringify({ booking_id: booking.id }),
       }).catch(err => console.error('Booking notification failed:', err));
 
-      // 2. In-app confirmation message to parent
+      const botConversationKey = `${config.bot.email}__${String(user.email).toLowerCase()}`;
+      const existingBotConversations = await base44.entities.Conversation.filter(
+        { conversation_key: botConversationKey },
+        '-updated_date',
+        1
+      );
+
+      let conv = existingBotConversations?.[0];
+
+      if (!conv) {
+        conv = await base44.entities.Conversation.create({
+          conversation_key: botConversationKey,
+          participant_emails: [config.bot.email, user.email],
+          participant_names: [config.bot.name, user.full_name || 'Roditelj'],
+          last_message: `Rezervacija s dadiljom ${nanny.first_name} zaprimljena.`,
+          last_message_date: new Date().toISOString(),
+          hidden_for: [],
+        });
+      } else {
+        await base44.entities.Conversation.update(conv.id, {
+          last_message: `Rezervacija s dadiljom ${nanny.first_name} zaprimljena.`,
+          last_message_date: new Date().toISOString(),
+          hidden_for: (conv.hidden_for || []).filter(e => e !== user.email),
+        });
+      }
+
       const botMessage = `✅ Vaša rezervacija s dadiljom ${nanny.first_name} ${nanny.last_name} za ${bookingData.date} od ${bookingData.start_time} do ${bookingData.end_time} je zaprimljena. Ukupno: €${bookingData.total_price}. Dadilja će potvrditi u najkraćem roku.`;
-      const conv = await base44.entities.Conversation.create({
-        participant_emails: [config.bot.email, user.email],
-        participant_names: [config.bot.name, user.full_name || 'Roditelj'],
-        last_message: `Rezervacija s dadiljom ${nanny.first_name} zaprimljena.`,
-        last_message_date: new Date().toISOString(),
-        unread_count: 1,
-      });
+
       await base44.entities.Message.create({
         conversation_id: String(conv.id),
         sender_email: config.bot.email,
