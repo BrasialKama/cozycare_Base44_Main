@@ -12,6 +12,24 @@ import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { config } from '@/lib/config';
 
+function buildBotMessage(privateNanny, bookingData) {
+  var parts = [];
+  parts.push("\u2705 Rezervacija s dadiljom ");
+  parts.push(privateNanny.first_name);
+  parts.push(" ");
+  parts.push(privateNanny.last_name);
+  parts.push(" za ");
+  parts.push(bookingData.date);
+  parts.push(" od ");
+  parts.push(bookingData.start_time);
+  parts.push(" do ");
+  parts.push(bookingData.end_time);
+  parts.push(" je zaprimljena. Ukupno: \u20ac");
+  parts.push(bookingData.total_price);
+  parts.push(". Dadilja ce potvrditi u najkracem roku.");
+  return parts.join("");
+}
+
 export default function BookNanny() {
   const [searchParams] = useSearchParams();
   const nannyId = searchParams.get('nanny_id');
@@ -101,7 +119,7 @@ export default function BookNanny() {
   const timeError = form.start_time && form.end_time && durationHours <= 0 ? 'Vrijeme završetka mora biti nakon vremena početka' : null;
   const canBook = form.date && form.start_time && form.end_time && form.address.trim() && durationHours > 0;
 
-  const nannyName = displayNanny ? `${displayNanny.first_name || displayNanny.display_name || ''} ${displayNanny.last_name_initial || displayNanny.last_name || ''}`.trim() : '';
+  const nannyName = displayNanny ? (displayNanny.first_name || displayNanny.display_name || '') + ' ' + (displayNanny.last_name_initial || displayNanny.last_name || '') : '';
 
   const bookMutation = useMutation({
     mutationFn: async () => {
@@ -113,7 +131,7 @@ export default function BookNanny() {
       const bookingData = {
         nanny_id: privateNanny.id,
         nanny_user_email: privateNanny.user_email,
-        nanny_name: privateNanny.display_name || `${privateNanny.first_name} ${privateNanny.last_name}`,
+        nanny_name: privateNanny.display_name || (privateNanny.first_name + ' ' + privateNanny.last_name),
         family_user_email: user.email,
         family_profile_id: familyProfile?.id || '',
         family_name: user.full_name || '',
@@ -122,7 +140,7 @@ export default function BookNanny() {
         end_time: form.end_time,
         duration_hours: durationHours,
         total_price: totalPrice,
-        status: 'Na čekanju',
+        status: 'Na \u010dekanju',
         address: form.address,
         message: form.notes,
         children_count: Number(form.children_count) || 1,
@@ -138,39 +156,35 @@ export default function BookNanny() {
         body: JSON.stringify({ booking_id: booking.id }),
       }).catch(err => console.error('Booking notification failed:', err));
 
-      const botConversationKey = `${config.bot.email}__${String(user.email).toLowerCase()}`;
+      var botConvKey = config.bot.email + '__' + String(user.email).toLowerCase();
       const existingBotConversations = await base44.entities.Conversation.filter(
-        { conversation_key: botConversationKey },
+        { conversation_key: botConvKey },
         '-updated_date',
         1
       );
 
       let conv = existingBotConversations?.[0];
 
+      var shortMsg = 'Rezervacija s dadiljom ' + privateNanny.first_name + ' zaprimljena.';
+
       if (!conv) {
         conv = await base44.entities.Conversation.create({
-          conversation_key: botConversationKey,
+          conversation_key: botConvKey,
           participant_emails: [config.bot.email, user.email],
           participant_names: [config.bot.name, user.full_name || 'Roditelj'],
-          last_message: `Rezervacija s dadiljom ${privateNanny.first_name} zaprimljena.`,
+          last_message: shortMsg,
           last_message_date: new Date().toISOString(),
           hidden_for: [],
         });
       } else {
         await base44.entities.Conversation.update(conv.id, {
-          last_message: `Rezervacija s dadiljom ${privateNanny.first_name} zaprimljena.`,
+          last_message: shortMsg,
           last_message_date: new Date().toISOString(),
-          hidden_for: (conv.hidden_for || []).filter(e => e !== user.email),
+          hidden_for: (conv.hidden_for || []).filter(function(e) { return e !== user.email; }),
         });
       }
 
-      const botMsg = [
-        `\u2705 Va\u0161a rezervacija s dadiljom ${privateNanny.first_name} ${privateNanny.last_name}`,
-        `za ${bookingData.date} od ${bookingData.start_time} do ${bookingData.end_time}`,
-        `je zaprimljena. Ukupno: \u20ac${bookingData.total_price}.`,
-        `Dadilja \u0107e potvrditi u najkra\u0107em roku.`
-      ].join(' ');
-      const botMessage = botMsg; do ${bookingData.end_time} je zaprimljena. Ukupno: €${bookingData.total_price}. Dadilja će potvrditi u najkraćem roku.`; od ${bookingData.start_time} do ${bookingData.end_time} je zaprimljena. Ukupno: €${bookingData.total_price}. Dadilja će potvrditi u najkraćem roku.`;
+      var botMessage = buildBotMessage(privateNanny, bookingData);
 
       await base44.entities.Message.create({
         conversation_id: String(conv.id),
@@ -194,7 +208,7 @@ export default function BookNanny() {
         <h2 className="font-display text-xl font-bold mb-2">Dadilja nije odabrana</h2>
         <p className="text-muted-foreground mb-6">Niste odabrali dadilju za rezervaciju.</p>
         <Link to="/FindNannies">
-          <Button className="rounded-2xl px-8">Pronađi dadilje</Button>
+          <Button className="rounded-2xl px-8">Prona\u0111i dadilje</Button>
         </Link>
       </div>
     );
@@ -212,10 +226,10 @@ export default function BookNanny() {
     return (
       <div className="max-w-lg mx-auto pt-16 text-center">
         <AlertCircle className="w-10 h-10 text-destructive mx-auto mb-4" />
-        <h2 className="font-display text-xl font-bold mb-2">Dadilja nije pronađena</h2>
-        <p className="text-muted-foreground mb-6">Profil dadilje nije dostupan. Pokušajte ponovo.</p>
+        <h2 className="font-display text-xl font-bold mb-2">Dadilja nije prona\u0111ena</h2>
+        <p className="text-muted-foreground mb-6">Profil dadilje nije dostupan. Poku\u0161ajte ponovo.</p>
         <Link to="/FindNannies">
-          <Button className="rounded-2xl px-8">Pronađi dadilje</Button>
+          <Button className="rounded-2xl px-8">Prona\u0111i dadilje</Button>
         </Link>
       </div>
     );
@@ -232,7 +246,7 @@ export default function BookNanny() {
         </div>
         <h1 className="font-display text-2xl font-bold text-foreground mb-2">Rezervacija poslana!</h1>
         <p className="text-muted-foreground mb-8 max-w-sm mx-auto">
-          {nannyName} će potvrditi vaš termin uskoro. Pratite status u vašim rezervacijama.
+          {nannyName} ce potvrditi vas termin uskoro. Pratite status u vasim rezervacijama.
         </p>
         <Link to="/MyBookings">
           <Button className="rounded-2xl px-8 h-12 text-base font-semibold shadow-lg shadow-primary/20">
@@ -269,7 +283,7 @@ export default function BookNanny() {
             <Sparkles className="w-3 h-3 inline mr-1" />Rezervacija
           </p>
           <h1 className="font-display text-xl font-bold text-foreground">{nannyName}</h1>
-          <p className="text-sm text-muted-foreground">€{rate}/sat</p>
+          <p className="text-sm text-muted-foreground">{"\u20ac"}{rate}/sat</p>
         </div>
       </div>
 
@@ -293,7 +307,7 @@ export default function BookNanny() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Početak</Label>
+                <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Po\u010detak</Label>
                 <Select value={form.start_time} onValueChange={val => update('start_time', val)}>
                   <SelectTrigger className="rounded-xl">
                     <SelectValue placeholder="Odaberi" />
@@ -302,13 +316,13 @@ export default function BookNanny() {
                     {Array.from({ length: 48 }, (_, i) => {
                       const h = String(Math.floor(i / 2)).padStart(2, '0');
                       const m = i % 2 === 0 ? '00' : '30';
-                      return <SelectItem key={`s-${i}`} value={`${h}:${m}`}>{h}:{m}</SelectItem>;
+                      return <SelectItem key={'s-' + i} value={h + ':' + m}>{h}:{m}</SelectItem>;
                     })}
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Završetak</Label>
+                <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Zavr\u0161etak</Label>
                 <Select value={form.end_time} onValueChange={val => update('end_time', val)}>
                   <SelectTrigger className="rounded-xl">
                     <SelectValue placeholder="Odaberi" />
@@ -317,7 +331,7 @@ export default function BookNanny() {
                     {Array.from({ length: 48 }, (_, i) => {
                       const h = String(Math.floor(i / 2)).padStart(2, '0');
                       const m = i % 2 === 0 ? '00' : '30';
-                      return <SelectItem key={`e-${i}`} value={`${h}:${m}`}>{h}:{m}</SelectItem>;
+                      return <SelectItem key={'e-' + i} value={h + ':' + m}>{h}:{m}</SelectItem>;
                     })}
                   </SelectContent>
                 </Select>
@@ -332,7 +346,7 @@ export default function BookNanny() {
 
             {durationHours > 0 && !timeError && (
               <div className="inline-flex items-center gap-2 bg-sage/15 text-sage-foreground text-sm px-3.5 py-2 rounded-xl font-medium">
-                <Clock className="w-3.5 h-3.5" /> {durationHours % 1 === 0 ? durationHours : durationHours.toFixed(1)} sati × €{rate}/sat = <span className="font-bold">€{totalPrice.toFixed(2)} ukupno</span>
+                <Clock className="w-3.5 h-3.5" /> {durationHours % 1 === 0 ? durationHours : durationHours.toFixed(1)} sati {"\u00d7"} {"\u20ac"}{rate}/sat = <span className="font-bold">{"\u20ac"}{totalPrice.toFixed(2)} ukupno</span>
               </div>
             )}
           </div>
@@ -358,11 +372,11 @@ export default function BookNanny() {
           </div>
           <div>
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Poruka dadilji</Label>
-            <Textarea value={form.notes} onChange={e => update('notes', e.target.value)} placeholder="Predstavite se, opišite svoju obitelj…" rows={2} className="rounded-xl resize-none" />
+            <Textarea value={form.notes} onChange={e => update('notes', e.target.value)} placeholder="Predstavite se, opi\u0161ite svoju obitelj\u2026" rows={2} className="rounded-xl resize-none" />
           </div>
           <div>
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Posebne upute</Label>
-            <Textarea value={form.special_notes} onChange={e => update('special_notes', e.target.value)} placeholder="Alergije, raspored spavanja, kućna pravila…" rows={2} className="rounded-xl resize-none" />
+            <Textarea value={form.special_notes} onChange={e => update('special_notes', e.target.value)} placeholder="Alergije, raspored spavanja, ku\u0107na pravila\u2026" rows={2} className="rounded-xl resize-none" />
           </div>
         </div>
 
@@ -372,13 +386,13 @@ export default function BookNanny() {
         <div className="bg-gradient-to-br from-ivory to-rose-light/30 rounded-2xl p-5 space-y-3">
           <h3 className="font-display font-semibold text-base">Pregled cijene</h3>
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">{durationHours > 0 ? `${durationHours % 1 === 0 ? durationHours : durationHours.toFixed(1)} sati` : '0 sati'} × €{rate}/sat</span>
-            <span className="font-medium">€{totalPrice.toFixed(2)}</span>
+            <span className="text-muted-foreground">{durationHours > 0 ? (durationHours % 1 === 0 ? durationHours : durationHours.toFixed(1)) + ' sati' : '0 sati'} {"\u00d7"} {"\u20ac"}{rate}/sat</span>
+            <span className="font-medium">{"\u20ac"}{totalPrice.toFixed(2)}</span>
           </div>
           <Separator className="opacity-40" />
           <div className="flex justify-between font-semibold text-base">
             <span>Ukupno</span>
-            <span className="text-primary font-display text-xl">€{totalPrice.toFixed(2)}</span>
+            <span className="text-primary font-display text-xl">{"\u20ac"}{totalPrice.toFixed(2)}</span>
           </div>
         </div>
 
@@ -386,7 +400,7 @@ export default function BookNanny() {
         <div className="flex items-start gap-3 bg-emerald-50 rounded-2xl p-4">
           <Shield className="w-4.5 h-4.5 text-emerald-600 flex-shrink-0 mt-0.5" />
           <p className="text-xs text-emerald-800 leading-relaxed">
-            Vaše plaćanje je zaštićeno. Naplatit će vam se tek kada dadilja potvrdi rezervaciju.
+            Va\u0161e pla\u0107anje je za\u0161ti\u0107eno. Naplatit \u0107e vam se tek kada dadilja potvrdi rezervaciju.
           </p>
         </div>
 
@@ -398,7 +412,7 @@ export default function BookNanny() {
             style={{ height: '3.25rem' }}
           >
             {bookMutation.isPending ? (
-              <span className="flex items-center gap-2"><div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" /> Šaljem zahtjev…</span>
+              <span className="flex items-center gap-2"><div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" /> \u0160aljem zahtjev\u2026</span>
             ) : (
               <span className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4" /> Potvrdi rezervaciju</span>
             )}
