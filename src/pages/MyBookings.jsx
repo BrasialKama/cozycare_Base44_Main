@@ -89,7 +89,7 @@ export default function MyBookings() {
 
   const { data: bookings = [], isLoading } = useQuery({
     queryKey: ['parentBookings', user?.email],
-    queryFn: () => base44.entities.Booking.filter({ created_by: user?.email }, '-date'),
+    queryFn: () => base44.entities.Booking.filter({ family_user_email: user?.email }, '-date'),
     enabled: !!user?.email,
   });
 
