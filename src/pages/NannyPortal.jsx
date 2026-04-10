@@ -15,7 +15,7 @@ export default function NannyPortal() {
   const { data: profile } = useQuery({
     queryKey: ['portalProfile', user?.email],
     queryFn: async () => {
-      const profiles = await base44.entities.NannyProfile.filter({ created_by: user?.email });
+      const profiles = await base44.entities.NannyProfile.filter({ user_email: user?.email }, '-created_date', 1);
       return profiles[0] || null;
     },
     enabled: !!user?.email && role === 'nanny',
@@ -23,7 +23,7 @@ export default function NannyPortal() {
 
   const { data: bookings = [] } = useQuery({
     queryKey: ['portalBookings', user?.email],
-    queryFn: () => base44.entities.Booking.list('-date', 20),
+    queryFn: () => base44.entities.Booking.filter({ nanny_user_email: user?.email }, '-date', 20),
     enabled: !!user?.email && role === 'nanny',
   });
 
