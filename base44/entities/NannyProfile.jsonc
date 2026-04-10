@@ -121,7 +121,7 @@
     "is_active": {
       "type": "boolean",
       "default": true,
-      "description": "Whether visible in search"
+      "description": "Admin suspension/visibility toggle after approval"
     },
     "video_url": {
       "type": "string",
@@ -143,6 +143,9 @@
   "required": [
     "first_name",
     "last_name",
-    "hourly_rate"
+    "display_name",
+    "user_email",
+    "status",
+    "is_active"
   ]
 }
