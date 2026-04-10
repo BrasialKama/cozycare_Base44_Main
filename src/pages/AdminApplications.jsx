@@ -32,8 +32,8 @@ export default function AdminApplications() {
     },
   });
 
-  const pending = nannies.filter(n => !n.is_active);
-  const approved = nannies.filter(n => n.is_active);
+  const pending = nannies.filter(n => n.status === 'pending');
+  const approved = nannies.filter(n => n.status === 'approved');
 
   const NannyRow = ({ nanny }) => (
     <Card className="p-4 border-border/60">
