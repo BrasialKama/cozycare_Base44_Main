@@ -43,6 +43,45 @@ function UploadZone({ label, hint, accept, file, onChange, icon: Icon }) {
   );
 }
 
+async function syncPublicNannyProfile(privateProfile) {
+  const publicData = {
+    nanny_profile_id: privateProfile.id,
+    display_name: privateProfile.display_name || `${privateProfile.first_name} ${privateProfile.last_name?.[0] || ''}.`,
+    first_name: privateProfile.first_name || '',
+    last_name_initial: privateProfile.last_name ? `${privateProfile.last_name[0]}.` : '',
+    headline: '',
+    bio: privateProfile.bio || '',
+    city: '',
+    neighborhood: privateProfile.location || privateProfile.service_area || '',
+    profile_photo_url: privateProfile.photo_url || '',
+    intro_video_url: privateProfile.intro_video_url || '',
+    hourly_rate: privateProfile.hourly_rate || 0,
+    languages: privateProfile.languages || [],
+    badges: privateProfile.badges || [],
+    experience_years: privateProfile.years_experience || 0,
+    qualifications_summary: (privateProfile.specialties || []).join(', '),
+    availability_summary: (privateProfile.availability || []).join(', '),
+    rating: privateProfile.rating || 0,
+    review_count: privateProfile.review_count || 0,
+    total_bookings: privateProfile.total_bookings || 0,
+    status: privateProfile.status || 'pending',
+    is_active: privateProfile.is_active === true,
+    featured: privateProfile.is_featured === true,
+  };
+
+  const existing = await base44.entities.PublicNannyProfile.filter(
+    { nanny_profile_id: privateProfile.id },
+    '-created_date',
+    1
+  );
+
+  if (existing?.[0]) {
+    await base44.entities.PublicNannyProfile.update(existing[0].id, publicData);
+  } else {
+    await base44.entities.PublicNannyProfile.create(publicData);
+  }
+}
+
 export default function NannyOnboarding() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -105,7 +144,7 @@ export default function NannyOnboarding() {
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
 
-      await base44.entities.NannyProfile.create({
+      const createdProfile = await base44.entities.NannyProfile.create({
         first_name: firstName,
         last_name: lastName,
         display_name: form.display_name || form.full_name,
@@ -128,6 +167,8 @@ export default function NannyOnboarding() {
         is_active: false,
         badges: [], rating: 0, review_count: 0, total_bookings: 0,
       });
+
+      await syncPublicNannyProfile(createdProfile);
 
       await base44.auth.updateMe({
         onboarding_complete: true,
