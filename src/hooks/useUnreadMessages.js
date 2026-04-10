@@ -6,17 +6,18 @@ import { useEffect } from 'react';
 export default function useUnreadMessages() {
   const { user } = useAuth();
 
-  const { data: unreadCount = 0, refetch } = useQuery({
+  const { data: unreadMessages = [], refetch } = useQuery({
     queryKey: ['unreadMessages', user?.email],
-    queryFn: async () => {
-      const msgs = await base44.entities.Message.filter({ read: false });
-      return msgs.filter(m => m.sender_email !== user?.email && m.receiver_email === user?.email).length;
-    },
+    queryFn: () =>
+      base44.entities.Message.filter(
+        { receiver_email: user?.email, read: false },
+        '-created_date',
+        100
+      ),
     enabled: !!user?.email,
     refetchInterval: 10000,
   });
 
-  // Refetch on tab focus
   useEffect(() => {
     const onFocus = () => refetch();
     window.addEventListener('focus', onFocus);
@@ -24,11 +25,15 @@ export default function useUnreadMessages() {
   }, [refetch]);
 
   const markAllRead = async () => {
-    const msgs = await base44.entities.Message.filter({ read: false });
-    const mine = msgs.filter(m => m.sender_email !== user?.email && m.receiver_email === user?.email);
-    await Promise.all(mine.map(m => base44.entities.Message.update(m.id, { read: true })));
+    await Promise.all(
+      unreadMessages.map(m => base44.entities.Message.update(m.id, { read: true }))
+    );
     refetch();
   };
 
-  return { unreadCount, markAllRead, refetch };
+  return {
+    unreadCount: unreadMessages.length,
+    markAllRead,
+    refetch,
+  };
 }
