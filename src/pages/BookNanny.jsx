@@ -45,9 +45,10 @@ export default function BookNanny() {
   });
 
   // Pre-fill address from FamilyProfile
-  const { data: familyProfiles } = useQuery({
+  const { data: familyProfiles = [] } = useQuery({
     queryKey: ['familyProfile', user?.email],
-    queryFn: () => base44.entities.FamilyProfile.filter({ created_by: user?.email }),
+    queryFn: () =>
+      base44.entities.FamilyProfile.filter({ user_email: user?.email }, '-created_date', 1),
     enabled: !!user?.email,
   });
 
