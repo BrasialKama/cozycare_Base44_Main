@@ -19,8 +19,11 @@ export default function ParentHome() {
   const firstName = (user?.full_name || 'there').split(' ')[0];
 
   const { data: topNannies = [] } = useQuery({
-    queryKey: ['topNannies'],
-    queryFn: () => base44.entities.NannyProfile.filter({ status: 'approved' }, '-rating', 6),
+    queryKey: ['topPublicNannies'],
+    queryFn: async () => {
+      const all = await base44.entities.PublicNannyProfile.filter({ status: 'approved' }, '-rating', 6);
+      return all.filter(n => n.is_active !== false);
+    },
   });
 
   const { data: myBookings = [] } = useQuery({

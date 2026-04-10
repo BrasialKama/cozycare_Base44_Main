@@ -11,13 +11,13 @@ const CERT_CONFIG = {
 };
 
 export default function LandingNannyCard({ nanny }) {
-  const name = `${nanny.first_name} ${nanny.last_name}`;
+  const name = `${nanny.first_name || ''} ${nanny.last_name_initial || ''}`.trim();
   const initial = (nanny.first_name || '?')[0];
-  const expLabel = nanny.years_experience
-    ? `${nanny.years_experience}+ god. iskustva`
+  const expLabel = nanny.experience_years
+    ? `${nanny.experience_years}+ god. iskustva`
     : 'Iskusna';
 
-  const certs = (nanny.certifications || []).slice(0, 3);
+  const certs = (nanny.badges || []).slice(0, 3);
 
   return (
     <div
@@ -32,8 +32,8 @@ export default function LandingNannyCard({ nanny }) {
     >
       <div className="flex gap-4 mb-4">
         <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 border border-border/30">
-          {nanny.photo_url ? (
-            <img src={nanny.photo_url} alt={name} className="w-full h-full object-cover" />
+          {nanny.profile_photo_url ? (
+            <img src={nanny.profile_photo_url} alt={name} className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-rose-light to-peach flex items-center justify-center">
               <span className="text-2xl font-display font-bold text-primary">{initial}</span>

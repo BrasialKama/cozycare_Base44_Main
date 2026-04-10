@@ -7,8 +7,11 @@ import LandingNannyCard from '@/components/landing/LandingNannyCard';
 
 export default function FeaturedNannies() {
   const { data: nannies = [] } = useQuery({
-    queryKey: ['featuredNannies'],
-    queryFn: () => base44.entities.NannyProfile.filter({ is_featured: true, status: 'approved' }, '-rating', 3),
+    queryKey: ['featuredPublicNannies'],
+    queryFn: async () => {
+      const all = await base44.entities.PublicNannyProfile.filter({ featured: true, status: 'approved' }, '-rating', 3);
+      return all.filter(n => n.is_active !== false);
+    },
   });
 
   if (nannies.length === 0) return null;

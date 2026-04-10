@@ -63,41 +63,42 @@ export default function FindNannies() {
   const clearAll = () => setFilters({ ...DEFAULT_FILTERS });
 
   const { data: nannies = [], isLoading } = useQuery({
-    queryKey: ['activeNannies'],
+    queryKey: ['activePublicNannies'],
     queryFn: async () => {
-      const approved = await base44.entities.NannyProfile.filter({ status: 'approved' }, '-rating', 100);
+      const approved = await base44.entities.PublicNannyProfile.filter({ status: 'approved' }, '-rating', 100);
       return approved.filter(n => n.is_active !== false);
     },
   });
 
   const filtered = useMemo(() => {
     let result = nannies.filter(n => {
-      const fullName = `${n.first_name} ${n.last_name}`;
+      const fullName = `${n.first_name} ${n.last_name_initial || ''}`;
 
       // Text search
       const q = normalize(search);
       const matchesSearch = !search ||
         normalize(fullName).includes(q) ||
         normalize(n.bio).includes(q) ||
-        normalize(n.location).includes(q) ||
-        n.specialties?.some(s => normalize(s).includes(q));
+        normalize(n.neighborhood).includes(q) ||
+        normalize(n.city).includes(q) ||
+        normalize(n.qualifications_summary).includes(q);
 
       // Price
       const rate = n.hourly_rate || 0;
       const matchesPrice = rate >= filters.priceRange[0] && rate <= filters.priceRange[1];
 
-      // Availability — match against the availability array field
+      // Availability — match against the availability_summary string
       const matchesAvail = filters.availability.length === 0 ||
         filters.availability.some(fv => {
           const label = AVAILABILITY_MAP[fv];
-          return (n.availability || []).some(a => normalize(a) === normalize(label));
+          return normalize(n.availability_summary || '').includes(normalize(label));
         });
 
-      // Child age — match against the age_groups array field
+      // Child age — match against the qualifications_summary string
       const matchesAge = filters.childAge.length === 0 ||
         filters.childAge.some(fv => {
           const label = AGE_MAP[fv];
-          return (n.age_groups || []).some(a => normalize(a) === normalize(label));
+          return normalize(n.qualifications_summary || '').includes(normalize(label));
         });
 
       // Language — match against the languages array field
@@ -113,7 +114,7 @@ export default function FindNannies() {
     if (sortBy === 'rating') result.sort((a, b) => (b.rating || 0) - (a.rating || 0));
     else if (sortBy === 'rate_low') result.sort((a, b) => (a.hourly_rate || 0) - (b.hourly_rate || 0));
     else if (sortBy === 'rate_high') result.sort((a, b) => (b.hourly_rate || 0) - (a.hourly_rate || 0));
-    else if (sortBy === 'experience') result.sort((a, b) => (b.years_experience || 0) - (a.years_experience || 0));
+    else if (sortBy === 'experience') result.sort((a, b) => (b.experience_years || 0) - (a.experience_years || 0));
     return result;
   }, [nannies, search, sortBy, filters]);
 

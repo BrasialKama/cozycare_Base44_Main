@@ -22,7 +22,7 @@ const LIFESTYLE_IMAGES = [
 const dailyImageUrl = LIFESTYLE_IMAGES[Math.floor(Date.now() / 86400000) % LIFESTYLE_IMAGES.length];
 
 export default function NannyCard({ nanny, onWatchVideo }) {
-  const name = `${nanny.first_name} ${nanny.last_name}`;
+  const name = `${nanny.first_name || ''} ${nanny.last_name_initial || ''}`.trim();
   const initial = (nanny.first_name || '?')[0];
 
   return (
@@ -43,8 +43,8 @@ export default function NannyCard({ nanny, onWatchVideo }) {
       <div className="flex gap-4">
         <Link to={`/NannyDetail?id=${nanny.id}`} className="flex-shrink-0">
           <div className="w-20 h-20 rounded-xl overflow-hidden border border-border/30">
-            {nanny.photo_url ? (
-              <img src={nanny.photo_url} alt={name} className="w-full h-full object-cover" />
+            {nanny.profile_photo_url ? (
+              <img src={nanny.profile_photo_url} alt={name} className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full bg-gradient-to-br from-rose-light to-peach flex items-center justify-center">
                 <span className="text-2xl font-display font-bold text-primary">{initial}</span>
@@ -72,14 +72,14 @@ export default function NannyCard({ nanny, onWatchVideo }) {
           </div>
 
           <p className="text-sm text-muted-foreground mt-0.5">
-            {nanny.years_experience > 0 && <>{nanny.years_experience}+ god. iskustva · </>}
+            {nanny.experience_years > 0 && <>{nanny.experience_years}+ god. iskustva · </>}
             <span className="font-semibold text-foreground">€{nanny.hourly_rate}</span>/sat
           </p>
 
-          {nanny.location && (
+          {nanny.neighborhood && (
             <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
               <MapPin className="w-3 h-3 flex-shrink-0" />
-              {nanny.location}
+              {nanny.neighborhood}{nanny.city ? `, ${nanny.city}` : ''}
             </p>
           )}
         </div>
@@ -90,20 +90,17 @@ export default function NannyCard({ nanny, onWatchVideo }) {
       )}
 
       <div className="flex flex-wrap gap-1.5 mt-3">
-        {nanny.years_experience > 0 && (
+        {nanny.experience_years > 0 && (
           <Badge className="text-[11px] font-medium bg-peach/50 text-peach-dark border-0 rounded-full px-2.5 py-0.5">
-            <Clock className="w-2.5 h-2.5 mr-1" />{nanny.years_experience} god.
+            <Clock className="w-2.5 h-2.5 mr-1" />{nanny.experience_years} god.
           </Badge>
         )}
-        {nanny.specialties?.slice(0, 2).map(s => (
-          <Badge key={s} className="text-[11px] font-medium bg-muted/60 text-foreground/70 border-0 rounded-full px-2.5 py-0.5">{s}</Badge>
-        ))}
         {nanny.languages?.slice(0, 2).map(l => (
           <Badge key={l} className="text-[11px] font-medium bg-sage/15 text-sage-foreground border-0 rounded-full px-2.5 py-0.5">{l}</Badge>
         ))}
-        {nanny.certifications?.length > 0 && (
+        {nanny.badges?.length > 0 && (
           <Badge className="text-[11px] font-medium bg-primary/8 text-primary border-0 rounded-full px-2.5 py-0.5">
-            <Award className="w-2.5 h-2.5 mr-1" />{nanny.certifications.length} cert.
+            <Award className="w-2.5 h-2.5 mr-1" />{nanny.badges.length} cert.
           </Badge>
         )}
       </div>
@@ -113,7 +110,7 @@ export default function NannyCard({ nanny, onWatchVideo }) {
         <NannyTrustBadges nanny={nanny} />
       </div>
 
-      {nanny.video_url && onWatchVideo && (
+      {nanny.intro_video_url && onWatchVideo && (
         <div className="mt-3">
           <button
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); onWatchVideo(nanny); }}

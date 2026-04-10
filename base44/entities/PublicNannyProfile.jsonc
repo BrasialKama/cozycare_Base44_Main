@@ -1,0 +1,116 @@
+{
+  "name": "PublicNannyProfile",
+  "type": "object",
+  "properties": {
+    "nanny_profile_id": {
+      "type": "string",
+      "description": "References the internal NannyProfile.id"
+    },
+    "display_name": {
+      "type": "string",
+      "description": "Public display name"
+    },
+    "first_name": {
+      "type": "string",
+      "description": "First name"
+    },
+    "last_name_initial": {
+      "type": "string",
+      "description": "Last name initial only, e.g. M."
+    },
+    "headline": {
+      "type": "string",
+      "description": "Short headline / tagline"
+    },
+    "bio": {
+      "type": "string",
+      "description": "Public bio"
+    },
+    "city": {
+      "type": "string",
+      "description": "City, e.g. Zagreb"
+    },
+    "neighborhood": {
+      "type": "string",
+      "description": "Neighborhood / area"
+    },
+    "profile_photo_url": {
+      "type": "string",
+      "description": "Profile photo URL"
+    },
+    "intro_video_url": {
+      "type": "string",
+      "description": "Intro video URL"
+    },
+    "hourly_rate": {
+      "type": "number",
+      "description": "Hourly rate in EUR"
+    },
+    "languages": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Languages spoken"
+    },
+    "badges": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Trust/verification badges"
+    },
+    "experience_years": {
+      "type": "number",
+      "description": "Years of childcare experience"
+    },
+    "qualifications_summary": {
+      "type": "string",
+      "description": "Summary of specialties, certifications, age groups"
+    },
+    "availability_summary": {
+      "type": "string",
+      "description": "Summary of availability"
+    },
+    "rating": {
+      "type": "number",
+      "description": "Average rating 0-5"
+    },
+    "review_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Total number of reviews"
+    },
+    "total_bookings": {
+      "type": "number",
+      "default": 0,
+      "description": "Lifetime completed bookings"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "default": "pending",
+      "description": "Approval status"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": false,
+      "description": "Visibility toggle"
+    },
+    "featured": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether to feature on landing page"
+    }
+  },
+  "required": [
+    "nanny_profile_id",
+    "display_name",
+    "status",
+    "is_active"
+  ]
+}

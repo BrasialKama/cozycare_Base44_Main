@@ -20,19 +20,27 @@ export default function BookNanny() {
   const queryClient = useQueryClient();
   const [submitted, setSubmitted] = useState(false);
 
-  const { data: nanny, isLoading, isError } = useQuery({
-    queryKey: ['nannyProfile', nannyId],
+  const publicId = searchParams.get('public_id');
+
+  // Fetch internal NannyProfile for booking data (user_email etc)
+  const { data: nanny, isLoading } = useQuery({
+    queryKey: ['nannyProfileForBooking', nannyId],
     queryFn: async () => {
-      try {
-        const profile = await base44.entities.NannyProfile.get(nannyId);
-        return profile || null;
-      } catch (e) {
-        console.error('BookNanny: failed to fetch nanny', nannyId, e);
-        return null;
-      }
+      const profile = await base44.entities.NannyProfile.get(nannyId);
+      return profile || null;
     },
     enabled: !!nannyId,
   });
+
+  // Fetch PublicNannyProfile for display info
+  const { data: publicNanny } = useQuery({
+    queryKey: ['publicNannyForBooking', publicId],
+    queryFn: () => base44.entities.PublicNannyProfile.get(publicId),
+    enabled: !!publicId,
+  });
+
+  // Use public profile for display, internal for booking data
+  const displayNanny = publicNanny || nanny;
 
   const [form, setForm] = useState({
     date: '',
@@ -92,12 +100,12 @@ export default function BookNanny() {
   };
 
   const durationHours = calculateDuration(form.start_time, form.end_time);
-  const rate = nanny?.hourly_rate || 0;
+  const rate = displayNanny?.hourly_rate || nanny?.hourly_rate || 0;
   const totalPrice = +(durationHours * rate).toFixed(2);
   const timeError = form.start_time && form.end_time && durationHours <= 0 ? 'Vrijeme završetka mora biti nakon vremena početka' : null;
   const canBook = form.date && form.start_time && form.end_time && form.address.trim() && durationHours > 0;
 
-  const nannyName = nanny ? `${nanny.first_name} ${nanny.last_name}` : '';
+  const nannyName = displayNanny ? `${displayNanny.first_name || displayNanny.display_name || ''} ${displayNanny.last_name_initial || displayNanny.last_name || ''}`.trim() : '';
 
   const bookMutation = useMutation({
     mutationFn: async () => {
@@ -208,7 +216,8 @@ export default function BookNanny() {
     );
   }
 
-  const initial = (nanny.first_name || '?')[0];
+  const displayName = displayNanny?.first_name || nanny?.first_name || '?';
+  const initial = displayName[0];
 
   if (submitted) {
     return (
@@ -242,8 +251,8 @@ export default function BookNanny() {
       {/* Nanny preview strip */}
       <div className="flex items-center gap-4 bg-card border border-border/40 rounded-2xl p-4 mb-7 shadow-sm">
         <div className="w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0">
-          {nanny.photo_url ? (
-            <img src={nanny.photo_url} alt={nannyName} className="w-full h-full object-cover" />
+          {(displayNanny?.profile_photo_url || nanny?.photo_url) ? (
+            <img src={displayNanny?.profile_photo_url || nanny?.photo_url} alt={nannyName} className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-rose-light to-peach flex items-center justify-center">
               <span className="text-xl font-display font-bold text-primary">{initial}</span>

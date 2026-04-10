@@ -70,11 +70,16 @@ export default function NannyDetail() {
   const navigate = useNavigate();
 
   const { data: nanny, isLoading } = useQuery({
-    queryKey: ['nannyProfile', id],
-    queryFn: async () => {
-      return await base44.entities.NannyProfile.get(id);
-    },
+    queryKey: ['publicNannyProfile', id],
+    queryFn: () => base44.entities.PublicNannyProfile.get(id),
     enabled: !!id,
+  });
+
+  // Fetch the internal NannyProfile for messaging (needs user_email)
+  const { data: internalNanny } = useQuery({
+    queryKey: ['internalNannyForMsg', nanny?.nanny_profile_id],
+    queryFn: () => base44.entities.NannyProfile.get(nanny.nanny_profile_id),
+    enabled: !!nanny?.nanny_profile_id && !!user?.email,
   });
 
   const { data: reviews = [] } = useQuery({
@@ -84,9 +89,9 @@ export default function NannyDetail() {
   });
 
   const handleMessage = async () => {
-    if (!nanny || !user?.email) return;
+    if (!internalNanny || !user?.email) return;
 
-    const nannyEmail = nanny.user_email;
+    const nannyEmail = internalNanny.user_email;
     const conversationKey = buildConversationKey(user.email, nannyEmail);
 
     const existing = await base44.entities.Conversation.filter(
@@ -100,12 +105,12 @@ export default function NannyDetail() {
       return;
     }
 
-    const name = `${nanny.first_name} ${nanny.last_name}`;
+    const cName = `${nanny.first_name || ''} ${nanny.last_name_initial || ''}`.trim();
 
     const conv = await base44.entities.Conversation.create({
       conversation_key: conversationKey,
       participant_emails: [user.email, nannyEmail],
-      participant_names: [user.display_name || user.full_name, name],
+      participant_names: [user.display_name || user.full_name, cName],
       last_message: '',
       last_message_date: new Date().toISOString(),
       hidden_for: [],
@@ -126,7 +131,7 @@ export default function NannyDetail() {
 
   if (!nanny) return <div className="text-center py-16 text-muted-foreground">Dadilja nije pronađena.</div>;
 
-  const name = `${nanny.first_name} ${nanny.last_name}`;
+  const name = `${nanny.first_name || ''} ${nanny.last_name_initial || ''}`.trim();
   const initial = (nanny.first_name || '?')[0];
 
   return (
@@ -153,8 +158,8 @@ export default function NannyDetail() {
                   <div className="absolute -inset-2 rounded-[1.75rem] bg-gradient-to-br from-rose-light via-peach/60 to-sage/30 opacity-70 blur-sm" />
                   <div className="absolute -inset-1.5 rounded-[1.5rem] bg-gradient-to-br from-primary/15 via-peach/40 to-sage/20" />
                   <div className="relative w-24 h-24 rounded-3xl overflow-hidden border-[3px] border-card shadow-xl">
-                    {nanny.photo_url ? (
-                      <img src={nanny.photo_url} alt={name} className="w-full h-full object-cover" />
+                    {nanny.profile_photo_url ? (
+                      <img src={nanny.profile_photo_url} alt={name} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-rose-light to-peach flex items-center justify-center">
                         <span className="text-4xl font-display font-bold text-primary">{initial}</span>
@@ -176,11 +181,11 @@ export default function NannyDetail() {
               <h1 className="font-display text-3xl lg:text-4xl font-bold text-foreground leading-tight mb-2">{name}</h1>
 
               <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-5">
-                {nanny.location && (
-                  <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-primary/60" /> {nanny.location}</span>
+                {nanny.neighborhood && (
+                  <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-primary/60" /> {nanny.neighborhood}{nanny.city ? `, ${nanny.city}` : ''}</span>
                 )}
-                {nanny.years_experience > 0 && (
-                  <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-primary/60" /> {nanny.years_experience} godina iskustva</span>
+                {nanny.experience_years > 0 && (
+                  <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-primary/60" /> {nanny.experience_years} godina iskustva</span>
                 )}
               </div>
 
@@ -190,7 +195,7 @@ export default function NannyDetail() {
                   <CheckCircle2 className="w-3 h-3" />
                   Provjerena dadilja
                 </span>
-                {nanny.certifications?.map(c => {
+                {nanny.badges?.map(c => {
                   const color = CERT_STYLE[c] || 'text-muted-foreground bg-muted/50';
                   return (
                     <span key={c} className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full ${color}`}>
@@ -217,7 +222,7 @@ export default function NannyDetail() {
           )}
 
           {/* Intro video */}
-          {nanny.video_url && (
+          {nanny.intro_video_url && (
             <div className="bg-card border border-border/50 rounded-3xl p-7 shadow-sm shadow-primary/3">
               <h3 className="font-display font-semibold text-xl mb-4 flex items-center gap-2.5">
                 <div className="w-7 h-7 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -226,7 +231,7 @@ export default function NannyDetail() {
                 Video predstavljanje
               </h3>
               <div className="rounded-2xl overflow-hidden bg-muted aspect-video">
-                <video src={nanny.video_url} controls className="w-full h-full object-cover" />
+                <video src={nanny.intro_video_url} controls className="w-full h-full object-cover" />
               </div>
             </div>
           )}
@@ -250,43 +255,29 @@ export default function NannyDetail() {
                   </div>
                 </div>
               )}
-              {nanny.specialties?.length > 0 && (
-                <div>
+              {nanny.qualifications_summary && (
+                <div className="sm:col-span-2">
                   <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5 mb-3">
-                    <Sparkles className="w-3.5 h-3.5" /> Specijalnosti
+                    <Sparkles className="w-3.5 h-3.5" /> Kvalifikacije
                   </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {nanny.specialties.map(s => <Badge key={s} className="rounded-xl text-xs px-3 py-1 bg-sage/20 text-sage-foreground border-0">{s}</Badge>)}
-                  </div>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{nanny.qualifications_summary}</p>
                 </div>
               )}
-              {nanny.availability?.length > 0 && (
+              {nanny.availability_summary && (
                 <div>
                   <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5 mb-3">
                     <Clock className="w-3.5 h-3.5" /> Dostupnost
                   </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {nanny.availability.map(a => <Badge key={a} className="rounded-xl text-xs px-3 py-1 bg-peach/50 text-peach-dark border-0">{a}</Badge>)}
-                  </div>
+                  <p className="text-sm text-muted-foreground">{nanny.availability_summary}</p>
                 </div>
               )}
-              {nanny.age_groups?.length > 0 && (
-                <div>
-                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5 mb-3">
-                    <Heart className="w-3.5 h-3.5" /> Dobne skupine
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {nanny.age_groups.map(a => <Badge key={a} className="rounded-xl text-xs px-3 py-1 bg-primary/8 text-primary border-0">{a}</Badge>)}
-                  </div>
-                </div>
-              )}
-              {nanny.certifications?.length > 0 && (
+              {nanny.badges?.length > 0 && (
                 <div>
                   <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5 mb-3">
                     <Award className="w-3.5 h-3.5" /> Certifikati
                   </p>
                   <div className="flex flex-wrap gap-1.5">
-                    {nanny.certifications.map(c => <Badge key={c} className="rounded-xl text-xs px-3 py-1 bg-peach/50 text-peach-dark border-0">{c}</Badge>)}
+                    {nanny.badges.map(c => <Badge key={c} className="rounded-xl text-xs px-3 py-1 bg-peach/50 text-peach-dark border-0">{c}</Badge>)}
                   </div>
                 </div>
               )}
@@ -327,15 +318,15 @@ export default function NannyDetail() {
               </div>
 
               <div className="space-y-2.5">
-                {user?.role === 'parent' && (
-                  <Link to={`/BookNanny?nanny_id=${nanny.id}`} className="block">
+                {user?.role === 'parent' && nanny.nanny_profile_id && (
+                  <Link to={`/BookNanny?nanny_id=${nanny.nanny_profile_id}&public_id=${nanny.id}`} className="block">
                     <Button className="w-full h-12 font-semibold rounded-2xl text-sm shadow-md shadow-primary/25">
                       <Calendar className="w-4 h-4 mr-2" />
                       Rezerviraj termin
                     </Button>
                   </Link>
                 )}
-                {user ? (
+                {user && internalNanny ? (
                   <Button variant="outline" className="w-full h-12 rounded-2xl text-sm border-border/60" onClick={handleMessage}>
                     <MessageCircle className="w-4 h-4 mr-2" />
                     Pošalji poruku
