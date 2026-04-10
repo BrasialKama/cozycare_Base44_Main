@@ -22,7 +22,7 @@ export default function NannyProfile() {
 
   const { data: profiles = [], isLoading } = useQuery({
     queryKey: ['myNannyProfile', user?.email],
-    queryFn: () => base44.entities.NannyProfile.filter({ created_by: user?.email }),
+    queryFn: () => base44.entities.NannyProfile.filter({ user_email: user?.email }, '-created_date', 1),
     enabled: !!user?.email,
   });
 
