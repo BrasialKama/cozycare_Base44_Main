@@ -95,7 +95,7 @@ export default function NannyDetail() {
       const res = await base44.functions.invoke('openOrCreateConversation', {
         nanny_profile_id: nanny.nanny_profile_id,
       });
-      const conversationId = res.data?.conversation_id;
+      const conversationId = res.data?.conversation_id || res?.conversation_id;
       if (!conversationId) {
         toast.error('Nije moguće otvoriti razgovor. Pokušajte kasnije.');
         return;

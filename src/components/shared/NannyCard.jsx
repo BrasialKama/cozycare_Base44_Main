@@ -118,7 +118,7 @@ export default function NannyCard({ nanny, onWatchVideo }) {
           Pogledaj profil
         </Link>
         <Link
-          to={`/BookNanny?nanny_id=${nanny.id}`}
+          to={`/BookNanny?nanny_id=${nanny.nanny_profile_id}&public_id=${nanny.id}`}
           className="text-sm font-semibold text-primary-foreground bg-primary hover:bg-primary/90 px-5 py-2 rounded-full transition-colors"
         >
           Rezerviraj

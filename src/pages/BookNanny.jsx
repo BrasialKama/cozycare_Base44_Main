@@ -209,7 +209,7 @@ export default function BookNanny() {
         <h2 className="font-display text-xl font-bold mb-2">Dadilja nije odabrana</h2>
         <p className="text-muted-foreground mb-6">Niste odabrali dadilju za rezervaciju.</p>
         <Link to="/FindNannies">
-          <Button className="rounded-2xl px-8">Prona\u0111i dadilje</Button>
+          <Button className="rounded-2xl px-8">Pronađi dadilje</Button>
         </Link>
       </div>
     );
@@ -227,10 +227,10 @@ export default function BookNanny() {
     return (
       <div className="max-w-lg mx-auto pt-16 text-center">
         <AlertCircle className="w-10 h-10 text-destructive mx-auto mb-4" />
-        <h2 className="font-display text-xl font-bold mb-2">Dadilja nije prona\u0111ena</h2>
-        <p className="text-muted-foreground mb-6">Profil dadilje nije dostupan. Poku\u0161ajte ponovo.</p>
+        <h2 className="font-display text-xl font-bold mb-2">Dadilja nije pronađena</h2>
+        <p className="text-muted-foreground mb-6">Profil dadilje nije dostupan. Pokušajte ponovo.</p>
         <Link to="/FindNannies">
-          <Button className="rounded-2xl px-8">Prona\u0111i dadilje</Button>
+          <Button className="rounded-2xl px-8">Pronađi dadilje</Button>
         </Link>
       </div>
     );
@@ -302,7 +302,7 @@ export default function BookNanny() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Po\u010detak</Label>
+                <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Početak</Label>
                 <Select value={form.start_time} onValueChange={val => update('start_time', val)}>
                   <SelectTrigger className="rounded-xl">
                     <SelectValue placeholder="Odaberi" />
@@ -317,7 +317,7 @@ export default function BookNanny() {
                 </Select>
               </div>
               <div>
-                <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Zavr\u0161etak</Label>
+                <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Završetak</Label>
                 <Select value={form.end_time} onValueChange={val => update('end_time', val)}>
                   <SelectTrigger className="rounded-xl">
                     <SelectValue placeholder="Odaberi" />
@@ -367,11 +367,11 @@ export default function BookNanny() {
           </div>
           <div>
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Poruka dadilji</Label>
-            <Textarea value={form.notes} onChange={e => update('notes', e.target.value)} placeholder="Predstavite se, opi\u0161ite svoju obitelj\u2026" rows={2} className="rounded-xl resize-none" />
+            <Textarea value={form.notes} onChange={e => update('notes', e.target.value)} placeholder="Predstavite se, opišite svoju obitelj…" rows={2} className="rounded-xl resize-none" />
           </div>
           <div>
             <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Posebne upute</Label>
-            <Textarea value={form.special_notes} onChange={e => update('special_notes', e.target.value)} placeholder="Alergije, raspored spavanja, ku\u0107na pravila\u2026" rows={2} className="rounded-xl resize-none" />
+            <Textarea value={form.special_notes} onChange={e => update('special_notes', e.target.value)} placeholder="Alergije, raspored spavanja, kućna pravila…" rows={2} className="rounded-xl resize-none" />
           </div>
         </div>
 
@@ -395,7 +395,7 @@ export default function BookNanny() {
         <div className="flex items-start gap-3 bg-emerald-50 rounded-2xl p-4">
           <Shield className="w-4.5 h-4.5 text-emerald-600 flex-shrink-0 mt-0.5" />
           <p className="text-xs text-emerald-800 leading-relaxed">
-            Va\u0161e pla\u0107anje je za\u0161ti\u0107eno. Naplatit \u0107e vam se tek kada dadilja potvrdi rezervaciju.
+           Vaše plaćanje je zaštićeno. Naplatit će vam se tek kada dadilja potvrdi rezervaciju.
           </p>
         </div>
 
@@ -407,7 +407,7 @@ export default function BookNanny() {
             style={{ height: '3.25rem' }}
           >
             {bookMutation.isPending ? (
-              <span className="flex items-center gap-2"><div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" /> \u0160aljem zahtjev\u2026</span>
+              <span className="flex items-center gap-2"><div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" /> Šaljem zahtjev…</span>
             ) : (
               <span className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4" /> Potvrdi rezervaciju</span>
             )}
