@@ -3,9 +3,10 @@
  * All images are warm, trustworthy, feminine-leaning, family-safe.
  *
  * Usage:
- *   import { getNannyImage, getNannyBackgroundImage } from '@/lib/nannyImages';
- *   const src = getNannyImage(nanny);           // profile photo or curated fallback
- *   const bg  = getNannyBackgroundImage(nanny);  // lifestyle background for cards
+ *   import { getNannyImage, getNannyOwnImage, getNannyBackgroundImage } from '@/lib/nannyImages';
+ *   getNannyImage(nanny)        — always returns a curated fallback (for public-facing views)
+ *   getNannyOwnImage(nanny)     — returns real uploaded photo if available, else fallback (for own-profile editing)
+ *   getNannyBackgroundImage()   — single consistent lifestyle background for cards
  */
 
 // ── Portrait fallbacks (6 curated images) ──
@@ -18,11 +19,8 @@ const PORTRAIT_FALLBACKS = [
   'https://media.base44.com/images/public/69b94f7a37d2e3ed888df054/ab377bb97_generated_image.png',
 ];
 
-// ── Background / lifestyle fallbacks (2 curated images) ──
-const BACKGROUND_FALLBACKS = [
-  'https://media.base44.com/images/public/69b94f7a37d2e3ed888df054/7d09d0182_generated_image.png',
-  'https://media.base44.com/images/public/69b94f7a37d2e3ed888df054/6f7e754dd_generated_image.png',
-];
+// ── Single consistent background for all cards ──
+const CARD_BACKGROUND = 'https://media.base44.com/images/public/69b94f7a37d2e3ed888df054/7d09d0182_generated_image.png';
 
 /**
  * Simple deterministic hash from a string → positive integer.
@@ -36,28 +34,31 @@ function hashString(str) {
 }
 
 /**
- * Derive a stable key from a nanny-like object. Works with both
- * PublicNannyProfile and NannyProfile shapes.
+ * Canonical stable key: always prefer nanny_profile_id so the same nanny
+ * gets the same fallback whether viewed through PublicNannyProfile or NannyProfile.
  */
 function stableKey(nanny) {
-  return nanny?.id || nanny?.nanny_profile_id || nanny?.user_email || nanny?.display_name || 'default';
+  return nanny?.nanny_profile_id || nanny?.user_email || nanny?.display_name || nanny?.id || 'default';
 }
 
 /**
- * Returns the nanny's real profile photo if one exists,
- * otherwise a deterministic curated fallback portrait.
- *
- * Pass `uniform: true` to always return a curated fallback,
- * ignoring any real photo. Useful for browse/listing pages
- * where visual consistency matters.
+ * Public-facing image — always returns a deterministic curated fallback.
+ * Use this on browse cards, detail pages, booking pages, etc.
  */
-export function getNannyImage(nanny, { uniform = false } = {}) {
-  if (!uniform) {
-    const realPhoto = nanny?.profile_photo_url || nanny?.photo_url;
-    if (realPhoto) return realPhoto;
-  }
+export function getNannyImage(nanny) {
   const idx = hashString(stableKey(nanny)) % PORTRAIT_FALLBACKS.length;
   return PORTRAIT_FALLBACKS[idx];
+}
+
+/**
+ * Own-profile image — returns the real uploaded photo if available,
+ * otherwise falls back to the curated portrait.
+ * Use this only on the nanny's own profile editing page.
+ */
+export function getNannyOwnImage(nanny) {
+  const realPhoto = nanny?.profile_photo_url || nanny?.photo_url;
+  if (realPhoto) return realPhoto;
+  return getNannyImage(nanny);
 }
 
 /**
@@ -68,9 +69,8 @@ export function hasRealPhoto(nanny) {
 }
 
 /**
- * Returns a deterministic curated lifestyle background image for cards / hero areas.
+ * Returns one consistent lifestyle background image for all cards.
  */
-export function getNannyBackgroundImage(nanny) {
-  const idx = hashString(stableKey(nanny)) % BACKGROUND_FALLBACKS.length;
-  return BACKGROUND_FALLBACKS[idx];
+export function getNannyBackgroundImage() {
+  return CARD_BACKGROUND;
 }

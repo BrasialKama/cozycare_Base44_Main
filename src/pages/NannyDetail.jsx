@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
@@ -58,7 +58,7 @@ function ReviewCard({ review, isFirst }) {
 export default function NannyDetail() {
   const [searchParams] = useSearchParams();
   const id = searchParams.get('id');
-  const { user } = useAuth();
+  const { user, isAuthenticated, navigateToLogin } = useAuth();
   const navigate = useNavigate();
 
   const { data: nanny, isLoading } = useQuery({
@@ -138,7 +138,7 @@ export default function NannyDetail() {
     navigate(`/Messages?conversation=${conv.id}`);
   };
 
-  const heroImage = useMemo(() => getNannyBackgroundImage(nanny || { id }), [nanny, id]);
+  const heroImage = getNannyBackgroundImage();
 
   if (isLoading) {
     return (
@@ -339,7 +339,7 @@ export default function NannyDetail() {
                     </Button>
                   </Link>
                 )}
-                {user ? (
+                {isAuthenticated ? (
                   <Button
                     variant="outline"
                     className="w-full h-12 rounded-2xl text-sm border-border/60"
@@ -350,7 +350,7 @@ export default function NannyDetail() {
                     Pošalji poruku
                   </Button>
                 ) : (
-                  <Button variant="outline" className="w-full h-12 rounded-2xl text-sm border-border/60" onClick={() => base44.auth.redirectToLogin(window.location.pathname + window.location.search)}>
+                  <Button variant="outline" className="w-full h-12 rounded-2xl text-sm border-border/60" onClick={() => navigateToLogin()}>
                     <MessageCircle className="w-4 h-4 mr-2" />
                     Prijavi se za slanje poruke
                   </Button>

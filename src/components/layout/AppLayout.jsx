@@ -6,7 +6,6 @@ import {
   Shield, Heart, LogOut, DollarSign, ClipboardList } from
 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { base44 } from '@/api/base44Client';
 import useUnreadMessages from '@/hooks/useUnreadMessages';
 
 const Logo = () =>
@@ -92,7 +91,7 @@ const mobileTabNav = {
 };
 
 export default function AppLayout() {
-  const { user } = useAuth();
+  const { user, isAuthenticated, logout, navigateToLogin } = useAuth();
   const location = useLocation();
   const role = user?.role || 'parent';
   const items = navItems[role] || navItems.parent;
@@ -138,7 +137,7 @@ export default function AppLayout() {
           <Button
             variant="ghost"
             className="w-full justify-start text-muted-foreground hover:text-foreground text-xs rounded-xl min-h-[40px] px-4 py-2.5"
-            onClick={() => base44.auth.logout()}>
+            onClick={() => logout()}>
             
             <LogOut className="w-4 h-4 mr-2" />
             Odjava
@@ -149,11 +148,11 @@ export default function AppLayout() {
       {/* ── Mobile header ── */}
       <div className="lg:hidden fixed top-0 inset-x-0 h-14 bg-card/95 backdrop-blur-md border-b border-border/60 z-30 flex items-center justify-between px-4">
         <Logo />
-        {user ?
+        {isAuthenticated ?
         <Button
           variant="ghost"
           className="text-xs text-muted-foreground hover:text-foreground rounded-none gap-1.5 h-full px-4"
-          onClick={() => base44.auth.logout()}>
+          onClick={() => logout()}>
           
             <LogOut className="w-4 h-4" />
             Odjava
@@ -162,7 +161,7 @@ export default function AppLayout() {
         <Button
           variant="ghost"
           className="text-xs text-muted-foreground hover:text-foreground rounded-none h-full px-4"
-          onClick={() => base44.auth.redirectToLogin(window.location.pathname)}>
+          onClick={() => navigateToLogin()}>
           
             Prijava
           </Button>

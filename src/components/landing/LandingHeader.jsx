@@ -1,12 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Heart } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import { Heart, LogOut, LogIn } from 'lucide-react';
+import { useAuth } from '@/lib/AuthContext';
 
 export default function LandingHeader() {
-  const handleSignOut = async () => {
-    base44.auth.logout('/');
-  };
+  const { isAuthenticated, logout, navigateToLogin } = useAuth();
 
   const navItems = [
     { label: 'Pretraži dadilje', to: '/FindNannies' },
@@ -44,12 +42,23 @@ export default function LandingHeader() {
               {item.label}
             </Link>
           ))}
-          <button
-            onClick={handleSignOut}
-            className="text-sm font-medium text-foreground/70 hover:text-foreground transition-colors px-4 py-2.5 rounded-xl hover:bg-black/5 min-h-[40px]"
-          >
-            Odjava
-          </button>
+          {isAuthenticated ? (
+            <button
+              onClick={() => logout()}
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors px-4 py-2.5 rounded-xl hover:bg-black/5 min-h-[40px]"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              Odjava
+            </button>
+          ) : (
+            <button
+              onClick={() => navigateToLogin()}
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors px-4 py-2.5 rounded-xl hover:bg-primary/5 min-h-[40px]"
+            >
+              <LogIn className="w-3.5 h-3.5" />
+              Prijava
+            </button>
+          )}
         </nav>
 
         {/* No mobile hamburger — mobile uses bottom tab bar in AppLayout */}
