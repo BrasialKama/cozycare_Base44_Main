@@ -33,7 +33,7 @@ export default function LandingNannyCard({ nanny }) {
     >
       <div className="flex gap-4 mb-4">
         <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 border border-border/30">
-          <img src={getNannyImage(nanny)} alt={name} className="w-full h-full object-cover" />
+          <img src={getNannyImage(nanny, { uniform: true })} alt={name} className="w-full h-full object-cover" />
         </div>
 
         <div className="flex-1 min-w-0">

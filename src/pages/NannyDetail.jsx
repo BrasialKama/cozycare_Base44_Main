@@ -81,9 +81,23 @@ export default function NannyDetail() {
   });
 
   // Fetch the internal NannyProfile for messaging (needs user_email)
+  // nanny_profile_id may be a real record ID or a sample slug — use filter as fallback
   const { data: internalNanny } = useQuery({
     queryKey: ['internalNannyForMsg', nanny?.nanny_profile_id],
-    queryFn: () => base44.entities.NannyProfile.get(nanny.nanny_profile_id),
+    queryFn: async () => {
+      const npId = nanny.nanny_profile_id;
+      try {
+        return await base44.entities.NannyProfile.get(npId);
+      } catch (_) {
+        // sample slug or invalid ID — try filter by display_name
+        const results = await base44.entities.NannyProfile.filter(
+          { display_name: nanny.display_name },
+          '-created_date',
+          1
+        );
+        return results?.[0] || null;
+      }
+    },
     enabled: !!nanny?.nanny_profile_id && !!user?.email,
   });
 
@@ -325,8 +339,13 @@ export default function NannyDetail() {
                     </Button>
                   </Link>
                 )}
-                {user && internalNanny ? (
-                  <Button variant="outline" className="w-full h-12 rounded-2xl text-sm border-border/60" onClick={handleMessage}>
+                {user ? (
+                  <Button
+                    variant="outline"
+                    className="w-full h-12 rounded-2xl text-sm border-border/60"
+                    onClick={handleMessage}
+                    disabled={!internalNanny}
+                  >
                     <MessageCircle className="w-4 h-4 mr-2" />
                     Pošalji poruku
                   </Button>

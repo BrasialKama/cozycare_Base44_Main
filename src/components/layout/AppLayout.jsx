@@ -138,7 +138,7 @@ export default function AppLayout() {
           <Button
             variant="ghost"
             className="w-full justify-start text-muted-foreground hover:text-foreground text-xs rounded-xl min-h-[40px] px-4 py-2.5"
-            onClick={() => base44.auth.logout('/')}>
+            onClick={() => base44.auth.logout()}>
             
             <LogOut className="w-4 h-4 mr-2" />
             Odjava
@@ -153,7 +153,7 @@ export default function AppLayout() {
         <Button
           variant="ghost"
           className="text-xs text-muted-foreground hover:text-foreground rounded-none gap-1.5 h-full px-4"
-          onClick={() => base44.auth.logout('/')}>
+          onClick={() => base44.auth.logout()}>
           
             <LogOut className="w-4 h-4" />
             Odjava

@@ -36,7 +36,7 @@ export default function NannyCard({ nanny, onWatchVideo }) {
       <div className="flex gap-4">
         <Link to={`/NannyDetail?id=${nanny.id}`} className="flex-shrink-0">
           <div className="w-20 h-20 rounded-xl overflow-hidden border border-border/30">
-            <img src={getNannyImage(nanny)} alt={name} className="w-full h-full object-cover" />
+            <img src={getNannyImage(nanny, { uniform: true })} alt={name} className="w-full h-full object-cover" />
           </div>
         </Link>
 

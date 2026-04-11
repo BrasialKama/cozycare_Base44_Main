@@ -46,10 +46,16 @@ function stableKey(nanny) {
 /**
  * Returns the nanny's real profile photo if one exists,
  * otherwise a deterministic curated fallback portrait.
+ *
+ * Pass `uniform: true` to always return a curated fallback,
+ * ignoring any real photo. Useful for browse/listing pages
+ * where visual consistency matters.
  */
-export function getNannyImage(nanny) {
-  const realPhoto = nanny?.profile_photo_url || nanny?.photo_url;
-  if (realPhoto) return realPhoto;
+export function getNannyImage(nanny, { uniform = false } = {}) {
+  if (!uniform) {
+    const realPhoto = nanny?.profile_photo_url || nanny?.photo_url;
+    if (realPhoto) return realPhoto;
+  }
   const idx = hashString(stableKey(nanny)) % PORTRAIT_FALLBACKS.length;
   return PORTRAIT_FALLBACKS[idx];
 }
