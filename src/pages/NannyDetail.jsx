@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
@@ -80,26 +80,7 @@ export default function NannyDetail() {
     enabled: !!id,
   });
 
-  // Fetch the internal NannyProfile for messaging (needs user_email)
-  // nanny_profile_id may be a real record ID or a sample slug — use filter as fallback
-  const { data: internalNanny } = useQuery({
-    queryKey: ['internalNannyForMsg', nanny?.nanny_profile_id],
-    queryFn: async () => {
-      const npId = nanny.nanny_profile_id;
-      try {
-        return await base44.entities.NannyProfile.get(npId);
-      } catch (_) {
-        // sample slug or invalid ID — try filter by display_name
-        const results = await base44.entities.NannyProfile.filter(
-          { display_name: nanny.display_name },
-          '-created_date',
-          1
-        );
-        return results?.[0] || null;
-      }
-    },
-    enabled: !!nanny?.nanny_profile_id && isAuthenticated,
-  });
+  const [isSendingMessage, setIsSendingMessage] = useState(false);
 
   const { data: reviews = [] } = useQuery({
     queryKey: ['nannyReviews', id],
@@ -108,34 +89,38 @@ export default function NannyDetail() {
   });
 
   const handleMessage = async () => {
-    if (!internalNanny || !user?.email) return;
+    if (!user?.email || !nanny?.nanny_user_email) return;
+    setIsSendingMessage(true);
+    try {
+      const nannyEmail = nanny.nanny_user_email;
+      const conversationKey = buildConversationKey(user.email, nannyEmail);
 
-    const nannyEmail = internalNanny.user_email;
-    const conversationKey = buildConversationKey(user.email, nannyEmail);
+      const existing = await base44.entities.Conversation.filter(
+        { conversation_key: conversationKey },
+        '-updated_date',
+        1
+      );
 
-    const existing = await base44.entities.Conversation.filter(
-      { conversation_key: conversationKey },
-      '-updated_date',
-      1
-    );
+      if (existing?.[0]) {
+        navigate(`/Messages?conversation=${existing[0].id}`);
+        return;
+      }
 
-    if (existing?.[0]) {
-      navigate(`/Messages?conversation=${existing[0].id}`);
-      return;
+      const cName = `${nanny.first_name || ''} ${nanny.last_name_initial || ''}`.trim();
+
+      const conv = await base44.entities.Conversation.create({
+        conversation_key: conversationKey,
+        participant_emails: [user.email, nannyEmail],
+        participant_names: [user.display_name || user.full_name, cName],
+        last_message: '',
+        last_message_date: new Date().toISOString(),
+        hidden_for: [],
+      });
+
+      navigate(`/Messages?conversation=${conv.id}`);
+    } finally {
+      setIsSendingMessage(false);
     }
-
-    const cName = `${nanny.first_name || ''} ${nanny.last_name_initial || ''}`.trim();
-
-    const conv = await base44.entities.Conversation.create({
-      conversation_key: conversationKey,
-      participant_emails: [user.email, nannyEmail],
-      participant_names: [user.display_name || user.full_name, cName],
-      last_message: '',
-      last_message_date: new Date().toISOString(),
-      hidden_for: [],
-    });
-
-    navigate(`/Messages?conversation=${conv.id}`);
   };
 
   const heroImage = getNannyBackgroundImage();
@@ -344,10 +329,10 @@ export default function NannyDetail() {
                     variant="outline"
                     className="w-full h-12 rounded-2xl text-sm border-border/60"
                     onClick={handleMessage}
-                    disabled={!internalNanny}
+                    disabled={isSendingMessage || !nanny?.nanny_user_email}
                   >
-                    {!internalNanny ? (
-                      <><div className="w-3.5 h-3.5 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin mr-2" /> Učitavanje…</>
+                    {isSendingMessage ? (
+                      <><div className="w-3.5 h-3.5 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin mr-2" /> Otvaranje razgovora…</>
                     ) : (
                       <><MessageCircle className="w-4 h-4 mr-2" /> Pošalji poruku</>
                     )}
