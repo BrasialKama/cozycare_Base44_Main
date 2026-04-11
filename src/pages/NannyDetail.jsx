@@ -98,7 +98,7 @@ export default function NannyDetail() {
         return results?.[0] || null;
       }
     },
-    enabled: !!nanny?.nanny_profile_id && !!user?.email,
+    enabled: !!nanny?.nanny_profile_id && isAuthenticated,
   });
 
   const { data: reviews = [] } = useQuery({
@@ -346,8 +346,11 @@ export default function NannyDetail() {
                     onClick={handleMessage}
                     disabled={!internalNanny}
                   >
-                    <MessageCircle className="w-4 h-4 mr-2" />
-                    Pošalji poruku
+                    {!internalNanny ? (
+                      <><div className="w-3.5 h-3.5 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin mr-2" /> Učitavanje…</>
+                    ) : (
+                      <><MessageCircle className="w-4 h-4 mr-2" /> Pošalji poruku</>
+                    )}
                   </Button>
                 ) : (
                   <Button variant="outline" className="w-full h-12 rounded-2xl text-sm border-border/60" onClick={() => navigateToLogin()}>
@@ -356,11 +359,13 @@ export default function NannyDetail() {
                   </Button>
                 )}
               </div>
-              {/* Reciprocity — free browsing note */}
-              <p className="text-[11px] text-center text-muted-foreground mt-3 leading-relaxed">
-                <Info className="w-3 h-3 inline mr-1 -mt-0.5" />
-                Besplatno pregledajte profile — registracija tek pri rezervaciji.
-              </p>
+              {/* Reciprocity — free browsing note (guest only) */}
+              {!isAuthenticated && (
+                <p className="text-[11px] text-center text-muted-foreground mt-3 leading-relaxed">
+                  <Info className="w-3 h-3 inline mr-1 -mt-0.5" />
+                  Besplatno pregledajte profile — registracija tek pri rezervaciji.
+                </p>
+              )}
 
               <div className="mt-5 pt-5 border-t border-border/40">
                 <div className="flex items-start gap-3">
