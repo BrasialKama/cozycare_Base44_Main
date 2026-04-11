@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { toast } from 'sonner';
+import { useToast } from '@/components/ui/use-toast';
 
 
 
@@ -60,6 +60,7 @@ export default function NannyDetail() {
   const id = searchParams.get('id');
   const { user, isAuthenticated, navigateToLogin } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const { data: nanny, isLoading } = useQuery({
     queryKey: ['publicNanny', id],
@@ -97,12 +98,12 @@ export default function NannyDetail() {
       });
       const conversationId = res.data?.conversation_id || res?.conversation_id;
       if (!conversationId) {
-        toast.error('Nije moguće otvoriti razgovor. Pokušajte kasnije.');
+        toast({ variant: 'destructive', title: 'Greška', description: 'Nije moguće otvoriti razgovor. Pokušajte kasnije.' });
         return;
       }
       navigate(`/Messages?conversation=${conversationId}`);
     } catch (err) {
-      toast.error('Nije moguće otvoriti razgovor. Pokušajte kasnije.');
+      toast({ variant: 'destructive', title: 'Greška', description: 'Nije moguće otvoriti razgovor. Pokušajte kasnije.' });
     } finally {
       setIsSendingMessage(false);
     }
