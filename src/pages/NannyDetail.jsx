@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { toast } from 'sonner';
 
 
 
@@ -94,7 +95,14 @@ export default function NannyDetail() {
       const res = await base44.functions.invoke('openOrCreateConversation', {
         nanny_profile_id: nanny.nanny_profile_id,
       });
-      navigate(`/Messages?conversation=${res.data.conversation_id}`);
+      const conversationId = res.data?.conversation_id;
+      if (!conversationId) {
+        toast.error('Nije moguće otvoriti razgovor. Pokušajte kasnije.');
+        return;
+      }
+      navigate(`/Messages?conversation=${conversationId}`);
+    } catch (err) {
+      toast.error('Nije moguće otvoriti razgovor. Pokušajte kasnije.');
     } finally {
       setIsSendingMessage(false);
     }
