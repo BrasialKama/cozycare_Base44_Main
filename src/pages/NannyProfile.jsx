@@ -54,6 +54,7 @@ export default function NannyProfile() {
     if (!file || !profile) return;
     const { file_url } = await base44.integrations.Core.UploadFile({ file });
     await base44.entities.NannyProfile.update(profile.id, { photo_url: file_url });
+    await base44.functions.invoke('syncPublicNannyProfile', { nanny_profile_id: profile.id });
     queryClient.invalidateQueries({ queryKey: ['myNannyProfile'] });
     toast.success('Fotografija ažurirana!');
   };
@@ -70,6 +71,7 @@ export default function NannyProfile() {
         specialties: form.specialties.split(',').map(s => s.trim()).filter(Boolean),
         certifications: form.certifications.split(',').map(s => s.trim()).filter(Boolean),
       });
+      await base44.functions.invoke('syncPublicNannyProfile', { nanny_profile_id: profile.id });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['myNannyProfile'] });

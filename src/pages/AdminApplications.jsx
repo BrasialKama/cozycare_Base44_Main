@@ -16,27 +16,6 @@ const statusStyles = {
   inactive: 'bg-peach/50 text-peach-dark',
 };
 
-async function syncPublicStatus(privateProfile) {
-  const existing = await base44.entities.PublicNannyProfile.filter(
-    { nanny_profile_id: privateProfile.id },
-    '-created_date',
-    1
-  );
-
-  const publicPatch = {
-    status: privateProfile.status,
-    is_active: privateProfile.is_active === true,
-    rating: privateProfile.rating || 0,
-    review_count: privateProfile.review_count || 0,
-    total_bookings: privateProfile.total_bookings || 0,
-    badges: privateProfile.badges || [],
-  };
-
-  if (existing?.[0]) {
-    await base44.entities.PublicNannyProfile.update(existing[0].id, publicPatch);
-  }
-}
-
 export default function AdminApplications() {
   const queryClient = useQueryClient();
 
@@ -48,8 +27,7 @@ export default function AdminApplications() {
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }) => {
       await base44.entities.NannyProfile.update(id, data);
-      const updated = await base44.entities.NannyProfile.get(id);
-      await syncPublicStatus(updated);
+      await base44.functions.invoke('syncPublicNannyProfile', { nanny_profile_id: id });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['allNanniesAdmin'] });
