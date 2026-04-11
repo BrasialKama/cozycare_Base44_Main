@@ -90,6 +90,12 @@ const mobileTabNav = {
 
 };
 
+const ROLE_LABELS = {
+  parent: 'Roditelj',
+  nanny: 'Dadilja',
+  admin: 'Administrator',
+};
+
 export default function AppLayout() {
   const { user, isAuthenticated, logout, navigateToLogin } = useAuth();
   const location = useLocation();
@@ -97,6 +103,30 @@ export default function AppLayout() {
   const items = navItems[role] || navItems.parent;
   const mobileTabItems = mobileTabNav[role] || mobileTabNav.parent;
   const { unreadCount } = useUnreadMessages();
+
+  // Public/guest users get a minimal shell — no sidebar, no account UI
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col w-full max-w-full">
+        {/* Mobile header for guests */}
+        <div className="lg:hidden fixed top-0 inset-x-0 h-14 bg-card/95 backdrop-blur-md border-b border-border/60 z-30 flex items-center justify-between px-4">
+          <Logo />
+          <Button
+            variant="ghost"
+            className="text-xs text-muted-foreground hover:text-foreground rounded-none h-full px-4"
+            onClick={() => navigateToLogin()}
+          >
+            Prijava
+          </Button>
+        </div>
+        <main className="flex-1 min-w-0 pt-14 lg:pt-0 pb-8">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-7 lg:py-12 w-full">
+            <Outlet />
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex overflow-x-hidden w-full max-w-full">
@@ -130,8 +160,8 @@ export default function AppLayout() {
               {(user?.full_name || user?.email || '?')[0]?.toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-foreground truncate">{user?.display_name || user?.full_name || 'User'}</p>
-              <p className="text-xs text-muted-foreground capitalize">{role}</p>
+              <p className="text-sm font-semibold text-foreground truncate">{user?.display_name || user?.full_name || 'Korisnik'}</p>
+              <p className="text-xs text-muted-foreground">{ROLE_LABELS[role] || role}</p>
             </div>
           </div>
           <Button

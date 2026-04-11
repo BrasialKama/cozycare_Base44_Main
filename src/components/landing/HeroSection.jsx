@@ -18,7 +18,7 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="relative min-h-[85vh] min-h-[620px] overflow-hidden pt-0 max-w-full">
+    <section className="relative min-h-[85vh] min-h-[620px] pt-0 max-w-full">
       {/* Background image */}
       <div className="absolute inset-0 z-0">
         <img
@@ -44,7 +44,7 @@ export default function HeroSection() {
         />
       </div>
 
-      <div className="relative z-10 flex h-full items-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-hidden pt-4 pb-12">
+      <div className="relative z-10 flex h-full items-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12">
         <div className="max-w-xl min-w-0">
           {/* Frosted content veil */}
           <div className="relative rounded-2xl p-1" style={{ isolation: 'isolate' }}>
