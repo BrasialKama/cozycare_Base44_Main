@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
+import { getNannyImage, getNannyBackgroundImage } from '@/lib/nannyImages';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import {
   MapPin, Clock, Award, MessageCircle, Calendar, ArrowLeft,
@@ -12,16 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { buildConversationKey } from '@/lib/chat';
 
-const HERO_IMAGES = [
-  'https://images.unsplash.com/photo-1519689680058-324335c77eba?w=800&q=80',
-  'https://images.unsplash.com/photo-1586105251261-72a756497a11?w=800&q=80',
-  'https://images.unsplash.com/photo-1555252333-9f8e92e65df9?w=800&q=80',
-  'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=800&q=80',
-  'https://images.unsplash.com/photo-1566140967404-b8b3932483f5?w=800&q=80',
-  'https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=800&q=80',
-  'https://images.unsplash.com/photo-1522771930-78848d9293e8?w=800&q=80',
-  'https://images.unsplash.com/photo-1471286174890-9c112ffca5b4?w=800&q=80',
-];
+
 
 const CERT_STYLE = {
   'Potvrđen ID': 'text-primary bg-primary/8',
@@ -126,7 +118,7 @@ export default function NannyDetail() {
     navigate(`/Messages?conversation=${conv.id}`);
   };
 
-  const heroImage = useMemo(() => HERO_IMAGES[Math.floor(Math.random() * HERO_IMAGES.length)], [id]);
+  const heroImage = useMemo(() => getNannyBackgroundImage(nanny || { id }), [nanny, id]);
 
   if (isLoading) {
     return (
@@ -165,13 +157,7 @@ export default function NannyDetail() {
                   <div className="absolute -inset-2 rounded-[1.75rem] bg-gradient-to-br from-rose-light via-peach/60 to-sage/30 opacity-70 blur-sm" />
                   <div className="absolute -inset-1.5 rounded-[1.5rem] bg-gradient-to-br from-primary/15 via-peach/40 to-sage/20" />
                   <div className="relative w-24 h-24 rounded-3xl overflow-hidden border-[3px] border-card shadow-xl">
-                    {nanny.profile_photo_url ? (
-                      <img src={nanny.profile_photo_url} alt={name} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-rose-light to-peach flex items-center justify-center">
-                        <span className="text-4xl font-display font-bold text-primary">{initial}</span>
-                      </div>
-                    )}
+                    <img src={getNannyImage(nanny)} alt={name} className="w-full h-full object-cover" />
                   </div>
                 </div>
                 {nanny.rating > 0 && (

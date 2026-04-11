@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Clock, Award, CheckCircle2, Star, Video } from 'lucide-react';
+import { getNannyImage, getNannyBackgroundImage } from '@/lib/nannyImages';
 import { Badge } from '@/components/ui/badge';
 import NannyTrustBadges from '@/components/shared/NannyTrustBadges';
 
@@ -11,15 +12,7 @@ const CERT_STYLE = {
   'Video': 'text-muted-foreground bg-muted/60',
 };
 
-const LIFESTYLE_IMAGES = [
-  'https://images.unsplash.com/photo-1555252333-9f8e92e65df9?w=800&q=60',
-  'https://images.unsplash.com/photo-1519340241574-2cec6aef0c01?w=800&q=60',
-  'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&q=60',
-  'https://images.unsplash.com/photo-1484665754804-74b091211472?w=800&q=60',
-  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=60',
-];
 
-const dailyImageUrl = LIFESTYLE_IMAGES[Math.floor(Date.now() / 86400000) % LIFESTYLE_IMAGES.length];
 
 export default function NannyCard({ nanny, onWatchVideo }) {
   const name = `${nanny.first_name || ''} ${nanny.last_name_initial || ''}`.trim();
@@ -35,7 +28,7 @@ export default function NannyCard({ nanny, onWatchVideo }) {
     >
       {/* Background lifestyle image */}
       <div className="absolute inset-0 z-0">
-        <img src={dailyImageUrl} alt="" className="w-full h-full object-cover" loading="lazy" />
+        <img src={getNannyBackgroundImage(nanny)} alt="" className="w-full h-full object-cover" loading="lazy" />
         <div className="absolute inset-0" style={{ background: 'rgba(255,255,255,0.84)' }} />
       </div>
       {/* Card content */}
@@ -43,13 +36,7 @@ export default function NannyCard({ nanny, onWatchVideo }) {
       <div className="flex gap-4">
         <Link to={`/NannyDetail?id=${nanny.id}`} className="flex-shrink-0">
           <div className="w-20 h-20 rounded-xl overflow-hidden border border-border/30">
-            {nanny.profile_photo_url ? (
-              <img src={nanny.profile_photo_url} alt={name} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-rose-light to-peach flex items-center justify-center">
-                <span className="text-2xl font-display font-bold text-primary">{initial}</span>
-              </div>
-            )}
+            <img src={getNannyImage(nanny)} alt={name} className="w-full h-full object-cover" />
           </div>
         </Link>
 

@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { Save, Upload, Camera, CheckCircle2, Clock, Star, Heart, Shield } from 'lucide-react';
+import { getNannyImage, hasRealPhoto } from '@/lib/nannyImages';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -127,13 +128,7 @@ export default function NannyProfile() {
         </h2>
         <div className="flex items-center gap-5">
           <div className="w-24 h-24 rounded-3xl overflow-hidden border-2 border-peach/60 flex-shrink-0 shadow-sm">
-            {profile.photo_url ? (
-              <img src={profile.photo_url} alt="" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-rose-light to-peach/60 flex items-center justify-center">
-                <span className="text-3xl font-display font-bold text-primary">{initial}</span>
-              </div>
-            )}
+            <img src={getNannyImage(profile)} alt="" className="w-full h-full object-cover" />
           </div>
           <div>
             <label className="cursor-pointer">

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Star, ShieldCheck, CheckCircle2, Video } from 'lucide-react';
+import { getNannyImage } from '@/lib/nannyImages';
 import { Button } from '@/components/ui/button';
 
 const CERT_CONFIG = {
@@ -32,13 +33,7 @@ export default function LandingNannyCard({ nanny }) {
     >
       <div className="flex gap-4 mb-4">
         <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 border border-border/30">
-          {nanny.profile_photo_url ? (
-            <img src={nanny.profile_photo_url} alt={name} className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-rose-light to-peach flex items-center justify-center">
-              <span className="text-2xl font-display font-bold text-primary">{initial}</span>
-            </div>
-          )}
+          <img src={getNannyImage(nanny)} alt={name} className="w-full h-full object-cover" />
         </div>
 
         <div className="flex-1 min-w-0">

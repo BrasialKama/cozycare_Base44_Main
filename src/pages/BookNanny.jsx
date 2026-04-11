@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { ArrowLeft, Calendar, Clock, Shield, CheckCircle2, Sparkles, MapPin, AlertCircle } from 'lucide-react';
+import { getNannyImage } from '@/lib/nannyImages';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -270,13 +271,7 @@ export default function BookNanny() {
       {/* Nanny preview strip */}
       <div className="flex items-center gap-4 bg-card border border-border/40 rounded-2xl p-4 mb-7 shadow-sm">
         <div className="w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0">
-          {(displayNanny?.profile_photo_url || nanny?.photo_url) ? (
-            <img src={displayNanny?.profile_photo_url || nanny?.photo_url} alt={nannyName} className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-rose-light to-peach flex items-center justify-center">
-              <span className="text-xl font-display font-bold text-primary">{initial}</span>
-            </div>
-          )}
+          <img src={getNannyImage(displayNanny || nanny)} alt={nannyName} className="w-full h-full object-cover" />
         </div>
         <div>
           <p className="text-xs font-semibold tracking-widest uppercase text-primary/60 mb-0.5">
