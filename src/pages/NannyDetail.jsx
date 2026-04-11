@@ -64,6 +64,12 @@ export default function NannyDetail() {
   const { data: nanny, isLoading } = useQuery({
     queryKey: ['publicNanny', id],
     queryFn: async () => {
+      // id could be a PublicNannyProfile record id OR a NannyProfile id
+      // Try direct get first, fall back to filter by nanny_profile_id
+      try {
+        const direct = await base44.entities.PublicNannyProfile.get(id);
+        if (direct) return direct;
+      } catch (_) { /* not found by record id, try nanny_profile_id */ }
       const results = await base44.entities.PublicNannyProfile.filter(
         { nanny_profile_id: id },
         '-created_date',
