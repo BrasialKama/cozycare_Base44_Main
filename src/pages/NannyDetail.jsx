@@ -11,7 +11,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { buildConversationKey } from '@/lib/chat';
 
 
 
@@ -89,35 +88,13 @@ export default function NannyDetail() {
   });
 
   const handleMessage = async () => {
-    if (!user?.email || !nanny?.nanny_user_email) return;
+    if (!nanny?.nanny_profile_id) return;
     setIsSendingMessage(true);
     try {
-      const nannyEmail = nanny.nanny_user_email;
-      const conversationKey = buildConversationKey(user.email, nannyEmail);
-
-      const existing = await base44.entities.Conversation.filter(
-        { conversation_key: conversationKey },
-        '-updated_date',
-        1
-      );
-
-      if (existing?.[0]) {
-        navigate(`/Messages?conversation=${existing[0].id}`);
-        return;
-      }
-
-      const cName = `${nanny.first_name || ''} ${nanny.last_name_initial || ''}`.trim();
-
-      const conv = await base44.entities.Conversation.create({
-        conversation_key: conversationKey,
-        participant_emails: [user.email, nannyEmail],
-        participant_names: [user.display_name || user.full_name, cName],
-        last_message: '',
-        last_message_date: new Date().toISOString(),
-        hidden_for: [],
+      const res = await base44.functions.invoke('openOrCreateConversation', {
+        nanny_profile_id: nanny.nanny_profile_id,
       });
-
-      navigate(`/Messages?conversation=${conv.id}`);
+      navigate(`/Messages?conversation=${res.data.conversation_id}`);
     } finally {
       setIsSendingMessage(false);
     }
@@ -329,7 +306,7 @@ export default function NannyDetail() {
                     variant="outline"
                     className="w-full h-12 rounded-2xl text-sm border-border/60"
                     onClick={handleMessage}
-                    disabled={isSendingMessage || !nanny?.nanny_user_email}
+                    disabled={isSendingMessage || !nanny?.nanny_profile_id}
                   >
                     {isSendingMessage ? (
                       <><div className="w-3.5 h-3.5 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin mr-2" /> Otvaranje razgovora…</>

@@ -26,10 +26,9 @@ Deno.serve(async (req) => {
     return Response.json({ error: 'Forbidden' }, { status: 403 });
   }
 
-  // Build public-safe payload — never copy id_document_url, phone, address, admin notes
+  // Build public-safe payload — never copy user_email, id_document_url, phone, address, admin notes
   const publicData = {
     nanny_profile_id: privateProfile.id,
-    nanny_user_email: privateProfile.user_email || '',
     display_name: privateProfile.display_name || `${privateProfile.first_name} ${(privateProfile.last_name || '')[0] || ''}.`,
     first_name: privateProfile.first_name || '',
     last_name_initial: privateProfile.last_name ? `${privateProfile.last_name[0]}.` : '',

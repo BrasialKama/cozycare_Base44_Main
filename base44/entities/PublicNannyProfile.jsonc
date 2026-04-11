@@ -6,10 +6,6 @@
       "type": "string",
       "description": "References the internal NannyProfile.id"
     },
-    "nanny_user_email": {
-      "type": "string",
-      "description": "Nanny's email for messaging"
-    },
     "display_name": {
       "type": "string",
       "description": "Public display name"
