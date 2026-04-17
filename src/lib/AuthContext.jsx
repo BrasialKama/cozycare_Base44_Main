@@ -12,6 +12,7 @@ export const AuthProvider = ({ children }) => {
   const [isLoadingPublicSettings, setIsLoadingPublicSettings] = useState(true);
   const [authError, setAuthError] = useState(null);
   const [appPublicSettings, setAppPublicSettings] = useState(null); // Contains only { id, public_settings }
+  const [viewAsRole, setViewAsRole] = useState(null); // Admin-only: temporarily view app as another role
 
   useEffect(() => {
     checkAppState();
@@ -122,6 +123,9 @@ export const AuthProvider = ({ children }) => {
     base44.auth.redirectToLogin(returnUrl || window.location.href);
   };
 
+  // Admin can view as another role; everyone else sees their real role
+  const effectiveRole = (user?.role === 'admin' && viewAsRole) ? viewAsRole : (user?.role || 'parent');
+
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -132,7 +136,10 @@ export const AuthProvider = ({ children }) => {
       appPublicSettings,
       logout,
       navigateToLogin,
-      checkAppState
+      checkAppState,
+      viewAsRole,
+      setViewAsRole,
+      effectiveRole,
     }}>
       {children}
     </AuthContext.Provider>

@@ -8,6 +8,7 @@ import {
 import { Button } from '@/components/ui/button';
 import useUnreadMessages from '@/hooks/useUnreadMessages';
 import PublicHeader from '@/components/shared/PublicHeader';
+import AdminRoleSwitcher from '@/components/layout/AdminRoleSwitcher';
 
 const Logo = () =>
 <Link to="/Landing" className="flex items-center gap-3 h-full px-3 -mx-2 group hover:bg-muted/40 transition-colors">
@@ -98,9 +99,9 @@ const ROLE_LABELS = {
 };
 
 export default function AppLayout() {
-  const { user, isAuthenticated, logout, navigateToLogin } = useAuth();
+  const { user, isAuthenticated, logout, navigateToLogin, effectiveRole } = useAuth();
   const location = useLocation();
-  const role = user?.role || 'parent';
+  const role = effectiveRole || 'parent';
   const items = navItems[role] || navItems.parent;
   const mobileTabItems = mobileTabNav[role] || mobileTabNav.parent;
   const { unreadCount } = useUnreadMessages();
@@ -124,8 +125,9 @@ export default function AppLayout() {
 
       {/* ── Desktop Sidebar ── */}
       <aside className="hidden lg:flex flex-col w-64 border-r border-border/60 bg-card/70 backdrop-blur-sm fixed inset-y-0 left-0 z-30">
-        <div className="p-6 pb-5 border-b border-border/60">
+        <div className="p-6 pb-5 border-b border-border/60 space-y-3">
           <Logo />
+          <AdminRoleSwitcher />
         </div>
 
         <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
@@ -167,8 +169,9 @@ export default function AppLayout() {
       </aside>
 
       {/* ── Mobile header ── */}
-      <div className="lg:hidden fixed top-0 inset-x-0 h-14 bg-card/95 backdrop-blur-md border-b border-border/60 z-30 flex items-center justify-between px-4">
-        <Logo />
+      <div className="lg:hidden fixed top-0 inset-x-0 bg-card/95 backdrop-blur-md border-b border-border/60 z-30">
+        <div className="h-14 flex items-center justify-between px-4">
+          <Logo />
         {isAuthenticated ?
         <Button
           variant="ghost"
@@ -187,6 +190,12 @@ export default function AppLayout() {
             Prijava
           </Button>
         }
+        </div>
+        {user?.role === 'admin' && (
+          <div className="px-3 pb-2">
+            <AdminRoleSwitcher />
+          </div>
+        )}
       </div>
 
       {/* ── Mobile bottom tab bar ── */}

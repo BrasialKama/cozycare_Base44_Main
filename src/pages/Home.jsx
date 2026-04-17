@@ -5,8 +5,8 @@ import ParentHome from '@/components/home/ParentHome';
 import NannyHome from '@/components/home/NannyHome';
 
 export default function Home() {
-  const { user, isAuthenticated } = useAuth();
-  const role = user?.role;
+  const { user, isAuthenticated, effectiveRole } = useAuth();
+  const role = effectiveRole;
 
   // If not authenticated, show parent home (browse mode)
   if (!isAuthenticated || !user) {

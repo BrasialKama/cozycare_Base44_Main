@@ -25,10 +25,16 @@ export default function RequireRole({ allowed = [], redirect = '/' }) {
     return <Navigate to={redirect} replace />;
   }
 
-  const role = user.role;
+  const realRole = user.role;
+
+  // Admins always pass — they may be viewing as another role
+  // but should still access admin-only or nanny-only routes via the role switcher
+  if (realRole === 'admin') {
+    return <Outlet />;
+  }
 
   // Logged in but wrong role → show friendly "access denied"
-  if (!allowed.includes(role)) {
+  if (!allowed.includes(realRole)) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center max-w-md mx-auto">
         <div className="w-16 h-16 rounded-2xl bg-destructive/10 flex items-center justify-center mx-auto mb-5">
