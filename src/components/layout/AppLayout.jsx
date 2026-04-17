@@ -3,7 +3,7 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 import {
   Home, Search, Calendar, MessageCircle, User,
-  Shield, Heart, LogOut, DollarSign, ClipboardList } from
+  Shield, Heart, LogOut, DollarSign, ClipboardList, ChevronRight, Settings } from
 'lucide-react';
 import { Button } from '@/components/ui/button';
 import useUnreadMessages from '@/hooks/useUnreadMessages';
@@ -125,11 +125,12 @@ export default function AppLayout() {
 
       {/* ── Desktop Sidebar ── */}
       <aside className="hidden lg:flex flex-col w-64 border-r border-border/60 bg-card/70 backdrop-blur-sm fixed inset-y-0 left-0 z-30">
-        <div className="p-6 pb-5 border-b border-border/60 space-y-3">
+        {/* Brand */}
+        <div className="p-6 pb-5 border-b border-border/60">
           <Logo />
-          <AdminRoleSwitcher />
         </div>
 
+        {/* Main navigation */}
         <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
           {items.map((item) => {
             const active = item.path === '/Home' ?
@@ -141,33 +142,46 @@ export default function AppLayout() {
                 item={item}
                 active={active}
                 badge={item.path === '/Messages' ? unreadCount : 0} />);
-
-
           })}
         </nav>
 
-        {/* Sidebar footer */}
-        <div className="p-4 border-t border-border/60">
-          <Link
-            to={role === 'nanny' ? '/NannyProfile' : role === 'admin' ? '/AdminDashboard' : '/FamilySettings'}
-            className="flex items-center gap-3 px-2 py-2 mb-2 rounded-xl hover:bg-muted/40 transition-colors"
-          >
-            <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center text-xs font-bold text-primary flex-shrink-0">
-              {(user?.full_name || user?.email || '?')[0]?.toUpperCase()}
+        {/* Bottom section: role switcher + profile + logout */}
+        <div className="border-t border-border/60">
+          {/* Admin role switcher */}
+          {user?.role === 'admin' && (
+            <div className="px-4 pt-4 pb-2">
+              <AdminRoleSwitcher />
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-foreground truncate">{user?.display_name || user?.full_name || 'Korisnik'}</p>
-              <p className="text-xs text-muted-foreground">{ROLE_LABELS[role] || role}</p>
-            </div>
-          </Link>
-          <Button
-            variant="ghost"
-            className="w-full justify-start text-muted-foreground hover:text-foreground text-xs rounded-xl min-h-[40px] px-4 py-2.5"
-            onClick={() => logout()}>
-            
-            <LogOut className="w-4 h-4 mr-2" />
-            Odjava
-          </Button>
+          )}
+
+          {/* Profile / settings button */}
+          <div className="px-4 pt-2 pb-2">
+            <Link
+              to={role === 'nanny' ? '/NannyProfile' : role === 'parent' ? '/FamilySettings' : '/FamilySettings'}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-muted/50 transition-colors cursor-pointer group"
+              aria-label="Postavke profila"
+            >
+              <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center text-xs font-bold text-primary flex-shrink-0">
+                {(user?.full_name || user?.email || '?')[0]?.toUpperCase()}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-foreground truncate">{user?.display_name || user?.full_name || 'Korisnik'}</p>
+                <p className="text-[11px] text-muted-foreground">{ROLE_LABELS[role] || role}</p>
+              </div>
+              <Settings className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors flex-shrink-0" />
+            </Link>
+          </div>
+
+          {/* Logout */}
+          <div className="px-4 pb-4">
+            <Button
+              variant="ghost"
+              className="w-full justify-start text-muted-foreground hover:text-foreground text-xs rounded-xl min-h-[36px] px-4 py-2"
+              onClick={() => logout()}>
+              <LogOut className="w-4 h-4 mr-2" />
+              Odjava
+            </Button>
+          </div>
         </div>
       </aside>
 
@@ -175,27 +189,26 @@ export default function AppLayout() {
       <div className="lg:hidden fixed top-0 inset-x-0 bg-card/95 backdrop-blur-md border-b border-border/60 z-30">
         <div className="h-14 flex items-center justify-between px-4">
           <Logo />
-        {isAuthenticated ?
-        <Button
-          variant="ghost"
-          className="text-xs text-muted-foreground hover:text-foreground rounded-none gap-1.5 h-full px-4"
-          onClick={() => logout()}>
-          
-            <LogOut className="w-4 h-4" />
-            Odjava
-          </Button> :
-
-        <Button
-          variant="ghost"
-          className="text-xs text-muted-foreground hover:text-foreground rounded-none h-full px-4"
-          onClick={() => navigateToLogin()}>
-          
-            Prijava
-          </Button>
-        }
+          <div className="flex items-center gap-1">
+            {isAuthenticated ?
+              <Button
+                variant="ghost"
+                className="text-xs text-muted-foreground hover:text-foreground gap-1.5 h-9 px-3"
+                onClick={() => logout()}>
+                <LogOut className="w-4 h-4" />
+                Odjava
+              </Button> :
+              <Button
+                variant="ghost"
+                className="text-xs text-muted-foreground hover:text-foreground h-9 px-3"
+                onClick={() => navigateToLogin()}>
+                Prijava
+              </Button>
+            }
+          </div>
         </div>
         {user?.role === 'admin' && (
-          <div className="px-3 pb-2">
+          <div className="px-4 pb-3">
             <AdminRoleSwitcher />
           </div>
         )}
