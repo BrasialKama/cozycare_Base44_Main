@@ -18,7 +18,7 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="relative min-h-[85vh] min-h-[620px] pt-0 max-w-full">
+    <section className="relative min-h-[85vh] min-h-[620px] pt-14 md:pt-16 max-w-full">
       {/* Background image */}
       <div className="absolute inset-0 z-0">
         <img

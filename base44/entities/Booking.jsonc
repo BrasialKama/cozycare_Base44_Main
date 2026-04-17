@@ -26,6 +26,10 @@
       "type": "string",
       "description": "Family display name"
     },
+    "public_nanny_profile_id": {
+      "type": "string",
+      "description": "Linked PublicNannyProfile id for reference"
+    },
     "date": {
       "type": "string",
       "format": "date",
@@ -53,6 +57,7 @@
         "Na \u010dekanju",
         "Potvr\u0111eno",
         "Otkazano",
+        "Odbijeno",
         "Zavr\u0161eno"
       ],
       "default": "Na \u010dekanju",
@@ -85,5 +90,47 @@
     "start_time",
     "end_time",
     "status"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "parent"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "data.family_user_email": "{{user.email}}"
+        },
+        {
+          "data.nanny_user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.family_user_email": "{{user.email}}"
+        },
+        {
+          "data.nanny_user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
 }

@@ -3,7 +3,7 @@ import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { ArrowLeft, Calendar, Clock, Shield, CheckCircle2, Sparkles, MapPin, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Shield, CheckCircle2, Sparkles, MapPin, AlertCircle, Loader2 } from 'lucide-react';
 import { getNannyImage } from '@/lib/nannyImages';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -129,6 +129,10 @@ export default function BookNanny() {
       // Resolve private NannyProfile at booking time
       const privateNanny = await base44.entities.NannyProfile.get(nanny.nanny_profile_id);
 
+      if (!privateNanny) {
+        throw new Error('Profil dadilje nije pronađen. Pokušajte ponovo.');
+      }
+
       const bookingData = {
         nanny_id: privateNanny.id,
         nanny_user_email: privateNanny.user_email,
@@ -136,6 +140,7 @@ export default function BookNanny() {
         family_user_email: user.email,
         family_profile_id: familyProfile?.id || '',
         family_name: user.full_name || '',
+        public_nanny_profile_id: nanny?.id || publicId || '',
         date: form.date,
         start_time: form.start_time,
         end_time: form.end_time,
@@ -200,7 +205,22 @@ export default function BookNanny() {
       queryClient.invalidateQueries({ queryKey: ['parentBookings'] });
       setSubmitted(true);
     },
+    onError: (error) => {
+      // Error state is available via bookMutation.error
+      console.error('Booking failed:', error);
+    },
   });
+
+  if (!user) {
+    return (
+      <div className="max-w-lg mx-auto pt-16 text-center">
+        <AlertCircle className="w-10 h-10 text-primary/40 mx-auto mb-4" />
+        <h2 className="font-display text-xl font-bold mb-2">Morate se prijaviti</h2>
+        <p className="text-muted-foreground mb-6">Morate se prijaviti kako biste rezervirali dadilju.</p>
+        <Button className="rounded-2xl px-8" onClick={() => navigate('/FindNannies')}>Pronađi dadilje</Button>
+      </div>
+    );
+  }
 
   if (!nannyId) {
     return (
@@ -245,9 +265,9 @@ export default function BookNanny() {
         <div className="w-20 h-20 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-6">
           <CheckCircle2 className="w-10 h-10 text-emerald-500" />
         </div>
-        <h1 className="font-display text-2xl font-bold text-foreground mb-2">Rezervacija poslana!</h1>
+        <h1 className="font-display text-2xl font-bold text-foreground mb-2">Zahtjev za rezervaciju je uspješno poslan!</h1>
         <p className="text-muted-foreground mb-8 max-w-sm mx-auto">
-          {nannyName} ce potvrditi vas termin uskoro. Pratite status u vasim rezervacijama.
+          {nannyName} će potvrditi vaš termin uskoro. Pratite status u vašim rezervacijama.
         </p>
         <Link to="/MyBookings">
           <Button className="rounded-2xl px-8 h-12 text-base font-semibold shadow-lg shadow-primary/20">
@@ -399,6 +419,27 @@ export default function BookNanny() {
           </p>
         </div>
 
+        {/* Error state */}
+        {bookMutation.isError && (
+          <div className="flex items-start gap-3 bg-destructive/8 border border-destructive/20 rounded-2xl p-4">
+            <AlertCircle className="w-4.5 h-4.5 text-destructive flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold text-destructive mb-0.5">Rezervacija nije poslana</p>
+              <p className="text-xs text-destructive/80 leading-relaxed">
+                {bookMutation.error?.message || 'Došlo je do greške prilikom slanja zahtjeva. Pokušajte ponovo.'}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Missing fields hint */}
+        {!canBook && (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 px-3.5 py-2.5 rounded-xl">
+            <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
+            {!form.date ? 'Odaberite datum.' : !form.start_time || !form.end_time ? 'Odaberite vrijeme početka i završetka.' : !form.address.trim() ? 'Unesite adresu.' : 'Ispunite sva obavezna polja.'}
+          </div>
+        )}
+
         {canBook ? (
           <Button
             onClick={() => bookMutation.mutate()}
@@ -407,7 +448,7 @@ export default function BookNanny() {
             style={{ height: '3.25rem' }}
           >
             {bookMutation.isPending ? (
-              <span className="flex items-center gap-2"><div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" /> Šaljem zahtjev…</span>
+              <span className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Šaljem zahtjev…</span>
             ) : (
               <span className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4" /> Potvrdi rezervaciju</span>
             )}

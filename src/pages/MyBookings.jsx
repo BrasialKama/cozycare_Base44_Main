@@ -13,6 +13,7 @@ const STATUS_STYLES = {
   'Potvrđeno': 'bg-sage/30 text-sage-foreground',
   'Završeno': 'bg-muted text-muted-foreground',
   'Otkazano': 'bg-destructive/10 text-destructive',
+  'Odbijeno': 'bg-destructive/10 text-destructive',
 };
 
 function BookingCard({ booking, onCancel }) {
@@ -58,7 +59,7 @@ function BookingCard({ booking, onCancel }) {
       </div>
 
       {/* Actions */}
-      {(booking.status === 'Na čekanju' || booking.status === 'Završeno') && (
+      {(booking.status === 'Na čekanju' || booking.status === 'Završeno' || booking.status === 'Odbijeno') && (
         <div className="border-t border-border/40 px-5 py-3 flex justify-end gap-2 bg-muted/20">
           {booking.status === 'Na čekanju' && (
             <Button
@@ -69,6 +70,13 @@ function BookingCard({ booking, onCancel }) {
             >
               Otkaži rezervaciju
             </Button>
+          )}
+          {booking.status === 'Odbijeno' && (
+            <Link to="/FindNannies">
+              <Button variant="ghost" size="sm" className="text-xs text-primary hover:bg-primary/8 rounded-xl">
+                <Search className="w-3 h-3 mr-1.5" /> Pronađi drugu dadilju
+              </Button>
+            </Link>
           )}
           {booking.status === 'Završeno' && (
             <Link to={`/LeaveReview?booking_id=${booking.id}`}>
@@ -102,7 +110,7 @@ export default function MyBookings() {
   });
 
   const upcoming = bookings.filter(b => ['Na čekanju', 'Potvrđeno'].includes(b.status));
-  const past = bookings.filter(b => ['Završeno', 'Otkazano'].includes(b.status));
+  const past = bookings.filter(b => ['Završeno', 'Otkazano', 'Odbijeno'].includes(b.status));
 
   return (
     <div className="space-y-8 pb-8">

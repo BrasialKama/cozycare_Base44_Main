@@ -12,6 +12,7 @@ const statusStyles = {
   'Potvrđeno': 'bg-sage/30 text-sage-foreground',
   'Završeno': 'bg-muted text-muted-foreground',
   'Otkazano': 'bg-destructive/10 text-destructive',
+  'Odbijeno': 'bg-destructive/10 text-destructive',
 };
 
 export default function AdminBookings() {

@@ -3,7 +3,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Sparkles, Heart } from 'lucide-react';
-import ProfileCompletionCard from '@/components/portal/ProfileCompletionCard';
+import NannyChecklist from '@/components/portal/NannyChecklist';
 import PortalUpcomingBookings from '@/components/portal/PortalUpcomingBookings';
 import PortalEarningsCard from '@/components/portal/PortalEarningsCard';
 import PortalReviewsCard from '@/components/portal/PortalReviewsCard';
@@ -67,7 +67,7 @@ export default function NannyPortal() {
 
       {/* Grid layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ProfileCompletionCard profile={profile} />
+        <NannyChecklist profile={profile} />
         <PortalEarningsCard bookings={bookings} />
         <PortalUpcomingBookings bookings={bookings} />
         <PortalReviewsCard reviews={reviews} avgRating={profile?.rating} totalReviews={profile?.review_count} />

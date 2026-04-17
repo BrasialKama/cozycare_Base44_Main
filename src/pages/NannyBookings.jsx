@@ -28,6 +28,7 @@ const statusStyles = {
   'Potvrđeno': 'bg-sage/30 text-sage-foreground',
   'Završeno': 'bg-muted text-muted-foreground',
   'Otkazano': 'bg-destructive/10 text-destructive',
+  'Odbijeno': 'bg-destructive/10 text-destructive',
 };
 
 export default function NannyBookings() {
@@ -44,7 +45,7 @@ export default function NannyBookings() {
     const parentEmail = booking.family_user_email;
     const nannyEmail = user.email;
     const nannyName = user.full_name || 'Dadilja';
-    const statusText = newStatus === 'Potvrđeno' ? 'potvrđena' : 'otkazana';
+    const statusText = newStatus === 'Potvrđeno' ? 'potvrđena' : newStatus === 'Odbijeno' ? 'odbijena' : 'otkazana';
     const content = `Vaša rezervacija za ${booking.date} je ${statusText}.`;
 
     const conversationKey = buildConversationKey(parentEmail, nannyEmail);
@@ -96,7 +97,7 @@ export default function NannyBookings() {
 
   const pending = bookings.filter(b => b.status === 'Na čekanju');
   const upcoming = bookings.filter(b => b.status === 'Potvrđeno');
-  const past = bookings.filter(b => ['Završeno', 'Otkazano'].includes(b.status));
+  const past = bookings.filter(b => ['Završeno', 'Otkazano', 'Odbijeno'].includes(b.status));
 
   const BookingCard = ({ booking }) => (
     <Card className="p-4 border-border/60">
@@ -162,12 +163,12 @@ export default function NannyBookings() {
                       onClick={() =>
                         updateMutation.mutate({
                           id: booking.id,
-                          data: { status: 'Otkazano' },
+                          data: { status: 'Odbijeno' },
                           booking,
-                        })
-                      }
-                    >
-                      Odbij rezervaciju
+                          })
+                          }
+                          >
+                          Odbij rezervaciju
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>

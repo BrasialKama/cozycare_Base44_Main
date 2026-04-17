@@ -361,6 +361,11 @@ export default function NannyOnboarding() {
                   <span className="flex items-center gap-2"><Heart className="w-4 h-4" fill="currentColor" /> Pošalji prijavu</span>
                 )}
               </Button>
+              {createMutation.isError && (
+                <p className="text-xs text-destructive text-center mt-2">
+                  Prijava nije poslana: {createMutation.error?.message || 'Došlo je do greške. Pokušajte ponovo.'}
+                </p>
+              )}
             )}
           </div>
         </div>
