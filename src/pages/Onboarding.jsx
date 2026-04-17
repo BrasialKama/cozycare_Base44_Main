@@ -13,12 +13,24 @@ const TRUST_POINTS = [
 ];
 
 export default function Onboarding() {
-  const { user } = useAuth();
+  const { user, isAuthenticated, isLoadingAuth, navigateToLogin } = useAuth();
   const navigate = useNavigate();
   const [selectedRole, setSelectedRole] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
   const [error, setError] = useState(null);
+
+  // Ensure the user is logged in before showing role selection
+  React.useEffect(() => {
+    if (isLoadingAuth) return; // still loading, wait
+    if (!isAuthenticated) {
+      // Redirect to login; after login they'll come back here
+      navigateToLogin(window.location.origin + '/Onboarding');
+      return;
+    }
+    setCheckingAuth(false);
+  }, [isLoadingAuth, isAuthenticated]);
 
   const handleContinue = async () => {
     if (!selectedRole) return;
@@ -36,6 +48,17 @@ export default function Onboarding() {
       setLoading(false);
     }
   };
+
+  if (isLoadingAuth || checkingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-sm text-muted-foreground font-body">Učitavanje...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-ivory via-background to-rose-light/30 flex items-center justify-center p-4">
