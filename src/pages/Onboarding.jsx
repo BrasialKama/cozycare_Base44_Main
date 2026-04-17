@@ -18,11 +18,23 @@ export default function Onboarding() {
   const [selectedRole, setSelectedRole] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const [error, setError] = useState(null);
+
   const handleContinue = async () => {
     if (!selectedRole) return;
     setLoading(true);
-    await base44.auth.updateMe({ role: selectedRole, display_name: user?.full_name || '' });
-    navigate(selectedRole === 'parent' ? '/FamilySettings' : '/NannyOnboarding');
+    setError(null);
+    try {
+      await base44.functions.invoke('setUserRole', {
+        role: selectedRole,
+        display_name: user?.full_name || '',
+      });
+      navigate(selectedRole === 'parent' ? '/FamilySettings' : '/NannyOnboarding');
+    } catch (err) {
+      console.error('Role setup failed:', err);
+      setError('Došlo je do greške pri postavljanju računa. Pokušajte ponovo.');
+      setLoading(false);
+    }
   };
 
   return (
@@ -118,6 +130,12 @@ export default function Onboarding() {
             </button>
           ))}
         </div>
+
+        {error && (
+          <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/8 border border-destructive/20 px-4 py-3 rounded-xl mb-4">
+            <span>{error}</span>
+          </div>
+        )}
 
         <Button
           onClick={handleContinue}
