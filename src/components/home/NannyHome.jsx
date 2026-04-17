@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Calendar, MessageCircle, DollarSign, Star, Heart, ArrowRight, Clock, CheckCircle2, Sparkles, User } from 'lucide-react';
+import { Calendar, MessageCircle, Euro, Star, Heart, ArrowRight, Clock, CheckCircle2, Sparkles, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const greetingTime = () => {
@@ -98,7 +98,7 @@ export default function NannyHome() {
             { icon: Calendar, label: 'Ukupno termina', value: profile?.total_bookings || 0, path: '/NannyBookings', bg: 'bg-rose-light', fg: 'text-primary' },
             { icon: Star, label: 'Prosj. ocjena', value: profile?.avg_rating ? profile.avg_rating.toFixed(1) : '—', path: '/NannyProfile', bg: 'bg-peach/50', fg: 'text-peach-dark' },
             { icon: MessageCircle, label: 'Poruke', value: '—', path: '/Messages', bg: 'bg-sage/25', fg: 'text-sage-foreground' },
-            { icon: DollarSign, label: 'Zarada', value: '—', path: '/Earnings', bg: 'bg-powder-blue/40', fg: 'text-foreground/60' },
+            { icon: Euro, label: 'Zarada', value: '—', path: '/Earnings', bg: 'bg-powder-blue/40', fg: 'text-foreground/60' },
           ].map(item => (
             <Link key={item.path} to={item.path}>
               <div className="bg-card border border-border/50 rounded-2xl p-5 hover:shadow-md hover:border-primary/20 transition-all group">
@@ -154,7 +154,7 @@ export default function NannyHome() {
           {[
             { icon: User, label: 'Uredi profil', sub: 'Ažuriraj bio i fotografije', path: '/NannyProfile', bg: 'bg-rose-light/60', fg: 'text-primary' },
             { icon: MessageCircle, label: 'Poruke', sub: 'Razgovaraj s obiteljima', path: '/Messages', bg: 'bg-sage/20', fg: 'text-sage-foreground' },
-            { icon: DollarSign, label: 'Zarada', sub: 'Prati svoje prihode', path: '/Earnings', bg: 'bg-powder-blue/40', fg: 'text-foreground/60' },
+            { icon: Euro, label: 'Zarada', sub: 'Prati svoje prihode', path: '/Earnings', bg: 'bg-powder-blue/40', fg: 'text-foreground/60' },
           ].map(item => (
             <Link key={item.path} to={item.path}>
               <div className="bg-card border border-border/50 rounded-2xl p-5 hover:shadow-md hover:border-primary/20 transition-all group h-full">

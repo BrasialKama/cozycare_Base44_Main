@@ -3,7 +3,7 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 import {
   Home, Search, Calendar, MessageCircle, User,
-  Shield, Heart, LogOut, DollarSign, ClipboardList, ChevronRight, Settings } from
+  Shield, Heart, LogOut, Euro, ClipboardList, ChevronRight, Settings } from
 'lucide-react';
 import { Button } from '@/components/ui/button';
 import useUnreadMessages from '@/hooks/useUnreadMessages';
@@ -34,7 +34,7 @@ const navItems = {
   { path: '/Home', icon: Home, label: 'Početna' },
   { path: '/NannyBookings', icon: Calendar, label: 'Moje rezervacije' },
   { path: '/Messages', icon: MessageCircle, label: 'Poruke' },
-  { path: '/Earnings', icon: DollarSign, label: 'Zarada' },
+  { path: '/Earnings', icon: Euro, label: 'Zarada' },
   { path: '/NannyProfile', icon: User, label: 'Moj profil' }],
 
   admin: [
@@ -81,7 +81,7 @@ const mobileTabNav = {
   { path: '/Home', icon: Home, label: 'Početna' },
   { path: '/NannyBookings', icon: Calendar, label: 'Rezervacije' },
   { path: '/Messages', icon: MessageCircle, label: 'Poruke' },
-  { path: '/Earnings', icon: DollarSign, label: 'Zarada' },
+  { path: '/Earnings', icon: Euro, label: 'Zarada' },
   { path: '/NannyProfile', icon: User, label: 'Profil' }],
 
   admin: [

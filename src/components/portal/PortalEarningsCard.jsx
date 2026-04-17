@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { DollarSign, ArrowRight } from 'lucide-react';
+import { Euro, ArrowRight } from 'lucide-react';
 
 export default function PortalEarningsCard({ bookings }) {
   const now = new Date();
@@ -25,14 +25,14 @@ export default function PortalEarningsCard({ bookings }) {
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-primary/6 rounded-xl p-4">
           <div className="w-9 h-9 rounded-xl bg-primary/12 flex items-center justify-center mb-2">
-            <DollarSign className="w-4.5 h-4.5 text-primary" />
+            <Euro className="w-4.5 h-4.5 text-primary" />
           </div>
           <p className="font-display text-2xl font-bold text-foreground">€{monthTotal.toFixed(0)}</p>
           <p className="text-xs text-muted-foreground mt-0.5">Ovaj mjesec</p>
         </div>
         <div className="bg-sage/15 rounded-xl p-4">
           <div className="w-9 h-9 rounded-xl bg-sage/25 flex items-center justify-center mb-2">
-            <DollarSign className="w-4.5 h-4.5 text-sage-foreground" />
+            <Euro className="w-4.5 h-4.5 text-sage-foreground" />
           </div>
           <p className="font-display text-2xl font-bold text-foreground">€{allTimeTotal.toFixed(0)}</p>
           <p className="text-xs text-muted-foreground mt-0.5">Ukupno</p>

@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { DollarSign, TrendingUp, Calendar, Clock } from 'lucide-react';
+import { Euro, TrendingUp, Calendar, Clock } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import PageHeader from '@/components/shared/PageHeader';
 import EmptyState from '@/components/shared/EmptyState';
@@ -38,12 +38,12 @@ export default function Earnings() {
 
   return (
     <div>
-      <PageHeader icon={DollarSign} title="Zarada" subtitle="Pratite svoje prihode i završene rezervacije" />
+      <PageHeader icon={Euro} title="Zarada" subtitle="Pratite svoje prihode i završene rezervacije" />
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
         {[
-          { icon: DollarSign, label: 'Ukupna zarada', value: `€${totalEarnings.toFixed(2)}`, color: 'bg-primary/8 text-primary' },
+          { icon: Euro, label: 'Ukupna zarada', value: `€${totalEarnings.toFixed(2)}`, color: 'bg-primary/8 text-primary' },
           { icon: Calendar, label: 'Završeni poslovi', value: bookings.length, color: 'bg-sage/30 text-sage-foreground' },
           { icon: Clock, label: 'Ukupno sati', value: `${totalHours.toFixed(1)}h`, color: 'bg-peach/50 text-peach-dark' },
           { icon: TrendingUp, label: 'Prosj. po rezervaciji', value: `€${avgPerBooking.toFixed(2)}`, color: 'bg-powder-blue/40 text-foreground' },
@@ -61,7 +61,7 @@ export default function Earnings() {
       {/* Transaction history */}
       <h2 className="font-display font-semibold text-lg mb-4">Povijest zarade</h2>
       {bookings.length === 0 ? (
-        <EmptyState icon={DollarSign} title="Još nema zarade" description="Završite rezervacije da počnete zarađivati" />
+        <EmptyState icon={Euro} title="Još nema zarade" description="Završite rezervacije da počnete zarađivati" />
       ) : (
         <div className="space-y-2">
           {bookings.map(b => (

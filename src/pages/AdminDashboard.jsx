@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
-import { BarChart3, Users, Calendar, Shield, DollarSign, ClipboardList, ArrowRight } from 'lucide-react';
+import { BarChart3, Users, Calendar, Shield, Euro, ClipboardList, ArrowRight } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import PageHeader from '@/components/shared/PageHeader';
 import { config } from '@/lib/config';
@@ -35,7 +35,7 @@ export default function AdminDashboard() {
     { icon: ClipboardList, label: 'Prijave na čekanju', value: pendingApps, color: 'bg-peach/50 text-peach-dark', link: '/AdminApplications' },
     { icon: Users, label: 'Odobrene dadilje', value: approvedNannies, color: 'bg-sage/30 text-sage-foreground', link: '/AdminApplications' },
     { icon: Calendar, label: 'Završene rezervacije', value: completedBookings, color: 'bg-primary/8 text-primary', link: '/AdminBookings' },
-    { icon: DollarSign, label: 'Prihod platforme', value: `€${totalRevenue.toFixed(2)}`, color: 'bg-powder-blue/40 text-foreground', link: '/AdminBookings' },
+    { icon: Euro, label: 'Prihod platforme', value: `€${totalRevenue.toFixed(2)}`, color: 'bg-powder-blue/40 text-foreground', link: '/AdminBookings' },
     { icon: Shield, label: 'Otvorene prijave', value: openReports, color: 'bg-destructive/10 text-destructive', link: '/AdminReports' },
     { icon: BarChart3, label: 'Ukupno rezervacija', value: bookings.length, color: 'bg-muted text-muted-foreground', link: '/AdminBookings' },
   ];
