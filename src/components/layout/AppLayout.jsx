@@ -148,7 +148,10 @@ export default function AppLayout() {
 
         {/* Sidebar footer */}
         <div className="p-4 border-t border-border/60">
-          <div className="flex items-center gap-3 px-2 py-2 mb-2 rounded-xl hover:bg-muted/40 transition-colors">
+          <Link
+            to={role === 'nanny' ? '/NannyProfile' : role === 'admin' ? '/AdminDashboard' : '/FamilySettings'}
+            className="flex items-center gap-3 px-2 py-2 mb-2 rounded-xl hover:bg-muted/40 transition-colors"
+          >
             <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center text-xs font-bold text-primary flex-shrink-0">
               {(user?.full_name || user?.email || '?')[0]?.toUpperCase()}
             </div>
@@ -156,7 +159,7 @@ export default function AppLayout() {
               <p className="text-sm font-semibold text-foreground truncate">{user?.display_name || user?.full_name || 'Korisnik'}</p>
               <p className="text-xs text-muted-foreground">{ROLE_LABELS[role] || role}</p>
             </div>
-          </div>
+          </Link>
           <Button
             variant="ghost"
             className="w-full justify-start text-muted-foreground hover:text-foreground text-xs rounded-xl min-h-[40px] px-4 py-2.5"

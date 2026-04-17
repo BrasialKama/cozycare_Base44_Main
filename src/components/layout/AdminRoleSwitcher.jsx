@@ -17,8 +17,8 @@ export default function AdminRoleSwitcher() {
   const activeKey = viewAsRole;
 
   return (
-    <div className="flex items-center gap-1.5 px-2 py-1.5 rounded-xl bg-muted/60 border border-border/50">
-      <Eye className="w-3.5 h-3.5 text-muted-foreground mr-1 flex-shrink-0" />
+    <div className="flex items-center gap-1 rounded-lg bg-muted/50 p-1">
+      <Eye className="w-3 h-3 text-muted-foreground mx-1 flex-shrink-0" />
       {ROLES.map((r) => {
         const active = activeKey === r.key;
         const Icon = r.icon;
@@ -26,11 +26,11 @@ export default function AdminRoleSwitcher() {
           <button
             key={r.key ?? 'admin'}
             onClick={() => setViewAsRole(r.key)}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
-              active ? r.color + ' shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+            className={`flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium transition-all whitespace-nowrap ${
+              active ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            <Icon className="w-3 h-3" />
+            <Icon className="w-3 h-3 flex-shrink-0" />
             {r.label}
           </button>
         );
