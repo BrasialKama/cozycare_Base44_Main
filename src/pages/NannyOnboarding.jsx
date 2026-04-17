@@ -347,25 +347,27 @@ export default function NannyOnboarding() {
                 Dalje <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             ) : (
-              <Button
-                onClick={() => createMutation.mutate()}
-                disabled={createMutation.isPending}
-                className="rounded-xl shadow-md shadow-primary/20"
-              >
-                {createMutation.isPending ? (
-                  <span className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                    Šaljem…
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-2"><Heart className="w-4 h-4" fill="currentColor" /> Pošalji prijavu</span>
+              <>
+                <Button
+                  onClick={() => createMutation.mutate()}
+                  disabled={createMutation.isPending}
+                  className="rounded-xl shadow-md shadow-primary/20"
+                >
+                  {createMutation.isPending ? (
+                    <span className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                      Šaljem…
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2"><Heart className="w-4 h-4" fill="currentColor" /> Pošalji prijavu</span>
+                  )}
+                </Button>
+                {createMutation.isError && (
+                  <p className="text-xs text-destructive text-center mt-2">
+                    Prijava nije poslana: {createMutation.error?.message || 'Došlo je do greške. Pokušajte ponovo.'}
+                  </p>
                 )}
-              </Button>
-              {createMutation.isError && (
-                <p className="text-xs text-destructive text-center mt-2">
-                  Prijava nije poslana: {createMutation.error?.message || 'Došlo je do greške. Pokušajte ponovo.'}
-                </p>
-              )}
+              </>
             )}
           </div>
         </div>
