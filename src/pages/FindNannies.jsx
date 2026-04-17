@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Search, X, Sparkles, ShieldCheck } from 'lucide-react';
@@ -124,8 +124,15 @@ export default function FindNannies() {
 
   return (
     <div className="space-y-6 pb-8">
+      {/* Breadcrumb */}
+      <nav className="flex items-center gap-1.5 text-sm pt-1">
+        <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">Početna</Link>
+        <span className="text-muted-foreground/50">/</span>
+        <span className="text-foreground font-medium">Pronađi dadilju</span>
+      </nav>
+
       {/* Header */}
-      <div className="pt-2">
+      <div>
         <p className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-widest uppercase text-primary/60 mb-2">
           <Sparkles className="w-3.5 h-3.5" />
           Provjerene dadilje

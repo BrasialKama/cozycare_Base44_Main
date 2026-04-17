@@ -5,7 +5,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { getNannyImage, getNannyBackgroundImage } from '@/lib/nannyImages';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import {
-  MapPin, Clock, Award, MessageCircle, Calendar, ArrowLeft,
+  MapPin, Clock, Award, MessageCircle, Calendar,
   Play, Shield, Heart, Globe, BookOpen, CheckCircle2, Sparkles, Star, Flame, Info
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -126,12 +126,14 @@ export default function NannyDetail() {
 
   return (
     <div className="pb-12">
-      <button
-        onClick={() => navigate(-1)}
-        className="inline-flex items-center gap-2 text-sm font-medium text-primary/70 hover:text-primary mb-7 transition-colors group"
-      >
-        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" /> Natrag na rezultate
-      </button>
+      {/* Breadcrumb navigation */}
+      <nav className="flex items-center gap-1.5 text-sm mb-7 flex-wrap">
+        <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">Početna</Link>
+        <span className="text-muted-foreground/50">/</span>
+        <Link to="/FindNannies" className="text-muted-foreground hover:text-foreground transition-colors">Pronađi dadilju</Link>
+        <span className="text-muted-foreground/50">/</span>
+        <span className="text-foreground font-medium truncate max-w-[200px]">{nanny ? `${nanny.first_name || ''} ${nanny.last_name_initial || ''}`.trim() : 'Profil'}</span>
+      </nav>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-7">
         {/* LEFT: Main content */}
