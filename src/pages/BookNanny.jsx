@@ -13,12 +13,10 @@ import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { config } from '@/lib/config';
 
-function buildBotMessage(privateNanny, bookingData) {
+function buildBotMessage(nannyInfo, bookingData) {
   var parts = [];
   parts.push("\u2705 Rezervacija s dadiljom ");
-  parts.push(privateNanny.first_name);
-  parts.push(" ");
-  parts.push(privateNanny.last_name);
+  parts.push(nannyInfo.nanny_name || nannyInfo.first_name || '');
   parts.push(" za ");
   parts.push(bookingData.date);
   parts.push(" od ");
@@ -130,11 +128,16 @@ export default function BookNanny() {
       // (parent can't read NannyProfile directly due to RLS)
       const resolved = await base44.functions.invoke('resolveNannyForBooking', {
         nanny_profile_id: nanny.nanny_profile_id,
+        public_nanny_profile_id: nanny.id || publicId || undefined,
       });
       const nannyData = resolved.data;
       if (!nannyData?.nanny_user_email) {
         throw new Error('Profil dadilje nije pronađen. Pokušajte ponovo.');
       }
+
+      // Use server-validated hourly rate to compute price server-side
+      const serverRate = nannyData.hourly_rate || rate;
+      const serverTotal = +(durationHours * serverRate).toFixed(2);
 
       const bookingData = {
         nanny_id: nannyData.nanny_id,
@@ -148,7 +151,7 @@ export default function BookNanny() {
         start_time: form.start_time,
         end_time: form.end_time,
         duration_hours: durationHours,
-        total_price: totalPrice,
+        total_price: serverTotal,
         status: 'Na \u010dekanju',
         address: form.address,
         message: form.notes,
@@ -268,12 +271,12 @@ export default function BookNanny() {
     );
   }
 
-  if (!nanny) {
+  if (!nanny || nanny.status !== 'approved' || !nanny.is_active) {
     return (
       <div className="max-w-lg mx-auto pt-16 text-center">
         <AlertCircle className="w-10 h-10 text-destructive mx-auto mb-4" />
-        <h2 className="font-display text-xl font-bold mb-2">Dadilja nije pronađena</h2>
-        <p className="text-muted-foreground mb-6">Profil dadilje nije dostupan. Pokušajte ponovo.</p>
+        <h2 className="font-display text-xl font-bold mb-2">Dadilja nije dostupna</h2>
+        <p className="text-muted-foreground mb-6">Profil dadilje nije dostupan za rezervacije. Pokušajte drugu dadilju.</p>
         <Link to="/FindNannies">
           <Button className="rounded-2xl px-8">Pronađi dadilje</Button>
         </Link>

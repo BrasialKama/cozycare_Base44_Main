@@ -83,10 +83,12 @@ export default function NannyDetail() {
 
   const [isSendingMessage, setIsSendingMessage] = useState(false);
 
+  // Reviews reference the internal NannyProfile.id, not the PublicNannyProfile record id
+  const nannyProfileId = nanny?.nanny_profile_id;
   const { data: reviews = [] } = useQuery({
-    queryKey: ['nannyReviews', id],
-    queryFn: () => base44.entities.Review.filter({ nanny_profile_id: id }, '-created_date', 10),
-    enabled: !!id,
+    queryKey: ['nannyReviews', nannyProfileId],
+    queryFn: () => base44.entities.Review.filter({ nanny_profile_id: nannyProfileId }, '-created_date', 10),
+    enabled: !!nannyProfileId,
   });
 
   const handleMessage = async () => {

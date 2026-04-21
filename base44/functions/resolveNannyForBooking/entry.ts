@@ -19,7 +19,12 @@ Deno.serve(async (req) => {
     }
 
     // Use service role to read private NannyProfile (RLS restricted)
-    const profile = await base44.asServiceRole.entities.NannyProfile.get(nanny_profile_id);
+    let profile;
+    try {
+      profile = await base44.asServiceRole.entities.NannyProfile.get(nanny_profile_id);
+    } catch (_) {
+      return Response.json({ error: 'Dadilja nije pronađena.' }, { status: 404 });
+    }
     if (!profile) {
       return Response.json({ error: 'Dadilja nije pronađena.' }, { status: 404 });
     }

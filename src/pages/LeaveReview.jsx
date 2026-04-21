@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { ArrowLeft, Star, Heart, Shield, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Star, Heart, Shield, MessageCircle, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -17,11 +17,15 @@ export default function LeaveReview() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const { data: booking } = useQuery({
+  const { data: booking, isLoading: bookingLoading } = useQuery({
     queryKey: ['booking', bookingId],
     queryFn: () => base44.entities.Booking.get(bookingId),
     enabled: !!bookingId,
   });
+
+  // Ownership & status guard
+  const isOwner = booking && user && booking.family_user_email === user.email;
+  const isCompleted = booking && booking.status === 'Završeno';
 
   const [rating, setRating] = useState(0);
   const [warmth, setWarmth] = useState(0);
@@ -49,6 +53,47 @@ export default function LeaveReview() {
       navigate('/MyBookings');
     },
   });
+
+  if (!bookingId) {
+    return (
+      <div className="max-w-lg mx-auto pt-16 text-center">
+        <AlertCircle className="w-10 h-10 text-destructive mx-auto mb-4" />
+        <h2 className="font-display text-xl font-bold mb-2">Rezervacija nije odabrana</h2>
+        <p className="text-muted-foreground mb-6">Nije moguće ostaviti recenziju bez povezane rezervacije.</p>
+        <Button onClick={() => navigate('/MyBookings')} className="rounded-2xl px-8">Moje rezervacije</Button>
+      </div>
+    );
+  }
+
+  if (bookingLoading) {
+    return (
+      <div className="h-96 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-muted border-t-primary rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!booking || !isOwner) {
+    return (
+      <div className="max-w-lg mx-auto pt-16 text-center">
+        <AlertCircle className="w-10 h-10 text-destructive mx-auto mb-4" />
+        <h2 className="font-display text-xl font-bold mb-2">Pristup odbijen</h2>
+        <p className="text-muted-foreground mb-6">Ovu rezervaciju ne možete recenzirati.</p>
+        <Button onClick={() => navigate('/MyBookings')} className="rounded-2xl px-8">Moje rezervacije</Button>
+      </div>
+    );
+  }
+
+  if (!isCompleted) {
+    return (
+      <div className="max-w-lg mx-auto pt-16 text-center">
+        <AlertCircle className="w-10 h-10 text-muted-foreground mx-auto mb-4" />
+        <h2 className="font-display text-xl font-bold mb-2">Recenzija nije moguća</h2>
+        <p className="text-muted-foreground mb-6">Recenzije su moguće samo za završene rezervacije.</p>
+        <Button onClick={() => navigate('/MyBookings')} className="rounded-2xl px-8">Moje rezervacije</Button>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-lg mx-auto">

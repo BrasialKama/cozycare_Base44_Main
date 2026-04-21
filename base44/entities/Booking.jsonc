@@ -92,7 +92,16 @@
     "status"
   ],
   "rls": {
-    "create": {},
+    "create": {
+      "user_condition": {
+        "role": {
+          "$in": [
+            "parent",
+            "admin"
+          ]
+        }
+      }
+    },
     "read": {
       "$or": [
         {
