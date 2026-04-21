@@ -25,9 +25,16 @@ export default function useUnreadMessages() {
   }, [refetch]);
 
   const markAllRead = async () => {
-    await Promise.all(
-      unreadMessages.map(m => base44.entities.Message.update(m.id, { read: true }))
-    );
+    if (unreadMessages.length === 0) {
+      refetch();
+      return;
+    }
+    // Batch in chunks of 100 (backend function limit)
+    const ids = unreadMessages.map(m => m.id);
+    for (let i = 0; i < ids.length; i += 100) {
+      const chunk = ids.slice(i, i + 100);
+      await base44.functions.invoke('markMessageAsRead', { message_ids: chunk });
+    }
     refetch();
   };
 
