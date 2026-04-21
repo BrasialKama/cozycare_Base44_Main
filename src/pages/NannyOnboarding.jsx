@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 import { useMutation } from '@tanstack/react-query';
@@ -44,11 +44,26 @@ function UploadZone({ label, hint, accept, file, onChange, icon: Icon }) {
 }
 
 export default function NannyOnboarding() {
-  const { user } = useAuth();
+  const { user, isAuthenticated, isLoadingAuth, navigateToLogin } = useAuth();
   const navigate = useNavigate();
+
+  // Auth guard: unauthenticated users and users without role=nanny must go through /Onboarding first.
+  // /Onboarding handles login redirect and calls setUserRole before returning here.
+  useEffect(() => {
+    if (isLoadingAuth) return;
+    if (!isAuthenticated) {
+      navigateToLogin(window.location.origin + '/Onboarding');
+      return;
+    }
+    if (user && user.role !== 'nanny' && user.role !== 'admin') {
+      // Send them through role-selection so setUserRole runs first
+      navigate('/Onboarding', { replace: true });
+    }
+  }, [isLoadingAuth, isAuthenticated, user, navigate, navigateToLogin]);
+
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
-    full_name: user?.full_name || '',
+    full_name: '',
     display_name: '',
     bio: '',
     hourly_rate: 25,
@@ -66,9 +81,16 @@ export default function NannyOnboarding() {
   const [idFile, setIdFile] = useState(null);
   const [stepErrors, setStepErrors] = useState([]);
 
+  // When user loads, seed full_name default
+  useEffect(() => {
+    if (user?.full_name && !form.full_name) {
+      setForm(prev => ({ ...prev, full_name: user.full_name }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
   const update = (key, val) => setForm(prev => ({ ...prev, [key]: val }));
 
-  /** Returns array of error messages for the given step, or empty if valid */
   const validateStep = (s) => {
     const errors = [];
     if (s === 0) {
@@ -96,6 +118,11 @@ export default function NannyOnboarding() {
 
   const createMutation = useMutation({
     mutationFn: async () => {
+      // Hard guard: never attempt submission without a resolved user.
+      if (!user || !user.email) {
+        throw new Error('Niste prijavljeni. Osvježite stranicu i pokušajte ponovo.');
+      }
+
       let photo_url = '', intro_video_url = '', id_document_url = '';
       if (photoFile) photo_url = (await base44.integrations.Core.UploadFile({ file: photoFile })).file_url;
       if (videoFile) intro_video_url = (await base44.integrations.Core.UploadFile({ file: videoFile })).file_url;
@@ -140,6 +167,18 @@ export default function NannyOnboarding() {
     onSuccess: () => navigate('/Home'),
   });
 
+  // Show loading while auth is resolving or while redirecting unauthenticated users.
+  if (isLoadingAuth || !isAuthenticated || !user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-sm text-muted-foreground font-body">Učitavanje...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-ivory via-background to-rose-light/20 flex items-center justify-center p-4">
       <div className="w-full max-w-lg">
@@ -152,74 +191,65 @@ export default function NannyOnboarding() {
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" /> Natrag
         </button>
 
-        {/* Header */}
-        <div className="text-center mb-10">
-          <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-primary/20 to-peach/50 flex items-center justify-center mx-auto mb-4 shadow-md">
+        {/* Brand heading */}
+        <div className="text-center mb-6">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-peach/60 flex items-center justify-center mx-auto mb-3 shadow-md shadow-primary/10">
             <Heart className="w-8 h-8 text-primary" fill="currentColor" />
           </div>
-          <h1 className="font-display text-3xl font-bold text-foreground">Pridruži se CozyCare-u</h1>
-          <p className="text-sm text-muted-foreground mt-2 max-w-xs mx-auto leading-relaxed">
+          <h1 className="font-display text-3xl font-bold text-foreground leading-tight">Pridruži se CozyCare-u</h1>
+          <p className="text-muted-foreground mt-1 text-sm leading-relaxed max-w-xs mx-auto">
             Ispunite svoj profil i počnite se povezivati s obiteljima kojima trebate.
           </p>
         </div>
 
-        {/* Step indicators */}
-        <div className="flex items-center justify-center gap-1 mb-8">
+        {/* Stepper */}
+        <div className="flex items-center justify-center gap-2 mb-6 flex-wrap">
           {STEPS.map((s, i) => (
             <React.Fragment key={s.id}>
-              <div className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl transition-all ${
-                i === step
-                  ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20'
-                  : i < step
-                  ? 'bg-primary/10 text-primary'
-                  : 'bg-muted/50 text-muted-foreground'
-              }`}>
-                {i < step ? (
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                ) : (
-                  <s.icon className="w-3.5 h-3.5" />
-                )}
-                <span className="text-xs font-semibold hidden sm:block">{s.label}</span>
+              <div
+                className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all ${
+                  i === step
+                    ? 'bg-primary text-primary-foreground border-primary shadow-sm shadow-primary/20'
+                    : i < step
+                    ? 'bg-primary/10 text-primary border-primary/20'
+                    : 'bg-card text-muted-foreground border-border/60'
+                }`}
+              >
+                <s.icon className="w-3 h-3" /> {s.label}
               </div>
-              {i < STEPS.length - 1 && (
-                <div className={`w-5 h-0.5 rounded-full transition-all ${i < step ? 'bg-primary' : 'bg-border'}`} />
-              )}
+              {i < STEPS.length - 1 && <span className="text-muted-foreground/40">—</span>}
             </React.Fragment>
           ))}
         </div>
 
-        {/* Card */}
-        <div className="bg-card border border-border/40 rounded-3xl shadow-xl shadow-foreground/5 overflow-hidden">
+        <div className="bg-card border border-border/50 rounded-3xl shadow-lg shadow-primary/5 overflow-hidden">
           <AnimatePresence mode="wait">
             <motion.div
               key={step}
-              initial={{ opacity: 0, x: 24 }}
+              initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -24 }}
-              transition={{ duration: 0.22, ease: 'easeOut' }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.25 }}
               className="p-7"
             >
-
               {step === 0 && (
                 <div className="space-y-5">
                   <div className="mb-6">
                     <p className="text-xs font-bold text-primary/70 uppercase tracking-widest mb-1">Korak 1 od 4</p>
                     <h2 className="font-display text-2xl font-bold text-foreground">O vama</h2>
-                    <p className="text-sm text-muted-foreground mt-1">Recite obiteljima tko ste i gdje radite.</p>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Puno ime</Label>
-                      <Input value={form.full_name} onChange={e => update('full_name', e.target.value)} className="rounded-xl" />
-                    </div>
-                    <div>
-                      <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Prikazano ime</Label>
-                      <Input value={form.display_name} onChange={e => update('display_name', e.target.value)} placeholder="Kako vas obitelji vide" className="rounded-xl" />
-                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">Osnovni podaci koje obitelji trebaju znati.</p>
                   </div>
                   <div>
-                    <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Telefon</Label>
-                    <Input value={form.phone} onChange={e => update('phone', e.target.value)} type="tel" className="rounded-xl" />
+                    <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Puno ime</Label>
+                    <Input value={form.full_name} onChange={e => update('full_name', e.target.value)} placeholder="Ana Marija Horvat" className="rounded-xl" />
+                  </div>
+                  <div>
+                    <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Javno ime (opcionalno)</Label>
+                    <Input value={form.display_name} onChange={e => update('display_name', e.target.value)} placeholder="Ana M." className="rounded-xl" />
+                  </div>
+                  <div>
+                    <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Broj telefona</Label>
+                    <Input value={form.phone} onChange={e => update('phone', e.target.value)} placeholder="+385 91 234 5678" className="rounded-xl" />
                   </div>
                   <div>
                     <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Područje rada</Label>
@@ -262,8 +292,11 @@ export default function NannyOnboarding() {
                     <Input value={form.specialties} onChange={e => update('specialties', e.target.value)} placeholder="Njega dojenčadi, Posebne potrebe, Podučavanje" className="rounded-xl" />
                   </div>
                   <div>
-                    <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Certifikati <span className="normal-case font-normal">(odvojeno zarezima)</span></Label>
-                    <Input value={form.certifications} onChange={e => update('certifications', e.target.value)} placeholder="Prva pomoć, CPR, Montessori" className="rounded-xl" />
+                    <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Obrazovanje i tečajevi <span className="normal-case font-normal">(odvojeno zarezima)</span></Label>
+                    <Input value={form.certifications} onChange={e => update('certifications', e.target.value)} placeholder="Tečaj prve pomoći, Diploma predškolskog odgoja" className="rounded-xl" />
+                    <p className="text-[11px] text-muted-foreground mt-1.5 leading-relaxed">
+                      Navedite stvarne tečajeve i obrazovanje. Službene oznake povjerenja dodjeljuje CozyCare tim nakon provjere dokumenata.
+                    </p>
                   </div>
                   <div>
                     <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Kontakt za hitne slučajeve</Label>
@@ -305,7 +338,7 @@ export default function NannyOnboarding() {
                     ].map(([key, val]) => (
                       <div key={key} className="flex items-center justify-between">
                         <span className="text-xs font-semibold text-muted-foreground">{key}</span>
-                        <span className={`text-sm font-medium ${val.startsWith('✓') ? 'text-emerald-600' : 'text-foreground'}`}>{val}</span>
+                        <span className={`text-sm font-medium ${String(val).startsWith('✓') ? 'text-emerald-600' : 'text-foreground'}`}>{val}</span>
                       </div>
                     ))}
                   </div>
@@ -347,7 +380,7 @@ export default function NannyOnboarding() {
                 Dalje <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             ) : (
-              <>
+              <div className="flex flex-col items-end gap-2">
                 <Button
                   onClick={() => createMutation.mutate()}
                   disabled={createMutation.isPending}
@@ -363,11 +396,11 @@ export default function NannyOnboarding() {
                   )}
                 </Button>
                 {createMutation.isError && (
-                  <p className="text-xs text-destructive text-center mt-2">
+                  <p className="text-xs text-destructive text-right">
                     Prijava nije poslana: {createMutation.error?.message || 'Došlo je do greške. Pokušajte ponovo.'}
                   </p>
                 )}
-              </>
+              </div>
             )}
           </div>
         </div>

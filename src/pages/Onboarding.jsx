@@ -122,14 +122,24 @@ export default function Onboarding() {
               id: 'parent',
               emoji: '🏡',
               title: 'Tražim dadilju',
-              description: 'Pronađite pouzdane, provjerene dadilje za svoju obitelj',
+              description: 'Za obitelji koje traže pouzdanu skrb za svoju djecu.',
+              bullets: [
+                'Pregledajte provjerene dadilje u vašem kvartu',
+                'Rezervirajte termine i dogovorite se izravno',
+                'Ostavite recenzije nakon završene rezervacije',
+              ],
               bg: selectedRole === 'parent' ? 'border-primary bg-primary/5 shadow-md shadow-primary/10' : 'border-border/60 bg-card hover:border-primary/25',
             },
             {
               id: 'nanny',
               emoji: '💛',
               title: 'Ja sam dadilja',
-              description: 'Pridružite se našoj platformi i povežite se s obiteljima',
+              description: 'Za dadilje koje žele rad s provjerenim obiteljima.',
+              bullets: [
+                'Izgradite profil i predstavite svoje iskustvo',
+                'Primajte rezervacije od obitelji u vašem području',
+                'Profil pregledava CozyCare tim prije objave',
+              ],
               bg: selectedRole === 'nanny' ? 'border-sage bg-sage/10 shadow-md shadow-sage/10' : 'border-border/60 bg-card hover:border-sage/40',
             },
           ].map((role) => (
@@ -138,17 +148,27 @@ export default function Onboarding() {
               onClick={() => setSelectedRole(role.id)}
               className={`w-full p-5 rounded-2xl border-2 text-left transition-all duration-200 ${role.bg}`}
             >
-              <div className="flex items-center gap-4">
+              <div className="flex items-start gap-4">
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-light/80 to-peach/60 flex items-center justify-center flex-shrink-0 text-2xl shadow-sm">
                   {role.emoji}
                 </div>
-                <div>
-                  <h3 className="font-display font-bold text-lg text-foreground">{role.title}</h3>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-display font-bold text-lg text-foreground">{role.title}</h3>
+                    {selectedRole === role.id && (
+                      <CheckCircle2 className="w-5 h-5 text-primary ml-auto flex-shrink-0" />
+                    )}
+                  </div>
                   <p className="text-sm text-muted-foreground mt-0.5">{role.description}</p>
+                  <ul className="mt-2 space-y-1">
+                    {role.bullets.map((b) => (
+                      <li key={b} className="text-xs text-muted-foreground flex items-start gap-1.5 leading-relaxed">
+                        <span className="w-1 h-1 rounded-full bg-primary/40 flex-shrink-0 mt-1.5" />
+                        {b}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                {selectedRole === role.id && (
-                  <CheckCircle2 className="w-5 h-5 text-primary ml-auto flex-shrink-0" />
-                )}
               </div>
             </button>
           ))}

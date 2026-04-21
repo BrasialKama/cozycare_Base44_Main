@@ -1,20 +1,29 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Heart, LogOut, LogIn, Search, Users } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 
 export default function LandingHeader() {
-  const { isAuthenticated, logout, navigateToLogin } = useAuth();
+  const { user, isAuthenticated, logout, navigateToLogin } = useAuth();
+  const navigate = useNavigate();
 
-  const navItems = [
-    { label: 'Pronađi dadilju', to: '/FindNannies', icon: Search },
-    { label: 'Portal za dadilje', to: '/NannyOnboarding', icon: Users },
-  ];
+  const handleNannyPortalClick = () => {
+    if (!isAuthenticated) {
+      // Send them to login; after login, drop them on /Onboarding (role selection)
+      navigateToLogin(window.location.origin + '/Onboarding');
+      return;
+    }
+    if (user?.role === 'nanny' || user?.role === 'admin') {
+      navigate('/NannyPortal');
+    } else {
+      // Authenticated but role is 'user' or 'parent' — send them through role selection
+      navigate('/Onboarding');
+    }
+  };
 
   return (
     <>
-      {/* Fixed header bar — visible on all screen sizes */}
       <header
         className="fixed top-0 left-0 right-0 z-50 h-14 md:h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8"
         style={{
@@ -34,16 +43,23 @@ export default function LandingHeader() {
 
         {/* Navigation */}
         <nav className="flex items-center gap-1">
-          {navItems.map((item) => (
-            <Link
-              key={item.label}
-              to={item.to}
-              className="hidden sm:flex items-center gap-1.5 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors px-3 lg:px-4 py-2 rounded-xl hover:bg-black/5 min-h-[36px]"
-            >
-              <item.icon className="w-3.5 h-3.5" />
-              {item.label}
-            </Link>
-          ))}
+          <Link
+            to="/FindNannies"
+            className="hidden sm:flex items-center gap-1.5 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors px-3 lg:px-4 py-2 rounded-xl hover:bg-black/5 min-h-[36px]"
+          >
+            <Search className="w-3.5 h-3.5" />
+            Pronađi dadilju
+          </Link>
+
+          <button
+            type="button"
+            onClick={handleNannyPortalClick}
+            className="hidden sm:flex items-center gap-1.5 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors px-3 lg:px-4 py-2 rounded-xl hover:bg-black/5 min-h-[36px]"
+          >
+            <Users className="w-3.5 h-3.5" />
+            Portal za dadilje
+          </button>
+
           {isAuthenticated ? (
             <div className="flex items-center gap-1 ml-1">
               <Link to="/Home">
