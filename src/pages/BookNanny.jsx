@@ -211,12 +211,35 @@ export default function BookNanny() {
     },
   });
 
-  // If not authenticated, redirect to login and return to this exact URL
   if (!user) {
-    base44.auth.redirectToLogin(window.location.href);
+    const returnUrl = window.location.href;
     return (
-      <div className="h-96 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-muted border-t-primary rounded-full animate-spin" />
+      <div className="max-w-md mx-auto pt-12 pb-12 text-center">
+        <div className="bg-card border border-border/40 rounded-3xl p-8 shadow-sm">
+          <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-5">
+            <Shield className="w-8 h-8 text-primary/70" />
+          </div>
+          <h2 className="font-display text-2xl font-bold text-foreground mb-2">Kreirajte račun za rezervaciju</h2>
+          <p className="text-muted-foreground text-sm leading-relaxed mb-7 max-w-sm mx-auto">
+            Kako bismo osigurali sigurnost za obitelji i dadilje, potreban je račun za dovršetak rezervacije. Registracija traje samo minutu.
+          </p>
+          <Button
+            className="w-full h-12 font-semibold rounded-2xl text-sm shadow-md shadow-primary/25 mb-3"
+            onClick={() => base44.auth.redirectToLogin(returnUrl)}
+          >
+            Kreiraj račun i nastavi
+          </Button>
+          <Button
+            variant="outline"
+            className="w-full h-11 rounded-2xl text-sm border-border/60 mb-5"
+            onClick={() => base44.auth.redirectToLogin(returnUrl)}
+          >
+            Već imate račun? Prijavite se
+          </Button>
+          <Link to="/FindNannies" className="text-sm text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1.5">
+            <ArrowLeft className="w-3.5 h-3.5" /> Nastavi pregledavati dadilje
+          </Link>
+        </div>
       </div>
     );
   }
