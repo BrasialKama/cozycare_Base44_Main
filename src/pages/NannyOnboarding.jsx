@@ -177,6 +177,10 @@ export default function NannyOnboarding() {
         display_name: form.display_name || form.full_name,
         phone: form.phone,
       });
+
+      // Refresh local user state so Home.jsx sees onboarding_complete=true
+      // (without this, Home bounces nanny back to /NannyOnboarding and the form resets to step 0)
+      await refreshUser();
     },
     onSuccess: () => navigate('/Home'),
   });

@@ -9,7 +9,7 @@ import ProfileView from '@/components/profile/ProfileView';
 import ProfileEditForm from '@/components/profile/ProfileEditForm';
 
 export default function FamilySettings() {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState(false);
 
@@ -68,6 +68,9 @@ export default function FamilySettings() {
         display_name: form.family_name || user?.full_name,
         phone: form.phone,
       });
+
+      // Refresh local user state so any downstream page that checks onboarding_complete sees the new value
+      await refreshUser();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['familyProfile', user?.email] });
