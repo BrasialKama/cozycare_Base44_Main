@@ -211,13 +211,12 @@ export default function BookNanny() {
     },
   });
 
+  // If not authenticated, redirect to login and return to this exact URL
   if (!user) {
+    base44.auth.redirectToLogin(window.location.href);
     return (
-      <div className="max-w-lg mx-auto pt-16 text-center">
-        <AlertCircle className="w-10 h-10 text-primary/40 mx-auto mb-4" />
-        <h2 className="font-display text-xl font-bold mb-2">Morate se prijaviti</h2>
-        <p className="text-muted-foreground mb-6">Morate se prijaviti kako biste rezervirali dadilju.</p>
-        <Button className="rounded-2xl px-8" onClick={() => navigate('/FindNannies')}>Pronađi dadilje</Button>
+      <div className="h-96 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-muted border-t-primary rounded-full animate-spin" />
       </div>
     );
   }

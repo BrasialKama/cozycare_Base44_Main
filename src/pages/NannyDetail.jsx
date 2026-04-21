@@ -304,7 +304,7 @@ export default function NannyDetail() {
               </div>
 
               <div className="space-y-2.5">
-                {user?.role === 'parent' && nanny.nanny_profile_id && (
+                {nanny.nanny_profile_id && (
                   <Link to={`/BookNanny?nanny_id=${nanny.nanny_profile_id}&public_id=${nanny.id}`} className="block">
                     <Button className="w-full h-12 font-semibold rounded-2xl text-sm shadow-md shadow-primary/25">
                       <Calendar className="w-4 h-4 mr-2" />
