@@ -111,6 +111,21 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Refresh the user object from the server without triggering the loading UI.
+  // Use this after operations that change user state (e.g. setUserRole) so
+  // local React state stays in sync with the server.
+  const refreshUser = async () => {
+    try {
+      const currentUser = await base44.auth.me();
+      setUser(currentUser);
+      setIsAuthenticated(true);
+      return currentUser;
+    } catch (error) {
+      console.error('refreshUser failed:', error?.message || error);
+      return null;
+    }
+  };
+
   const logout = () => {
     setUser(null);
     setIsAuthenticated(false);
@@ -137,6 +152,7 @@ export const AuthProvider = ({ children }) => {
       logout,
       navigateToLogin,
       checkAppState,
+      refreshUser,
       viewAsRole,
       setViewAsRole,
       effectiveRole,

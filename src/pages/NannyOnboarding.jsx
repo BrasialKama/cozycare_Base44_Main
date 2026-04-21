@@ -44,22 +44,36 @@ function UploadZone({ label, hint, accept, file, onChange, icon: Icon }) {
 }
 
 export default function NannyOnboarding() {
-  const { user, isAuthenticated, isLoadingAuth, navigateToLogin } = useAuth();
+  const { user, isAuthenticated, isLoadingAuth, navigateToLogin, refreshUser } = useAuth();
   const navigate = useNavigate();
 
   // Auth guard: unauthenticated users and users without role=nanny must go through /Onboarding first.
   // /Onboarding handles login redirect and calls setUserRole before returning here.
+  // We attempt ONE user refresh before bouncing — this handles the brief window where
+  // setUserRole has succeeded on the server but the React user state hasn't caught up yet.
+  const [refreshAttempted, setRefreshAttempted] = useState(false);
+
   useEffect(() => {
     if (isLoadingAuth) return;
     if (!isAuthenticated) {
       navigateToLogin(window.location.origin + '/Onboarding');
       return;
     }
-    if (user && user.role !== 'nanny' && user.role !== 'admin') {
-      // Send them through role-selection so setUserRole runs first
-      navigate('/Onboarding', { replace: true });
+    if (!user) return;
+
+    const roleAllowed = user.role === 'nanny' || user.role === 'admin';
+    if (roleAllowed) return;
+
+    // Role doesn't match — try a refresh once before deciding to bounce
+    if (!refreshAttempted) {
+      setRefreshAttempted(true);
+      refreshUser().catch(() => { /* ignore — will bounce on next effect run */ });
+      return;
     }
-  }, [isLoadingAuth, isAuthenticated, user, navigate, navigateToLogin]);
+
+    // Refresh was attempted and role is still wrong — actually bounce
+    navigate('/Onboarding', { replace: true });
+  }, [isLoadingAuth, isAuthenticated, user, refreshAttempted, navigate, navigateToLogin, refreshUser]);
 
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({

@@ -15,7 +15,7 @@ const TRUST_POINTS = [
 const VALID_INTENTS = ['parent', 'nanny'];
 
 export default function Onboarding() {
-  const { user, isAuthenticated, isLoadingAuth, navigateToLogin } = useAuth();
+  const { user, isAuthenticated, isLoadingAuth, navigateToLogin, refreshUser } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const intent = searchParams.get('intent');
@@ -49,6 +49,9 @@ export default function Onboarding() {
           role: intent,
           display_name: user?.full_name || '',
         });
+        // Refresh local user state so downstream pages see the new role
+        // (without this, NannyOnboarding's guard sees stale role='user' and bounces back here)
+        await refreshUser();
         navigate(intent === 'parent' ? '/FamilySettings' : '/NannyOnboarding', { replace: true });
       } catch (err) {
         console.error('Intent auto-apply failed:', err);
@@ -67,6 +70,8 @@ export default function Onboarding() {
         role: selectedRole,
         display_name: user?.full_name || '',
       });
+      // Refresh local user state before navigating so the next page sees the new role
+      await refreshUser();
       navigate(selectedRole === 'parent' ? '/FamilySettings' : '/NannyOnboarding');
     } catch (err) {
       console.error('Role setup failed:', err);
