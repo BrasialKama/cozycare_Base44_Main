@@ -93,7 +93,7 @@
       "items": {
         "type": "string"
       },
-      "description": "e.g. Potvr\u0111en ID, Video, Provjera pozadine, Reference"
+      "description": "Free-text qualifications listed by the nanny"
     },
     "badges": {
       "type": "array",
@@ -101,7 +101,7 @@
         "type": "string"
       },
       "default": [],
-      "description": "Trust badges"
+      "description": "Trust badges \u2014 admin-controlled only"
     },
     "status": {
       "type": "string",
@@ -152,9 +152,7 @@
     "read": {
       "$or": [
         {
-          "record_condition": {
-            "user_email": "$auth.email"
-          }
+          "data.user_email": "{{user.email}}"
         },
         {
           "user_condition": {
@@ -164,37 +162,44 @@
       ]
     },
     "create": {
-      "$or": [
+      "$and": [
         {
-          "user_condition": {
-            "role": "user"
-          }
+          "$or": [
+            {
+              "user_condition": {
+                "role": "user"
+              }
+            },
+            {
+              "user_condition": {
+                "role": "nanny"
+              }
+            },
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            }
+          ]
         },
         {
-          "user_condition": {
-            "role": "nanny"
-          }
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
+          "$or": [
+            {
+              "data.user_email": "{{user.email}}"
+            },
+            {
+              "user_condition": {
+                "role": "admin"
+              }
+            }
+          ]
         }
       ]
     },
     "update": {
-      "$or": [
-        {
-          "record_condition": {
-            "user_email": "$auth.email"
-          }
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
+      "user_condition": {
+        "role": "admin"
+      }
     },
     "delete": {
       "user_condition": {

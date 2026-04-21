@@ -53,30 +53,45 @@ export default function NannyProfile() {
 
   const handlePhotoUpload = async (file) => {
     if (!file || !profile) return;
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
-    await base44.entities.NannyProfile.update(profile.id, { photo_url: file_url });
-    await base44.functions.invoke('syncPublicNannyProfile', { nanny_profile_id: profile.id });
-    queryClient.invalidateQueries({ queryKey: ['myNannyProfile'] });
-    toast.success('Fotografija ažurirana!');
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      // Route through backend function — direct NannyProfile.update is now admin-only
+      await base44.functions.invoke('updateMyNannyProfile', {
+        nanny_profile_id: profile.id,
+        updates: { photo_url: file_url },
+      });
+      await base44.functions.invoke('syncPublicNannyProfile', { nanny_profile_id: profile.id });
+      queryClient.invalidateQueries({ queryKey: ['myNannyProfile'] });
+      toast.success('Fotografija ažurirana!');
+    } catch (err) {
+      toast.error('Greška pri učitavanju fotografije: ' + (err?.message || 'Nepoznata greška'));
+    }
   };
 
   const saveMutation = useMutation({
     mutationFn: async () => {
-      await base44.entities.NannyProfile.update(profile.id, {
-        first_name: form.first_name,
-        last_name: form.last_name,
-        bio: form.bio,
-        hourly_rate: Number(form.hourly_rate),
-        location: form.location,
-        languages: form.languages.split(',').map(s => s.trim()).filter(Boolean),
-        specialties: form.specialties.split(',').map(s => s.trim()).filter(Boolean),
-        certifications: form.certifications.split(',').map(s => s.trim()).filter(Boolean),
+      // Route through backend function — direct NannyProfile.update is now admin-only
+      await base44.functions.invoke('updateMyNannyProfile', {
+        nanny_profile_id: profile.id,
+        updates: {
+          first_name: form.first_name,
+          last_name: form.last_name,
+          bio: form.bio,
+          hourly_rate: Number(form.hourly_rate),
+          location: form.location,
+          languages: form.languages.split(',').map(s => s.trim()).filter(Boolean),
+          specialties: form.specialties.split(',').map(s => s.trim()).filter(Boolean),
+          certifications: form.certifications.split(',').map(s => s.trim()).filter(Boolean),
+        },
       });
       await base44.functions.invoke('syncPublicNannyProfile', { nanny_profile_id: profile.id });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['myNannyProfile'] });
       toast.success('Profil spremljen!');
+    },
+    onError: (err) => {
+      toast.error('Greška pri spremanju: ' + (err?.message || 'Nepoznata greška'));
     },
   });
 
@@ -187,8 +202,11 @@ export default function NannyProfile() {
           <Input value={form.specialties} onChange={e => update('specialties', e.target.value)} placeholder="Njega dojenčadi, Posebne potrebe, Podučavanje" className="rounded-xl" />
         </div>
         <div>
-          <SectionLabel>Certifikati <span className="normal-case font-normal">(odvojeno zarezima)</span></SectionLabel>
-          <Input value={form.certifications} onChange={e => update('certifications', e.target.value)} placeholder="Potvrđen ID, Provjera pozadine, Reference" className="rounded-xl" />
+          <SectionLabel>Obrazovanje i tečajevi <span className="normal-case font-normal">(odvojeno zarezima)</span></SectionLabel>
+          <Input value={form.certifications} onChange={e => update('certifications', e.target.value)} placeholder="Tečaj prve pomoći, Diploma predškolskog odgoja" className="rounded-xl" />
+          <p className="text-[11px] text-muted-foreground mt-1.5 leading-relaxed">
+            Ovdje navedite stvarne tečajeve i obrazovanje. Službene oznake povjerenja (Potvrđen ID, Provjera pozadine, Reference) dodjeljuje samo CozyCare tim nakon provjere dokumenata.
+          </p>
         </div>
       </div>
 
