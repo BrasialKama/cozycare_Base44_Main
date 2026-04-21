@@ -126,17 +126,20 @@ export default function BookNanny() {
     mutationFn: async () => {
       const familyProfile = familyProfiles?.[0] || null;
 
-      // Resolve private NannyProfile at booking time
-      const privateNanny = await base44.entities.NannyProfile.get(nanny.nanny_profile_id);
-
-      if (!privateNanny) {
+      // Resolve private nanny data via service-role backend function
+      // (parent can't read NannyProfile directly due to RLS)
+      const resolved = await base44.functions.invoke('resolveNannyForBooking', {
+        nanny_profile_id: nanny.nanny_profile_id,
+      });
+      const nannyData = resolved.data;
+      if (!nannyData?.nanny_user_email) {
         throw new Error('Profil dadilje nije pronađen. Pokušajte ponovo.');
       }
 
       const bookingData = {
-        nanny_id: privateNanny.id,
-        nanny_user_email: privateNanny.user_email,
-        nanny_name: privateNanny.display_name || (privateNanny.first_name + ' ' + privateNanny.last_name),
+        nanny_id: nannyData.nanny_id,
+        nanny_user_email: nannyData.nanny_user_email,
+        nanny_name: nannyData.nanny_name,
         family_user_email: user.email,
         family_profile_id: familyProfile?.id || '',
         family_name: user.full_name || '',
@@ -171,7 +174,7 @@ export default function BookNanny() {
 
       let conv = existingBotConversations?.[0];
 
-      var shortMsg = 'Rezervacija s dadiljom ' + privateNanny.first_name + ' zaprimljena.';
+      var shortMsg = 'Rezervacija s dadiljom ' + nannyData.first_name + ' zaprimljena.';
 
       if (!conv) {
         conv = await base44.entities.Conversation.create({
@@ -190,7 +193,7 @@ export default function BookNanny() {
         });
       }
 
-      var botMessage = buildBotMessage(privateNanny, bookingData);
+      var botMessage = buildBotMessage(nannyData, bookingData);
 
       await base44.entities.Message.create({
         conversation_id: String(conv.id),

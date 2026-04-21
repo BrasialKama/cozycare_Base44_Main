@@ -47,8 +47,15 @@ export default function AdminReports() {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1.5">
                     <AlertTriangle className="w-4 h-4 text-destructive" />
-                    <Badge className={`text-[11px] ${statusStyles[r.status]} border-0`}>{r.status}</Badge>
-                    <Badge variant="outline" className="text-[11px]">{r.category?.replace(/_/g, ' ')}</Badge>
+                    <Badge className={`text-[11px] ${statusStyles[r.status]} border-0`}>{r.status === 'open' ? 'Otvoreno' : r.status === 'investigating' ? 'Istraživanje' : r.status === 'resolved' ? 'Riješeno' : r.status === 'dismissed' ? 'Odbačeno' : r.status}</Badge>
+                    <Badge variant="outline" className="text-[11px]">{
+                      r.category === 'safety_concern' ? 'Sigurnosni problem' :
+                      r.category === 'inappropriate_behavior' ? 'Neprimjereno ponašanje' :
+                      r.category === 'no_show' ? 'Nedolazak' :
+                      r.category === 'payment_dispute' ? 'Spor oko plaćanja' :
+                      r.category === 'other' ? 'Ostalo' :
+                      r.category?.replace(/_/g, ' ')
+                    }</Badge>
                   </div>
                   <p className="text-sm text-muted-foreground">{r.description}</p>
                   <p className="text-xs text-muted-foreground mt-1.5">

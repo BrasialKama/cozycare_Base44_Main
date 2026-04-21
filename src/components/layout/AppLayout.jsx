@@ -157,7 +157,7 @@ export default function AppLayout() {
           {/* Profile / settings button */}
           <div className="px-4 pt-2 pb-2">
             <Link
-              to={role === 'nanny' ? '/NannyProfile' : role === 'parent' ? '/FamilySettings' : '/FamilySettings'}
+              to={role === 'nanny' ? '/NannyProfile' : role === 'admin' ? '/AdminDashboard' : '/FamilySettings'}
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-muted/50 transition-colors cursor-pointer group"
               aria-label="Postavke profila"
             >

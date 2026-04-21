@@ -19,10 +19,7 @@ export default function LeaveReview() {
 
   const { data: booking } = useQuery({
     queryKey: ['booking', bookingId],
-    queryFn: async () => {
-      const bookings = await base44.entities.Booking.filter({ id: bookingId });
-      return bookings[0];
-    },
+    queryFn: () => base44.entities.Booking.get(bookingId),
     enabled: !!bookingId,
   });
 
@@ -36,10 +33,10 @@ export default function LeaveReview() {
     mutationFn: async () => {
       await base44.entities.Review.create({
         booking_id: bookingId,
-        nanny_profile_id: booking.nanny_profile_id,
+        nanny_profile_id: booking.nanny_id,
         parent_email: user.email,
         parent_name: user.display_name || user.full_name,
-        nanny_email: booking.nanny_email,
+        nanny_email: booking.nanny_user_email,
         rating,
         warmth_rating: warmth,
         reliability_rating: reliability,

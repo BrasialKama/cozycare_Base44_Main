@@ -109,10 +109,10 @@ export default function Messages() {
   const activeConvData = conversations.find(c => c.id === activeConv);
   const otherName = activeConvData?.participant_names?.find(
     (n, i) => activeConvData.participant_emails[i] !== user?.email
-  ) || 'User';
+  ) || 'Korisnik';
 
   const getOtherName = (conv) =>
-    conv.participant_names?.find((n, i) => conv.participant_emails[i] !== user?.email) || 'User';
+    conv.participant_names?.find((n, i) => conv.participant_emails[i] !== user?.email) || 'Korisnik';
 
   const hideConversation = async (convId) => {
     const conv = conversations.find(c => c.id === convId);

@@ -34,11 +34,11 @@ export default function NannyHome() {
 
   const { data: bookings = [] } = useQuery({
     queryKey: ['nannyBookings', user?.email],
-    queryFn: () => base44.entities.Booking.filter({ nanny_email: user?.email }, '-date', 5),
+    queryFn: () => base44.entities.Booking.filter({ nanny_user_email: user?.email }, '-date', 5),
     enabled: !!user?.email,
   });
 
-  const upcoming = bookings.filter(b => ['confirmed', 'pending'].includes(b.status));
+  const upcoming = bookings.filter(b => ['Potvrđeno', 'Na čekanju'].includes(b.status));
   const statusCfg = STATUS_CONFIG[profile?.status] || STATUS_CONFIG.pending;
   const StatusIcon = statusCfg.icon;
 
@@ -136,8 +136,8 @@ export default function NannyHome() {
                     </p>
                   </div>
                 </div>
-                <span className={`text-xs font-semibold px-3 py-1.5 rounded-full capitalize ${
-                  b.status === 'pending' ? 'bg-peach/50 text-peach-dark' : 'bg-sage/30 text-sage-foreground'
+                <span className={`text-xs font-semibold px-3 py-1.5 rounded-full ${
+                  b.status === 'Na čekanju' ? 'bg-peach/50 text-peach-dark' : 'bg-sage/30 text-sage-foreground'
                 }`}>
                   {b.status}
                 </span>

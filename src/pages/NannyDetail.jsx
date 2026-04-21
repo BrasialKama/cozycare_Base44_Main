@@ -326,7 +326,7 @@ export default function NannyDetail() {
                     )}
                   </Button>
                 ) : (
-                  <Button variant="outline" className="w-full h-12 rounded-2xl text-sm border-border/60" onClick={() => navigateToLogin()}>
+                  <Button variant="outline" className="w-full h-12 rounded-2xl text-sm border-border/60" onClick={() => navigateToLogin(window.location.href)}>
                     <MessageCircle className="w-4 h-4 mr-2" />
                     Prijavi se za slanje poruke
                   </Button>

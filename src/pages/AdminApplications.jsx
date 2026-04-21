@@ -46,7 +46,7 @@ function NannyDetailDialog({ nanny }) {
               <p className="font-semibold">{nanny.first_name} {nanny.last_name}</p>
               <p className="text-xs text-muted-foreground">{nanny.user_email}</p>
               <div className="flex gap-1.5 mt-1">
-                <Badge className={`text-[10px] ${STATUS_BADGE[nanny.status]} border-0`}>{nanny.status}</Badge>
+                <Badge className={`text-[10px] ${STATUS_BADGE[nanny.status]} border-0`}>{nanny.status === 'pending' ? 'Na čekanju' : nanny.status === 'approved' ? 'Odobrena' : nanny.status === 'rejected' ? 'Odbijena' : nanny.status}</Badge>
                 <Badge className={`text-[10px] ${nanny.is_active ? 'bg-emerald-100 text-emerald-800' : 'bg-muted text-muted-foreground'} border-0`}>
                   {nanny.is_active ? 'Aktivna' : 'Neaktivna'}
                 </Badge>
@@ -105,7 +105,7 @@ function NannyRow({ nanny, onAction, isUpdating }) {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <h3 className="font-semibold text-sm">{nanny.first_name} {nanny.last_name}</h3>
-              <Badge className={`text-[10px] ${STATUS_BADGE[nanny.status]} border-0`}>{nanny.status}</Badge>
+              <Badge className={`text-[10px] ${STATUS_BADGE[nanny.status]} border-0`}>{nanny.status === 'pending' ? 'Na čekanju' : nanny.status === 'approved' ? 'Odobrena' : nanny.status === 'rejected' ? 'Odbijena' : nanny.status}</Badge>
               {nanny.is_featured && <Badge className="text-[10px] bg-amber-100 text-amber-800 border-0">⭐ Istaknuta</Badge>}
             </div>
             <p className="text-xs text-muted-foreground mt-0.5">
