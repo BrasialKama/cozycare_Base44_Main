@@ -1,0 +1,81 @@
+{
+  "name": "Review",
+  "type": "object",
+  "properties": {
+    "booking_id": {
+      "type": "string",
+      "description": "Associated booking"
+    },
+    "nanny_profile_id": {
+      "type": "string",
+      "description": "Nanny being reviewed"
+    },
+    "parent_email": {
+      "type": "string",
+      "description": "Parent who left the review"
+    },
+    "parent_name": {
+      "type": "string",
+      "description": "Parent display name"
+    },
+    "nanny_email": {
+      "type": "string",
+      "description": "Nanny email"
+    },
+    "rating": {
+      "type": "number",
+      "description": "Rating 1-5"
+    },
+    "comment": {
+      "type": "string",
+      "description": "Review comment"
+    },
+    "warmth_rating": {
+      "type": "number",
+      "description": "Warmth and kindness rating 1-5"
+    },
+    "reliability_rating": {
+      "type": "number",
+      "description": "Reliability rating 1-5"
+    },
+    "communication_rating": {
+      "type": "number",
+      "description": "Communication rating 1-5"
+    }
+  },
+  "required": [
+    "nanny_profile_id",
+    "parent_email",
+    "rating"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": {
+          "$in": [
+            "parent",
+            "admin"
+          ]
+        }
+      }
+    },
+    "read": {},
+    "update": {
+      "$or": [
+        {
+          "data.parent_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
