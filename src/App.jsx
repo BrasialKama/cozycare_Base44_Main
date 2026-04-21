@@ -25,6 +25,7 @@ import AdminDashboard from '@/pages/AdminDashboard';
 import AdminApplications from '@/pages/AdminApplications';
 import AdminBookings from '@/pages/AdminBookings';
 import AdminReports from '@/pages/AdminReports';
+import Join from '@/pages/Join';
 import Landing from '@/pages/Landing';
 import NannyPortal from '@/pages/NannyPortal';
 import RequireRole from '@/components/auth/RequireRole';
@@ -55,6 +56,7 @@ const AuthenticatedApp = () => {
       {/* Public routes — always accessible */}
       <Route path="/Onboarding" element={<ErrorBoundary><Onboarding /></ErrorBoundary>} />
       <Route path="/NannyOnboarding" element={<ErrorBoundary><NannyOnboarding /></ErrorBoundary>} />
+      <Route path="/Join" element={<ErrorBoundary><Join /></ErrorBoundary>} />
 
       {/* Landing page — outside AppLayout, shown to unauthenticated users */}
       <Route path="/" element={!isAuthenticated ? <Landing /> : <Navigate to="/Home" replace />} />

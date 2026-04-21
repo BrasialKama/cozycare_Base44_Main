@@ -27,7 +27,7 @@ export default function CTABanner() {
             asChild
             className="h-14 px-10 text-lg border-border hover:border-secondary/50 hover:bg-secondary/5"
           >
-            <Link to="/Onboarding">Ja sam dadilja</Link>
+            <Link to="/Join?for=nanny">Ja sam dadilja</Link>
           </Button>
         </div>
       </div>

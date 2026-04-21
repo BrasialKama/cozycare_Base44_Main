@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import { Heart, Baby, Sparkles, ArrowRight, ArrowLeft, Shield, Star, CheckCircle2 } from 'lucide-react';
@@ -12,25 +12,51 @@ const TRUST_POINTS = [
   { icon: CheckCircle2, text: 'Provjerene reference' },
 ];
 
+const VALID_INTENTS = ['parent', 'nanny'];
+
 export default function Onboarding() {
   const { user, isAuthenticated, isLoadingAuth, navigateToLogin } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const intent = searchParams.get('intent');
+
   const [selectedRole, setSelectedRole] = useState(null);
   const [loading, setLoading] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
-
   const [error, setError] = useState(null);
+  const [autoApplying, setAutoApplying] = useState(false);
 
-  // Ensure the user is logged in before showing role selection
-  React.useEffect(() => {
-    if (isLoadingAuth) return; // still loading, wait
+  // Auth check — preserve intent in returnUrl when redirecting to login
+  useEffect(() => {
+    if (isLoadingAuth) return;
     if (!isAuthenticated) {
-      // Redirect to login; after login they'll come back here
-      navigateToLogin(window.location.origin + '/Onboarding');
+      const qs = intent ? `?intent=${encodeURIComponent(intent)}` : '';
+      navigateToLogin(window.location.origin + '/Onboarding' + qs);
       return;
     }
     setCheckingAuth(false);
-  }, [isLoadingAuth, isAuthenticated]);
+  }, [isLoadingAuth, isAuthenticated, intent]);
+
+  // Auto-apply intent if present and valid
+  useEffect(() => {
+    if (checkingAuth || autoApplying || !user) return;
+    if (!VALID_INTENTS.includes(intent)) return;
+
+    setAutoApplying(true);
+    (async () => {
+      try {
+        await base44.functions.invoke('setUserRole', {
+          role: intent,
+          display_name: user?.full_name || '',
+        });
+        navigate(intent === 'parent' ? '/FamilySettings' : '/NannyOnboarding', { replace: true });
+      } catch (err) {
+        console.error('Intent auto-apply failed:', err);
+        setError('Došlo je do greške pri postavljanju računa. Odaberite opciju ispod.');
+        setAutoApplying(false);
+      }
+    })();
+  }, [checkingAuth, intent, user, navigate, autoApplying]);
 
   const handleContinue = async () => {
     if (!selectedRole) return;
@@ -49,12 +75,14 @@ export default function Onboarding() {
     }
   };
 
-  if (isLoadingAuth || checkingAuth) {
+  if (isLoadingAuth || checkingAuth || autoApplying) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
           <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-sm text-muted-foreground font-body">Učitavanje...</p>
+          <p className="text-sm text-muted-foreground font-body">
+            {autoApplying ? 'Postavljanje računa…' : 'Učitavanje...'}
+          </p>
         </div>
       </div>
     );
@@ -62,7 +90,6 @@ export default function Onboarding() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-ivory via-background to-rose-light/30 flex items-center justify-center p-4">
-      {/* Decorative blobs */}
       <div className="fixed -top-32 -right-32 w-96 h-96 rounded-full bg-primary/6 blur-3xl pointer-events-none" />
       <div className="fixed -bottom-24 -left-24 w-80 h-80 rounded-full bg-sage/10 blur-3xl pointer-events-none" />
 
@@ -72,7 +99,6 @@ export default function Onboarding() {
         transition={{ duration: 0.4, ease: 'easeOut' }}
         className="w-full max-w-md relative"
       >
-        {/* Back button */}
         <button
           onClick={() => navigate(-1)}
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors group"
@@ -80,7 +106,6 @@ export default function Onboarding() {
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" /> Natrag
         </button>
 
-        {/* Brand */}
         <div className="text-center mb-10">
           <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary/20 to-peach/60 flex items-center justify-center mx-auto mb-5 shadow-lg shadow-primary/10">
             <Heart className="w-10 h-10 text-primary" fill="currentColor" />
@@ -94,7 +119,6 @@ export default function Onboarding() {
           </p>
         </div>
 
-        {/* Trust row */}
         <div className="flex justify-center gap-5 mb-10">
           {TRUST_POINTS.map(({ icon: Icon, text }) => (
             <div key={text} className="flex flex-col items-center gap-1.5 text-center max-w-[5.5rem]">
@@ -106,7 +130,6 @@ export default function Onboarding() {
           ))}
         </div>
 
-        {/* Divider */}
         <div className="flex items-center gap-3 mb-7">
           <div className="flex-1 h-px bg-border/60" />
           <Sparkles className="w-3.5 h-3.5 text-primary/30" />
@@ -115,7 +138,6 @@ export default function Onboarding() {
 
         <p className="text-center text-sm font-semibold text-foreground mb-4">Kako nam se pridružujete?</p>
 
-        {/* Role cards */}
         <div className="space-y-3 mb-7">
           {[
             {
@@ -134,7 +156,7 @@ export default function Onboarding() {
               id: 'nanny',
               emoji: '💛',
               title: 'Ja sam dadilja',
-              description: 'Za dadilje koje žele rad s provjerenim obiteljima.',
+              description: 'Za dadilje koje žele raditi s provjerenim obiteljima.',
               bullets: [
                 'Izgradite profil i predstavite svoje iskustvo',
                 'Primajte rezervacije od obitelji u vašem području',

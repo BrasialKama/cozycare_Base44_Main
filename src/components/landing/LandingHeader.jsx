@@ -8,17 +8,21 @@ export default function LandingHeader() {
   const { user, isAuthenticated, logout, navigateToLogin } = useAuth();
   const navigate = useNavigate();
 
+  // "Portal za dadilje" is for nannies and prospects — hide it from parents.
+  // Visible if: unauthenticated OR role is 'nanny', 'admin', or 'user' (not yet set).
+  const showNannyPortalLink =
+    !isAuthenticated || !user?.role || ['nanny', 'admin', 'user'].includes(user.role);
+
   const handleNannyPortalClick = () => {
     if (!isAuthenticated) {
-      // Send them to login; after login, drop them on /Onboarding (role selection)
-      navigateToLogin(window.location.origin + '/Onboarding');
+      navigate('/Join?for=nanny');
       return;
     }
     if (user?.role === 'nanny' || user?.role === 'admin') {
       navigate('/NannyPortal');
     } else {
-      // Authenticated but role is 'user' or 'parent' — send them through role selection
-      navigate('/Onboarding');
+      // role === 'user' (no role set yet) — route through /Join to pick nanny
+      navigate('/Join?for=nanny');
     }
   };
 
@@ -33,7 +37,6 @@ export default function LandingHeader() {
           borderBottom: '1px solid rgba(200,142,142,0.12)',
         }}
       >
-        {/* Logo */}
         <Link to="/" className="flex items-center gap-2.5 py-2 px-2 -mx-2 rounded-xl hover:bg-black/5 transition-colors">
           <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-primary/90 flex items-center justify-center flex-shrink-0">
             <Heart className="w-4 h-4 text-white fill-white" />
@@ -41,7 +44,6 @@ export default function LandingHeader() {
           <span className="font-display text-lg md:text-xl font-bold text-foreground tracking-tight">CozyCare</span>
         </Link>
 
-        {/* Navigation */}
         <nav className="flex items-center gap-1">
           <Link
             to="/FindNannies"
@@ -51,14 +53,16 @@ export default function LandingHeader() {
             Pronađi dadilju
           </Link>
 
-          <button
-            type="button"
-            onClick={handleNannyPortalClick}
-            className="hidden sm:flex items-center gap-1.5 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors px-3 lg:px-4 py-2 rounded-xl hover:bg-black/5 min-h-[36px]"
-          >
-            <Users className="w-3.5 h-3.5" />
-            Portal za dadilje
-          </button>
+          {showNannyPortalLink && (
+            <button
+              type="button"
+              onClick={handleNannyPortalClick}
+              className="hidden sm:flex items-center gap-1.5 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors px-3 lg:px-4 py-2 rounded-xl hover:bg-black/5 min-h-[36px]"
+            >
+              <Users className="w-3.5 h-3.5" />
+              Portal za dadilje
+            </button>
+          )}
 
           {isAuthenticated ? (
             <div className="flex items-center gap-1 ml-1">

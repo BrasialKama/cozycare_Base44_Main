@@ -153,7 +153,7 @@ export default function HeroSection() {
                 WebkitBackdropFilter: 'blur(12px)',
               }}
             >
-              <Link to="/Onboarding">Pridruži se CozyCare-u</Link>
+              <Link to="/Join">Pridruži se CozyCare-u</Link>
             </Button>
           </div>
 
