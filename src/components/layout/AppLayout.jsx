@@ -148,7 +148,7 @@ export default function AppLayout() {
         {/* Bottom section: role switcher + profile + logout */}
         <div className="border-t border-border/60">
           {/* Admin role switcher */}
-          {user?.role === 'admin' && (
+          {(user?.app_role === 'admin' || user?.role === 'admin') && (
             <div className="px-4 pt-4 pb-2">
               <AdminRoleSwitcher />
             </div>
@@ -207,7 +207,7 @@ export default function AppLayout() {
             }
           </div>
         </div>
-        {user?.role === 'admin' && (
+        {(user?.app_role === 'admin' || user?.role === 'admin') && (
           <div className="px-4 pb-3">
             <AdminRoleSwitcher />
           </div>

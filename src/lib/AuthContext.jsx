@@ -138,8 +138,12 @@ export const AuthProvider = ({ children }) => {
     base44.auth.redirectToLogin(returnUrl || window.location.href);
   };
 
-  // Admin can view as another role; everyone else sees their real role
-  const effectiveRole = (user?.role === 'admin' && viewAsRole) ? viewAsRole : (user?.role || 'parent');
+  // Domain role lives on app_role (parent/nanny/admin). The built-in `role` field
+  // only carries admin/user — Base44 doesn't accept other values. Treat built-in
+  // role='admin' as equivalent to app_role='admin' for backwards compatibility
+  // (the original app owner / Base44-platform admins).
+  const realAppRole = user?.app_role || (user?.role === 'admin' ? 'admin' : null);
+  const effectiveRole = (realAppRole === 'admin' && viewAsRole) ? viewAsRole : (realAppRole || 'parent');
 
   return (
     <AuthContext.Provider value={{ 

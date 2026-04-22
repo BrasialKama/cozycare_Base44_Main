@@ -25,11 +25,11 @@ export default function RequireRole({ allowed = [], redirect = '/' }) {
     return <Navigate to={redirect} replace />;
   }
 
-  const realRole = user.role;
+  const realRole = user.app_role || (user.role === 'admin' ? 'admin' : null);
 
   // Admins always pass — they may be viewing as another role
   // but should still access admin-only or nanny-only routes via the role switcher
-  if (realRole === 'admin') {
+  if (realRole === 'admin' || user.role === 'admin') {
     return <Outlet />;
   }
 

@@ -87,14 +87,14 @@ export default function Join() {
   useEffect(() => {
     if (isLoadingAuth) return;
     if (!isAuthenticated || !user) return;
-    if (user.role === 'admin') {
+    if (user.app_role === 'admin' || user.role === 'admin') {
       navigate('/AdminDashboard', { replace: true });
-    } else if (user.role === 'nanny') {
+    } else if (user.app_role === 'nanny') {
       navigate('/NannyPortal', { replace: true });
-    } else if (user.role === 'parent') {
+    } else if (user.app_role === 'parent') {
       navigate('/Home', { replace: true });
     }
-    // Users with role='user' or no role fall through to role-selection cards below
+    // Users with app_role='user' or no app_role fall through to role-selection cards below
   }, [isLoadingAuth, isAuthenticated, user, navigate]);
 
   const handleSelect = (role) => {

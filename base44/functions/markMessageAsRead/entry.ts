@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
 
       const receiver = String(msg.receiver_email || '').toLowerCase();
       const isReceiver = receiver === callerEmail;
-      const isAdmin = user.role === 'admin';
+      const isAdmin = user.role === 'admin' || user.app_role === 'admin';
       if (!isReceiver && !isAdmin) {
         skipped.push({ id, reason: 'forbidden' });
         continue;

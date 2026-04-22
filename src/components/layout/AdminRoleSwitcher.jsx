@@ -18,7 +18,7 @@ const ROLES = [
 export default function AdminRoleSwitcher() {
   const { user, viewAsRole, setViewAsRole } = useAuth();
 
-  if (user?.role !== 'admin') return null;
+  if (user?.app_role !== 'admin' && user?.role !== 'admin') return null;
 
   // null means admin (no override), otherwise parent/nanny
   const currentValue = viewAsRole || 'admin';

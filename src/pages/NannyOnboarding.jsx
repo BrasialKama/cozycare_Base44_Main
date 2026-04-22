@@ -61,7 +61,7 @@ export default function NannyOnboarding() {
     }
     if (!user) return;
 
-    const roleAllowed = user.role === 'nanny' || user.role === 'admin';
+    const roleAllowed = user.app_role === 'nanny' || user.app_role === 'admin' || user.role === 'admin';
     if (roleAllowed) return;
 
     // Role doesn't match — try a refresh once before deciding to bounce

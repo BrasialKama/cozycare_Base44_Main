@@ -11,17 +11,17 @@ export default function LandingHeader() {
   // "Portal za dadilje" is for nannies and prospects — hide it from parents.
   // Visible if: unauthenticated OR role is 'nanny', 'admin', or 'user' (not yet set).
   const showNannyPortalLink =
-    !isAuthenticated || !user?.role || ['nanny', 'admin', 'user'].includes(user.role);
+    !isAuthenticated || !user?.app_role || ['nanny', 'admin', 'user'].includes(user.app_role) || user?.role === 'admin';
 
   const handleNannyPortalClick = () => {
     if (!isAuthenticated) {
       navigate('/Join?for=nanny');
       return;
     }
-    if (user?.role === 'nanny' || user?.role === 'admin') {
+    if (user?.app_role === 'nanny' || user?.app_role === 'admin' || user?.role === 'admin') {
       navigate('/NannyPortal');
     } else {
-      // role === 'user' (no role set yet) — route through /Join to pick nanny
+      // app_role is 'user' or missing — route through /Join to pick nanny
       navigate('/Join?for=nanny');
     }
   };

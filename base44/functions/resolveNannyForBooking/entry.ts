@@ -9,7 +9,9 @@ Deno.serve(async (req) => {
     }
 
     // Only parents should be creating bookings
-    if (user.role !== 'parent' && user.role !== 'admin') {
+    const isAdmin = user.role === 'admin' || user.app_role === 'admin';
+    const isParent = user.app_role === 'parent';
+    if (!isParent && !isAdmin) {
       return Response.json({ error: 'Samo roditelji mogu kreirati rezervacije.' }, { status: 403 });
     }
 

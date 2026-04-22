@@ -88,7 +88,7 @@ export default function BookNanny() {
   useEffect(() => {
     if (!user) return;
     if (roleCheckDone) return;
-    const allowed = user.role === 'parent' || user.role === 'admin';
+    const allowed = user.app_role === 'parent' || user.app_role === 'admin' || user.role === 'admin';
     if (allowed) {
       setRoleCheckDone(true);
       return;
@@ -97,7 +97,7 @@ export default function BookNanny() {
     setRoleCheckDone(true);
     (async () => {
       const refreshed = await refreshUser();
-      const stillNotAllowed = !refreshed || (refreshed.role !== 'parent' && refreshed.role !== 'admin');
+      const stillNotAllowed = !refreshed || (refreshed.app_role !== 'parent' && refreshed.app_role !== 'admin' && refreshed.role !== 'admin');
       if (stillNotAllowed) {
         // Route through role selection with intent=parent so setUserRole runs and they come back
         const returnUrl = window.location.pathname + window.location.search;
@@ -144,7 +144,7 @@ export default function BookNanny() {
   const totalPrice = +(durationHours * rate).toFixed(2);
   const timeError = form.start_time && form.end_time && durationHours <= 0 ? 'Vrijeme završetka mora biti nakon vremena početka' : null;
   const canBook = form.date && form.start_time && form.end_time && form.address.trim() && durationHours > 0;
-  const roleAllowed = user?.role === 'parent' || user?.role === 'admin';
+  const roleAllowed = user?.app_role === 'parent' || user?.app_role === 'admin' || user?.role === 'admin';
   const canSubmit = canBook && roleAllowed && roleCheckDone;
 
   const nannyName = displayNanny ? (displayNanny.first_name || displayNanny.display_name || '') + ' ' + (displayNanny.last_name_initial || displayNanny.last_name || '') : '';

@@ -21,7 +21,7 @@ Deno.serve(async (req) => {
 
   // Authorization: only the nanny themselves or an admin may trigger sync
   const isOwner = privateProfile.user_email === user.email;
-  const isAdmin = user.role === 'admin';
+  const isAdmin = user.role === 'admin' || user.app_role === 'admin';
   if (!isOwner && !isAdmin) {
     return Response.json({ error: 'Forbidden' }, { status: 403 });
   }

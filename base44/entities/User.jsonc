@@ -1,0 +1,44 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "role": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "parent",
+        "nanny"
+      ],
+      "default": "parent",
+      "description": "Built-in Base44 role (accepts only admin/user at runtime). Kept for backwards compatibility and admin detection."
+    },
+    "app_role": {
+      "type": "string",
+      "enum": [
+        "user",
+        "parent",
+        "nanny",
+        "admin"
+      ],
+      "default": "user",
+      "description": "Application-level role, distinct from Base44's built-in admin/user role. Used by RLS rules and route guards."
+    },
+    "onboarding_complete": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether user has completed onboarding"
+    },
+    "display_name": {
+      "type": "string",
+      "description": "Display name"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Phone number"
+    }
+  },
+  "required": [
+    "display_name",
+    "phone"
+  ]
+}

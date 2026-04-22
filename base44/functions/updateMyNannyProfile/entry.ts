@@ -75,7 +75,7 @@ Deno.serve(async (req) => {
 
     // Authorization: caller must be the owner OR an admin
     const isOwner = profile.user_email && profile.user_email.toLowerCase() === String(user.email || '').toLowerCase();
-    const isAdmin = user.role === 'admin';
+    const isAdmin = user.role === 'admin' || user.app_role === 'admin';
     if (!isOwner && !isAdmin) {
       return Response.json({ error: 'Nemate dopuštenje za uređivanje ovog profila.' }, { status: 403 });
     }
