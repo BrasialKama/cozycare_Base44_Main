@@ -87,7 +87,7 @@ export default function Messages() {
         sender_email: user.email,
         receiver_email: receiverEmail,
         content: newMessage,
-        sender_name: user.display_name || user.full_name,
+        sender_name: user.display_name || user.full_name || (user.email ? user.email.split('@')[0] : 'Korisnik'),
         read: false,
       });
       // Unhide conversation for receiver if they had hidden it

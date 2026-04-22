@@ -60,11 +60,13 @@ Deno.serve(async (req) => {
     const nannyDisplayName = nannyProfile.display_name
       || `${nannyProfile.first_name || ''} ${(nannyProfile.last_name || '')[0] || ''}.`.trim();
 
+    const callerDisplayName = user.display_name || user.full_name || (user.email ? String(user.email).split('@')[0] : 'Korisnik');
+
     // Create new conversation via service role
     const conv = await base44.asServiceRole.entities.Conversation.create({
       conversation_key: conversationKey,
       participant_emails: [user.email, nannyEmail],
-      participant_names: [user.full_name || user.email, nannyDisplayName],
+      participant_names: [callerDisplayName, nannyDisplayName],
       last_message: '',
       last_message_date: new Date().toISOString(),
       hidden_for: [],

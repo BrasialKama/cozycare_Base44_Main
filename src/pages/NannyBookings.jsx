@@ -104,11 +104,18 @@ export default function NannyBookings() {
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
-            <h3 className="font-semibold text-sm">{booking.family_name || 'Obitelj'}</h3>
+            <h3 className="font-semibold text-sm">
+              {booking.family_display_name || booking.family_name || 'Obitelj'}
+            </h3>
             <Badge className={`text-[11px] ${statusStyles[booking.status]} border-0`}>
               {booking.status}
             </Badge>
           </div>
+          {booking.family_name && booking.family_display_name && booking.family_name !== booking.family_display_name && (
+            <p className="text-xs text-muted-foreground mb-1">
+              Obitelj {booking.family_name}
+            </p>
+          )}
           <p className="text-xs text-muted-foreground flex items-center gap-1">
             <Calendar className="w-3 h-3" /> {booking.date}
           </p>

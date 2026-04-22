@@ -145,7 +145,10 @@ export default function BookNanny() {
         nanny_name: nannyData.nanny_name,
         family_user_email: user.email,
         family_profile_id: familyProfile?.id || '',
-        family_name: user.full_name || '',
+        // Personal name of the booker — the primary name shown to the nanny
+        family_display_name: user.display_name || user.full_name || (user.email ? user.email.split('@')[0] : ''),
+        // Household name from FamilyProfile — shown as context, not primary
+        family_name: familyProfile?.family_name || user.display_name || user.full_name || '',
         public_nanny_profile_id: nanny?.id || publicId || '',
         date: form.date,
         start_time: form.start_time,
@@ -183,7 +186,7 @@ export default function BookNanny() {
         conv = await base44.entities.Conversation.create({
           conversation_key: botConvKey,
           participant_emails: [config.bot.email, user.email],
-          participant_names: [config.bot.name, user.full_name || 'Roditelj'],
+          participant_names: [config.bot.name, user.display_name || user.full_name || (user.email ? user.email.split('@')[0] : 'Roditelj')],
           last_message: shortMsg,
           last_message_date: new Date().toISOString(),
           hidden_for: [],

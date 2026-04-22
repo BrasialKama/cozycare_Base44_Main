@@ -24,7 +24,11 @@
     },
     "family_name": {
       "type": "string",
-      "description": "Family display name"
+      "description": "Household name (e.g. 'Obitelj Horvat'). Shown as subtitle context on nanny-facing booking cards."
+    },
+    "family_display_name": {
+      "type": "string",
+      "description": "Personal name of the parent who made the booking (e.g. 'Marko'). Primary identifier shown to the nanny."
     },
     "public_nanny_profile_id": {
       "type": "string",
