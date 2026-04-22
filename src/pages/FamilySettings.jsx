@@ -63,13 +63,15 @@ export default function FamilySettings() {
         });
       }
 
+      // Personal name → updates user.display_name (what the app calls them by)
+      // Family name → stays on the FamilyProfile entity, not on user.display_name
       await base44.auth.updateMe({
         onboarding_complete: true,
-        display_name: form.family_name || user?.full_name,
+        display_name: (form.display_name || '').trim() || user?.display_name || user?.full_name,
         phone: form.phone,
       });
 
-      // Refresh local user state so any downstream page that checks onboarding_complete sees the new value
+      // Refresh local user state so any downstream page that checks onboarding_complete or display_name sees the new value
       await refreshUser();
     },
     onSuccess: () => {

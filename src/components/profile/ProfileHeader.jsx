@@ -3,7 +3,7 @@ import { Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function ProfileHeader({ user, onEdit }) {
-  const initials = (user?.full_name || user?.email || '?')
+  const initials = (user?.display_name || user?.full_name || user?.email || '?')
     .split(' ')
     .map(w => w[0])
     .join('')
@@ -16,7 +16,7 @@ export default function ProfileHeader({ user, onEdit }) {
         <span className="text-xl font-display font-bold text-primary">{initials}</span>
       </div>
       <div className="flex-1 min-w-0">
-        <h1 className="font-display text-xl font-bold text-foreground truncate">{user?.full_name || 'Korisnik'}</h1>
+        <h1 className="font-display text-xl font-bold text-foreground truncate">{user?.display_name || user?.full_name || (user?.email ? user.email.split('@')[0] : 'Korisnik')}</h1>
         <p className="text-sm text-muted-foreground truncate">{user?.email}</p>
       </div>
       <Button variant="outline" size="icon" onClick={onEdit} className="rounded-xl border-border/60 flex-shrink-0">

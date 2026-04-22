@@ -162,10 +162,10 @@ export default function AppLayout() {
               aria-label="Postavke profila"
             >
               <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center text-xs font-bold text-primary flex-shrink-0">
-                {(user?.full_name || user?.email || '?')[0]?.toUpperCase()}
+                {(user?.display_name || user?.full_name || user?.email || '?')[0]?.toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-foreground truncate">{user?.display_name || user?.full_name || 'Korisnik'}</p>
+                <p className="text-sm font-semibold text-foreground truncate">{user?.display_name || user?.full_name || (user?.email ? user.email.split('@')[0] : 'Korisnik')}</p>
                 <p className="text-[11px] text-muted-foreground">{ROLE_LABELS[role] || role}</p>
               </div>
               <Settings className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors flex-shrink-0" />

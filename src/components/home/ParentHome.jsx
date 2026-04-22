@@ -16,7 +16,10 @@ const greetingTime = () => {
 
 export default function ParentHome() {
   const { user } = useAuth();
-  const firstName = (user?.full_name || 'there').split(' ')[0];
+  // Prefer display_name (user's chosen name) → full_name → email prefix → fallback
+  const emailPrefix = user?.email ? user.email.split('@')[0] : '';
+  const fullSource = user?.display_name || user?.full_name || emailPrefix || 'there';
+  const firstName = fullSource.split(' ')[0];
 
   const { data: topNannies = [] } = useQuery({
     queryKey: ['topPublicNannies'],

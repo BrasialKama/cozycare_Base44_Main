@@ -8,6 +8,7 @@ import { Plus, Trash2, Save, X } from 'lucide-react';
 
 const EMPTY_FORM = {
   family_name: '',
+  display_name: '',
   address: '',
   neighborhood: '',
   phone: '',
@@ -22,6 +23,7 @@ function populateForm(profile) {
   if (!profile) return { ...EMPTY_FORM, children: [{ name: '', age: '', needs: '' }] };
   return {
     family_name: profile.family_name || '',
+    display_name: profile.display_name || '',
     address: profile.address || '',
     neighborhood: profile.neighborhood || '',
     phone: profile.phone || '',
@@ -67,8 +69,24 @@ export default function ProfileEditForm({ profile, isSaving, onSave, onCancel })
   return (
     <Card className="p-6 space-y-5 border-border/50 shadow-sm">
       <div>
+        <Label>Vaše ime</Label>
+        <Input
+          value={form.display_name}
+          onChange={e => update('display_name', e.target.value)}
+          placeholder="npr. Marko"
+          className="mt-1"
+        />
+        <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+          Ime kojim ćemo vas oslovljavati u aplikaciji.
+        </p>
+      </div>
+
+      <div>
         <Label>Ime obitelji</Label>
         <Input value={form.family_name} onChange={e => update('family_name', e.target.value)} placeholder="npr. Obitelj Horvat" className="mt-1" />
+        <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+          Naziv vaše obitelji — vidljiv dadiljama u kontekstu rezervacije.
+        </p>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
