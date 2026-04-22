@@ -42,22 +42,27 @@ function stableKey(nanny) {
 }
 
 /**
- * Public-facing image — always returns a deterministic curated fallback.
- * Use this on browse cards, detail pages, booking pages, etc.
+ * Public-facing image — returns the real uploaded photo if available,
+ * otherwise falls back to a deterministic curated stock portrait so the UI
+ * never shows a broken/blank avatar.
+ *
+ * Used on browse cards, detail pages, booking pages, and home featured.
+ * It is critical for a child-safety platform that parents see the actual
+ * nanny — stock photos are only acceptable as a temporary placeholder
+ * before a real photo is uploaded.
  */
 export function getNannyImage(nanny) {
+  const realPhoto = nanny?.profile_photo_url || nanny?.photo_url;
+  if (realPhoto) return realPhoto;
   const idx = hashString(stableKey(nanny)) % PORTRAIT_FALLBACKS.length;
   return PORTRAIT_FALLBACKS[idx];
 }
 
 /**
- * Own-profile image — returns the real uploaded photo if available,
- * otherwise falls back to the curated portrait.
- * Use this only on the nanny's own profile editing page.
+ * Own-profile image — same logic as getNannyImage. Kept as a separate
+ * export so the editing page's intent is clear at the call site.
  */
 export function getNannyOwnImage(nanny) {
-  const realPhoto = nanny?.profile_photo_url || nanny?.photo_url;
-  if (realPhoto) return realPhoto;
   return getNannyImage(nanny);
 }
 
