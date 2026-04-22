@@ -13,6 +13,8 @@ export default function AuthDebug() {
   const [rawUser, setRawUser] = useState(null);
   const [error, setError] = useState(null);
   const [keys, setKeys] = useState([]);
+  const [probeResult, setProbeResult] = useState(null);
+  const [probeLoading, setProbeLoading] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -25,6 +27,19 @@ export default function AuthDebug() {
       }
     })();
   }, []);
+
+  const runRlsProbe = async () => {
+    setProbeLoading(true);
+    setProbeResult(null);
+    try {
+      const res = await base44.functions.invoke('rlsProbe', {});
+      setProbeResult(res.data);
+    } catch (err) {
+      setProbeResult({ invoke_error: err?.message || String(err), response: err?.response?.data });
+    } finally {
+      setProbeLoading(false);
+    }
+  };
 
   return (
     <div style={{ padding: 24, fontFamily: 'monospace', fontSize: 13, lineHeight: 1.5 }}>
@@ -72,6 +87,22 @@ export default function AuthDebug() {
   data_app_role: contextUser?.data?.app_role,
 }, null, 2)}
         </pre>
+      </section>
+
+      <section style={{ marginBottom: 24 }}>
+        <h2 style={{ fontSize: 15, fontWeight: 700, marginBottom: 6 }}>RLS probe (create RlsTest as caller):</h2>
+        <button
+          onClick={runRlsProbe}
+          disabled={probeLoading}
+          style={{ padding: '8px 14px', background: '#222', color: '#fff', border: 'none', borderRadius: 4, cursor: 'pointer', marginBottom: 8 }}
+        >
+          {probeLoading ? 'Running…' : 'Run rlsProbe'}
+        </button>
+        {probeResult && (
+          <pre style={{ background: '#f6f6f6', padding: 12, border: '1px solid #ddd', overflowX: 'auto' }}>
+{JSON.stringify(probeResult, null, 2)}
+          </pre>
+        )}
       </section>
 
       <section>

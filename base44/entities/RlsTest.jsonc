@@ -1,0 +1,35 @@
+{
+  "name": "RlsTest",
+  "type": "object",
+  "properties": {
+    "note": {
+      "type": "string",
+      "description": "Free text"
+    }
+  },
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "data.app_role": {
+              "$in": [
+                "parent",
+                "admin"
+              ]
+            }
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "read": {},
+    "update": false,
+    "delete": false
+  },
+  "required": []
+}
