@@ -1,52 +1,44 @@
 {
-  "name": "Conversation",
+  "name": "Message",
   "type": "object",
   "properties": {
-    "conversation_key": {
+    "conversation_id": {
       "type": "string",
-      "description": "Deterministic unique key built from the two participant emails"
+      "description": "Conversation thread ID"
     },
-    "participant_emails": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "Emails of participants"
-    },
-    "participant_names": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "Display names of participants"
-    },
-    "last_message": {
+    "sender_email": {
       "type": "string",
-      "description": "Preview of last message"
+      "description": "Sender's email"
     },
-    "last_message_date": {
+    "receiver_email": {
       "type": "string",
-      "format": "date-time",
-      "description": "When last message was sent"
+      "description": "Receiver's email"
     },
-    "hidden_for": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "default": [],
-      "description": "Emails of users who have hidden this conversation"
+    "content": {
+      "type": "string",
+      "description": "Message content"
+    },
+    "read": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether message has been read"
+    },
+    "sender_name": {
+      "type": "string",
+      "description": "Display name of sender"
     }
   },
   "required": [
-    "conversation_key",
-    "participant_emails"
+    "conversation_id",
+    "sender_email",
+    "receiver_email",
+    "content"
   ],
   "rls": {
-    "read": {
+    "create": {
       "$or": [
         {
-          "data.participant_emails": "{{user.email}}"
+          "data.sender_email": "{{user.email}}"
         },
         {
           "user_condition": {
@@ -60,10 +52,13 @@
         }
       ]
     },
-    "create": {
+    "read": {
       "$or": [
         {
-          "data.participant_emails": "{{user.email}}"
+          "data.sender_email": "{{user.email}}"
+        },
+        {
+          "data.receiver_email": "{{user.email}}"
         },
         {
           "user_condition": {
@@ -79,9 +74,6 @@
     },
     "update": {
       "$or": [
-        {
-          "data.participant_emails": "{{user.email}}"
-        },
         {
           "user_condition": {
             "data.app_role": "admin"
