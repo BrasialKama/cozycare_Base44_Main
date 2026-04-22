@@ -50,9 +50,15 @@ export default function Onboarding() {
           display_name: user?.full_name || '',
         });
         // Refresh local user state so downstream pages see the new role
-        // (without this, NannyOnboarding's guard sees stale role='user' and bounces back here)
         await refreshUser();
-        navigate(intent === 'parent' ? '/FamilySettings' : '/NannyOnboarding', { replace: true });
+        // If a returnTo URL was provided (e.g. from BookNanny role guard), honor it.
+        // Otherwise, route to the role's natural destination.
+        const returnTo = searchParams.get('returnTo');
+        if (returnTo && returnTo.startsWith('/')) {
+          navigate(returnTo, { replace: true });
+        } else {
+          navigate(intent === 'parent' ? '/FamilySettings' : '/NannyOnboarding', { replace: true });
+        }
       } catch (err) {
         console.error('Intent auto-apply failed:', err);
         setError('Došlo je do greške pri postavljanju računa. Odaberite opciju ispod.');
@@ -72,7 +78,13 @@ export default function Onboarding() {
       });
       // Refresh local user state before navigating so the next page sees the new role
       await refreshUser();
-      navigate(selectedRole === 'parent' ? '/FamilySettings' : '/NannyOnboarding');
+      // Honor returnTo if provided
+      const returnTo = searchParams.get('returnTo');
+      if (returnTo && returnTo.startsWith('/')) {
+        navigate(returnTo, { replace: true });
+      } else {
+        navigate(selectedRole === 'parent' ? '/FamilySettings' : '/NannyOnboarding');
+      }
     } catch (err) {
       console.error('Role setup failed:', err);
       setError('Došlo je do greške pri postavljanju računa. Pokušajte ponovo.');

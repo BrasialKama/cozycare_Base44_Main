@@ -32,7 +32,7 @@ function buildBotMessage(nannyInfo, bookingData) {
 export default function BookNanny() {
   const [searchParams] = useSearchParams();
   const nannyId = searchParams.get('nanny_id');
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [submitted, setSubmitted] = useState(false);
@@ -80,6 +80,33 @@ export default function BookNanny() {
     }
   }, [familyProfiles]);
 
+  // Role guard: Booking RLS requires role=parent or role=admin. If the user
+  // is authenticated but their role is still 'user' (or missing), refresh once
+  // in case auth state is stale, then route through /Onboarding so setUserRole runs.
+  // We keep this pre-emptive so the user never hits an opaque 403 at submit time.
+  const [roleCheckDone, setRoleCheckDone] = React.useState(false);
+  useEffect(() => {
+    if (!user) return;
+    if (roleCheckDone) return;
+    const allowed = user.role === 'parent' || user.role === 'admin';
+    if (allowed) {
+      setRoleCheckDone(true);
+      return;
+    }
+    // Try one refresh — handles the brief stale-state window after setUserRole
+    setRoleCheckDone(true);
+    (async () => {
+      const refreshed = await refreshUser();
+      const stillNotAllowed = !refreshed || (refreshed.role !== 'parent' && refreshed.role !== 'admin');
+      if (stillNotAllowed) {
+        // Route through role selection with intent=parent so setUserRole runs and they come back
+        const returnUrl = window.location.pathname + window.location.search;
+        navigate('/Onboarding?intent=parent&returnTo=' + encodeURIComponent(returnUrl), { replace: true });
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
   const update = (key, val) => {
     setForm(prev => ({ ...prev, [key]: val }));
   };
@@ -117,6 +144,8 @@ export default function BookNanny() {
   const totalPrice = +(durationHours * rate).toFixed(2);
   const timeError = form.start_time && form.end_time && durationHours <= 0 ? 'Vrijeme završetka mora biti nakon vremena početka' : null;
   const canBook = form.date && form.start_time && form.end_time && form.address.trim() && durationHours > 0;
+  const roleAllowed = user?.role === 'parent' || user?.role === 'admin';
+  const canSubmit = canBook && roleAllowed && roleCheckDone;
 
   const nannyName = displayNanny ? (displayNanny.first_name || displayNanny.display_name || '') + ' ' + (displayNanny.last_name_initial || displayNanny.last_name || '') : '';
 
@@ -162,7 +191,20 @@ export default function BookNanny() {
         special_notes: form.special_notes,
       };
 
-      const booking = await base44.entities.Booking.create(bookingData);
+      let booking;
+      try {
+        booking = await base44.entities.Booking.create(bookingData);
+      } catch (err) {
+        // Surface a useful error rather than the raw axios "Request failed with status code 403"
+        const status = err?.status || err?.response?.status;
+        if (status === 403) {
+          throw new Error('Vaš račun nema dozvolu za rezervacije. Osvježite stranicu i pokušajte ponovo, ili se obratite podršci.');
+        }
+        if (status === 401) {
+          throw new Error('Sesija je istekla. Prijavite se ponovno i pokušajte opet.');
+        }
+        throw err;
+      }
 
       // Optional notification call: only send booking id, not full private payload
       fetch(config.notificationApiUrl, {
@@ -471,7 +513,7 @@ export default function BookNanny() {
           </div>
         )}
 
-        {canBook ? (
+        {canSubmit ? (
           <Button
             onClick={() => bookMutation.mutate()}
             disabled={bookMutation.isPending}
