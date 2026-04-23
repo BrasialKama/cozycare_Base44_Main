@@ -94,12 +94,21 @@ export default function NannyBookings() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data, booking }) => {
-      await base44.entities.Booking.update(id, data);
-      await sendBookingMessage(booking, data.status);
+      const resp = await base44.functions.invoke('updateBooking', {
+        booking_id: id,
+        updates: data,
+      });
+      const respData = resp?.data || resp;
+      if (!respData?.success) throw new Error(respData?.error || 'Ažuriranje nije uspjelo.');
+      // Best-effort notification. Failure here doesn't undo the status change.
+      try { await sendBookingMessage(booking, data.status); } catch (e) { console.error('sendBookingMessage failed:', e?.message); }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['nannyBookingsAll', user?.email] });
       toast.success('Rezervacija ažurirana');
+    },
+    onError: (err) => {
+      toast.error(err?.message || 'Ažuriranje nije uspjelo.');
     },
   });
 

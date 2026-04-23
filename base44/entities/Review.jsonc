@@ -50,16 +50,17 @@
   ],
   "rls": {
     "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
       "$or": [
         {
-          "user_condition": {
-            "data.app_role": {
-              "$in": [
-                "parent",
-                "admin"
-              ]
-            }
-          }
+          "data.parent_email": "{{user.email}}"
+        },
+        {
+          "data.nanny_email": "{{user.email}}"
         },
         {
           "user_condition": {
@@ -68,16 +69,10 @@
         }
       ]
     },
-    "read": {},
     "update": {
       "$or": [
         {
           "data.parent_email": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "data.app_role": "admin"
-          }
         },
         {
           "user_condition": {
@@ -87,18 +82,9 @@
       ]
     },
     "delete": {
-      "$or": [
-        {
-          "user_condition": {
-            "data.app_role": "admin"
-          }
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
+      "user_condition": {
+        "role": "admin"
+      }
     }
   }
 }
