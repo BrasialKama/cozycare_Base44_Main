@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import PageHeader from '@/components/shared/PageHeader';
 import EmptyState from '@/components/shared/EmptyState';
+import ReportConversationPanel from '@/components/admin/ReportConversationPanel';
 import { toast } from 'sonner';
 
 const statusStyles = {
@@ -62,6 +63,12 @@ export default function AdminReports() {
                     Prijavio/la: {r.reporter_email}
                     {r.reported_email && ` · Protiv: ${r.reported_email}`}
                   </p>
+                  {r.admin_notes && (
+                    <div className="mt-2 bg-muted/40 border border-border/40 rounded-lg p-2">
+                      <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-1">Zabilješke / odgovori</p>
+                      <pre className="text-[11px] text-foreground whitespace-pre-wrap font-body leading-relaxed">{r.admin_notes}</pre>
+                    </div>
+                  )}
                 </div>
                 <Select
                   value={r.status}
@@ -78,6 +85,9 @@ export default function AdminReports() {
                   </SelectContent>
                 </Select>
               </div>
+              {r.booking_id && r.reporter_email === 'bot@cozycare.hr' && (
+                <ReportConversationPanel reportId={r.id} />
+              )}
             </Card>
           ))}
         </div>
