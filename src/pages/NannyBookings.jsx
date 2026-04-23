@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { Calendar, Clock, Check, X } from 'lucide-react';
+import { Calendar, Clock, Check, X, CheckCircle2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -146,6 +146,24 @@ export default function NannyBookings() {
 
         <div className="text-right">
           <p className="font-display font-semibold text-primary">€{booking.total_price?.toFixed(2)}</p>
+
+          {booking.status === 'Potvrđeno' && (
+            <div className="flex gap-1.5 mt-2 justify-end">
+              <Button
+                size="sm"
+                className="h-7 px-2.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
+                onClick={() =>
+                  updateMutation.mutate({
+                    id: booking.id,
+                    data: { status: 'Završeno' },
+                    booking,
+                  })
+                }
+              >
+                <CheckCircle2 className="w-3 h-3 mr-1" /> Završi
+              </Button>
+            </div>
+          )}
 
           {booking.status === 'Na čekanju' && (
             <div className="flex gap-1.5 mt-2">
