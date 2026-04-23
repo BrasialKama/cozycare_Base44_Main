@@ -217,44 +217,57 @@ export default function BookNanny() {
         body: JSON.stringify({ booking_id: booking.id }),
       }).catch(err => console.error('Booking notification failed:', err));
 
-      var botConvKey = config.bot.email + '__' + String(user.email).toLowerCase();
-      const existingBotConversations = await base44.entities.Conversation.filter(
-        { conversation_key: botConvKey },
-        '-updated_date',
-        1
-      );
+      // Bot notification is best-effort — don't fail the booking if it errors
+      try {
+        var botConvKey = config.bot.email + '__' + String(user.email).toLowerCase();
+        const existingBotConversations = await base44.entities.Conversation.filter(
+          { conversation_key: botConvKey },
+          '-updated_date',
+          1
+        );
 
-      let conv = existingBotConversations?.[0];
+        let conv = existingBotConversations?.[0];
 
-      var shortMsg = 'Rezervacija s dadiljom ' + nannyData.first_name + ' zaprimljena.';
+        var shortMsg = 'Rezervacija s dadiljom ' + nannyData.first_name + ' zaprimljena.';
 
-      if (!conv) {
-        conv = await base44.entities.Conversation.create({
-          conversation_key: botConvKey,
-          participant_emails: [config.bot.email, user.email],
-          participant_names: [config.bot.name, user.display_name || user.full_name || (user.email ? user.email.split('@')[0] : 'Roditelj')],
-          last_message: shortMsg,
-          last_message_date: new Date().toISOString(),
-          hidden_for: [],
-        });
-      } else {
-        await base44.entities.Conversation.update(conv.id, {
-          last_message: shortMsg,
-          last_message_date: new Date().toISOString(),
-          hidden_for: (conv.hidden_for || []).filter(function(e) { return e !== user.email; }),
-        });
+        if (!conv) {
+          const convResp = await base44.functions.invoke('createConversation', {
+            conversation: {
+              conversation_key: botConvKey,
+              participant_emails: [config.bot.email, user.email],
+              participant_names: [config.bot.name, user.display_name || user.full_name || (user.email ? user.email.split('@')[0] : 'Roditelj')],
+              last_message: shortMsg,
+              last_message_date: new Date().toISOString(),
+              hidden_for: [],
+            },
+          });
+          const convRespData = convResp?.data || convResp;
+          if (convRespData?.success && convRespData?.conversation) {
+            conv = convRespData.conversation;
+          }
+        } else {
+          await base44.entities.Conversation.update(conv.id, {
+            last_message: shortMsg,
+            last_message_date: new Date().toISOString(),
+            hidden_for: (conv.hidden_for || []).filter(function(e) { return e !== user.email; }),
+          });
+        }
+
+        if (conv) {
+          var botMessage = buildBotMessage(nannyData, bookingData);
+          await base44.entities.Message.create({
+            conversation_id: String(conv.id),
+            sender_email: config.bot.email,
+            sender_name: config.bot.name,
+            receiver_email: user.email,
+            content: botMessage,
+            read: false,
+          });
+        }
+      } catch (botErr) {
+        // Non-fatal — booking already succeeded, bot notification is just UX polish
+        console.error('Bot notification failed (non-fatal):', botErr?.message || botErr);
       }
-
-      var botMessage = buildBotMessage(nannyData, bookingData);
-
-      await base44.entities.Message.create({
-        conversation_id: String(conv.id),
-        sender_email: config.bot.email,
-        sender_name: config.bot.name,
-        receiver_email: user.email,
-        content: botMessage,
-        read: false,
-      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['parentBookings'] });

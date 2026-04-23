@@ -146,29 +146,32 @@ export default function NannyOnboarding() {
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
 
-      const createdProfile = await base44.entities.NannyProfile.create({
-        first_name: firstName,
-        last_name: lastName,
-        display_name: form.display_name || form.full_name,
-        user_email: user.email,
-        bio: form.bio,
-        hourly_rate: Number(form.hourly_rate),
-        years_experience: Number(form.years_experience),
-        service_area: form.service_area,
-        location: form.service_area,
-        education: form.education,
-        languages: form.languages.split(',').map(s => s.trim()).filter(Boolean),
-        specialties: form.specialties.split(',').map(s => s.trim()).filter(Boolean),
-        certifications: form.certifications.split(',').map(s => s.trim()).filter(Boolean),
-        emergency_contact: form.emergency_contact,
-        photo_url,
-        intro_video_url,
-        video_url: intro_video_url,
-        id_document_url,
-        status: 'pending',
-        is_active: false,
-        badges: [], rating: 0, review_count: 0, total_bookings: 0,
+      const resp = await base44.functions.invoke('createNannyProfile', {
+        profile: {
+          first_name: firstName,
+          last_name: lastName,
+          display_name: form.display_name || form.full_name,
+          bio: form.bio,
+          hourly_rate: Number(form.hourly_rate),
+          years_experience: Number(form.years_experience),
+          service_area: form.service_area,
+          location: form.service_area,
+          education: form.education,
+          languages: form.languages.split(',').map(s => s.trim()).filter(Boolean),
+          specialties: form.specialties.split(',').map(s => s.trim()).filter(Boolean),
+          certifications: form.certifications.split(',').map(s => s.trim()).filter(Boolean),
+          emergency_contact: form.emergency_contact,
+          photo_url,
+          intro_video_url,
+          video_url: intro_video_url,
+          id_document_url,
+        },
       });
+      const respData = resp?.data || resp;
+      if (!respData?.success || !respData?.profile) {
+        throw new Error(respData?.error || 'Profil nije kreiran.');
+      }
+      const createdProfile = respData.profile;
 
       await base44.functions.invoke('syncPublicNannyProfile', { nanny_profile_id: createdProfile.id });
 

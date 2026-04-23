@@ -58,14 +58,22 @@ export default function NannyBookings() {
     let conv = existing?.[0];
 
     if (!conv) {
-      conv = await base44.entities.Conversation.create({
-        conversation_key: conversationKey,
-        participant_emails: [nannyEmail, parentEmail],
-        participant_names: [nannyName, booking.family_name || 'Roditelj'],
-        last_message: content,
-        last_message_date: new Date().toISOString(),
-        hidden_for: [],
+      const convResp = await base44.functions.invoke('createConversation', {
+        conversation: {
+          conversation_key: conversationKey,
+          participant_emails: [nannyEmail, parentEmail],
+          participant_names: [nannyName, booking.family_name || 'Roditelj'],
+          last_message: content,
+          last_message_date: new Date().toISOString(),
+          hidden_for: [],
+        },
       });
+      const convRespData = convResp?.data || convResp;
+      if (convRespData?.success && convRespData?.conversation) {
+        conv = convRespData.conversation;
+      } else {
+        throw new Error(convRespData?.error || 'Razgovor nije kreiran.');
+      }
     } else {
       await base44.entities.Conversation.update(conv.id, {
         last_message: content,
