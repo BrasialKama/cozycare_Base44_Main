@@ -35,18 +35,21 @@ export default function LeaveReview() {
 
   const submitMutation = useMutation({
     mutationFn: async () => {
-      await base44.entities.Review.create({
-        booking_id: bookingId,
-        nanny_profile_id: booking.nanny_id,
-        parent_email: user.email,
-        parent_name: user.display_name || user.full_name,
-        nanny_email: booking.nanny_user_email,
-        rating,
-        warmth_rating: warmth,
-        reliability_rating: reliability,
-        communication_rating: communication,
-        comment,
+      const res = await base44.functions.invoke('createReview', {
+        review: {
+          booking_id: bookingId,
+          parent_name: user.display_name || user.full_name,
+          rating,
+          warmth_rating: warmth,
+          reliability_rating: reliability,
+          communication_rating: communication,
+          comment,
+        },
       });
+      const data = res?.data || res;
+      if (!data?.success) {
+        throw new Error(data?.error || 'Recenzija nije poslana.');
+      }
     },
     onSuccess: () => {
       toast.success('Hvala na vašoj recenziji!');

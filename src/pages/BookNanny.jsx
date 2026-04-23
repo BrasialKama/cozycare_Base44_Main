@@ -193,9 +193,13 @@ export default function BookNanny() {
 
       let booking;
       try {
-        booking = await base44.entities.Booking.create(bookingData);
+        const res = await base44.functions.invoke('createBooking', { booking: bookingData });
+        const data = res?.data || res;
+        if (!data?.success || !data?.booking) {
+          throw new Error(data?.error || 'Rezervacija nije kreirana.');
+        }
+        booking = data.booking;
       } catch (err) {
-        // Surface a useful error rather than the raw axios "Request failed with status code 403"
         const status = err?.status || err?.response?.status;
         if (status === 403) {
           throw new Error('Vaš račun nema dozvolu za rezervacije. Osvježite stranicu i pokušajte ponovo, ili se obratite podršci.');
@@ -203,7 +207,7 @@ export default function BookNanny() {
         if (status === 401) {
           throw new Error('Sesija je istekla. Prijavite se ponovno i pokušajte opet.');
         }
-        throw err;
+        throw new Error(err?.response?.data?.error || err?.message || 'Rezervacija nije poslana.');
       }
 
       // Optional notification call: only send booking id, not full private payload

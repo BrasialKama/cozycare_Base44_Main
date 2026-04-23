@@ -28,7 +28,6 @@ import AdminReports from '@/pages/AdminReports';
 import Join from '@/pages/Join';
 import Landing from '@/pages/Landing';
 import NannyPortal from '@/pages/NannyPortal';
-import AuthDebug from '@/pages/AuthDebug';
 import RequireRole from '@/components/auth/RequireRole';
 import ErrorBoundary from '@/components/shared/ErrorBoundary';
 
@@ -58,7 +57,6 @@ const AuthenticatedApp = () => {
       <Route path="/Onboarding" element={<ErrorBoundary><Onboarding /></ErrorBoundary>} />
       <Route path="/NannyOnboarding" element={<ErrorBoundary><NannyOnboarding /></ErrorBoundary>} />
       <Route path="/Join" element={<ErrorBoundary><Join /></ErrorBoundary>} />
-      <Route path="/AuthDebug" element={<ErrorBoundary><AuthDebug /></ErrorBoundary>} />
 
       {/* Landing page — outside AppLayout, shown to unauthenticated users */}
       <Route path="/" element={!isAuthenticated ? <Landing /> : <Navigate to="/Home" replace />} />

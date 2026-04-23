@@ -12,7 +12,7 @@
       "$or": [
         {
           "user_condition": {
-            "data.app_role": {
+            "role": {
               "$in": [
                 "parent",
                 "admin"

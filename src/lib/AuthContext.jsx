@@ -93,13 +93,6 @@ export const AuthProvider = ({ children }) => {
       // Now check if the user is authenticated
       setIsLoadingAuth(true);
       const currentUser = await base44.auth.me();
-      console.log('[checkUserAuth] auth.me returned:', {
-        id: currentUser?.id,
-        email: currentUser?.email,
-        role: currentUser?.role,
-        app_role: currentUser?.app_role,
-        has_app_role: 'app_role' in (currentUser || {}),
-      });
       setUser(currentUser);
       setIsAuthenticated(true);
       setIsLoadingAuth(false);
@@ -124,14 +117,6 @@ export const AuthProvider = ({ children }) => {
   const refreshUser = async () => {
     try {
       const currentUser = await base44.auth.me();
-      // TEMPORARY DIAGNOSTIC — confirm app_role is present on the returned user object
-      console.log('[refreshUser] auth.me returned:', {
-        id: currentUser?.id,
-        email: currentUser?.email,
-        role: currentUser?.role,
-        app_role: currentUser?.app_role,
-        has_app_role: 'app_role' in (currentUser || {}),
-      });
       setUser(currentUser);
       setIsAuthenticated(true);
       return currentUser;
