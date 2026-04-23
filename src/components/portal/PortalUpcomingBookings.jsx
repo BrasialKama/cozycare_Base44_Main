@@ -1,9 +1,35 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Calendar, Clock, ArrowRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Calendar, Clock, ArrowRight, MessageCircle } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
 
 export default function PortalUpcomingBookings({ bookings }) {
+  const navigate = useNavigate();
+  const [openingConvId, setOpeningConvId] = useState(null);
   const upcoming = bookings.filter(b => ['Potvrđeno', 'Na čekanju'].includes(b.status));
+
+  const handleMessageFamily = async (booking) => {
+    if (openingConvId) return;
+    setOpeningConvId(booking.id);
+    try {
+      const resp = await base44.functions.invoke('openOrCreateConversation', {
+        other_email: booking.family_user_email,
+        other_name: booking.family_display_name || booking.family_name || booking.parent_name || 'Obitelj',
+      });
+      const data = resp?.data || resp;
+      const convId = data?.conversation?.id || data?.conversation_id;
+      if (convId) {
+        navigate('/Messages?conversation=' + encodeURIComponent(convId));
+      } else {
+        navigate('/Messages');
+      }
+    } catch (err) {
+      console.error('openOrCreateConversation failed:', err?.message || err);
+      navigate('/Messages');
+    } finally {
+      setOpeningConvId(null);
+    }
+  };
 
   return (
     <div className="bg-card border border-border/50 rounded-2xl p-6">
@@ -32,11 +58,24 @@ export default function PortalUpcomingBookings({ bookings }) {
                   <Clock className="w-3 h-3" /> {b.date} · {b.start_time}–{b.end_time}
                 </p>
               </div>
-              <span className={`text-xs font-semibold px-2.5 py-1 rounded-full capitalize ${
-                b.status === 'Na čekanju' ? 'bg-peach/50 text-peach-dark' : 'bg-sage/30 text-sage-foreground'
-              }`}>
-                {b.status}
-              </span>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                {b.status === 'Potvrđeno' && (
+                  <button
+                    type="button"
+                    onClick={() => handleMessageFamily(b)}
+                    disabled={openingConvId === b.id}
+                    className="text-xs font-semibold px-2.5 py-1 rounded-full bg-white border border-primary/30 text-primary hover:bg-primary/5 transition-colors inline-flex items-center gap-1.5 disabled:opacity-50"
+                  >
+                    <MessageCircle className="w-3 h-3" />
+                    {openingConvId === b.id ? 'Otvaranje…' : 'Poruči'}
+                  </button>
+                )}
+                <span className={`text-xs font-semibold px-2.5 py-1 rounded-full capitalize ${
+                  b.status === 'Na čekanju' ? 'bg-peach/50 text-peach-dark' : 'bg-sage/30 text-sage-foreground'
+                }`}>
+                  {b.status}
+                </span>
+              </div>
             </div>
           ))}
         </div>

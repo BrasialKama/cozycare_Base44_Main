@@ -1,10 +1,11 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Calendar, MessageCircle, Euro, Star, Heart, ArrowRight, Clock, CheckCircle2, Sparkles, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import WelcomeCard from './WelcomeCard';
 
 const greetingTime = () => {
   const h = new Date().getHours();
@@ -21,7 +22,32 @@ const STATUS_CONFIG = {
 
 export default function NannyHome() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const [openingConvId, setOpeningConvId] = useState(null);
   const firstName = (user?.display_name || user?.full_name || 'there').split(' ')[0];
+
+  const handleMessageFamily = async (booking) => {
+    if (openingConvId) return;
+    setOpeningConvId(booking.id);
+    try {
+      const resp = await base44.functions.invoke('openOrCreateConversation', {
+        other_email: booking.family_user_email,
+        other_name: booking.family_display_name || booking.family_name || booking.parent_name || 'Obitelj',
+      });
+      const data = resp?.data || resp;
+      const convId = data?.conversation?.id || data?.conversation_id;
+      if (convId) {
+        navigate('/Messages?conversation=' + encodeURIComponent(convId));
+      } else {
+        navigate('/Messages');
+      }
+    } catch (err) {
+      console.error('openOrCreateConversation failed:', err?.message || err);
+      navigate('/Messages');
+    } finally {
+      setOpeningConvId(null);
+    }
+  };
 
   const { data: profile } = useQuery({
     queryKey: ['myNannyProfile', user?.email],
@@ -44,6 +70,8 @@ export default function NannyHome() {
 
   return (
     <div className="space-y-10 pb-8">
+
+      {user && !user.welcome_seen && <WelcomeCard role="nanny" />}
 
       {/* ── Hero ── */}
       <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sage/25 via-peach/30 to-ivory border border-sage/30 shadow-sm">
@@ -136,11 +164,24 @@ export default function NannyHome() {
                     </p>
                   </div>
                 </div>
-                <span className={`text-xs font-semibold px-3 py-1.5 rounded-full ${
-                  b.status === 'Na čekanju' ? 'bg-peach/50 text-peach-dark' : 'bg-sage/30 text-sage-foreground'
-                }`}>
-                  {b.status}
-                </span>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  {b.status === 'Potvrđeno' && (
+                    <button
+                      type="button"
+                      onClick={() => handleMessageFamily(b)}
+                      disabled={openingConvId === b.id}
+                      className="text-xs font-semibold px-3 py-1.5 rounded-full bg-white border border-primary/30 text-primary hover:bg-primary/5 transition-colors inline-flex items-center gap-1.5 disabled:opacity-50"
+                    >
+                      <MessageCircle className="w-3 h-3" />
+                      {openingConvId === b.id ? 'Otvaranje…' : 'Poruči obitelji'}
+                    </button>
+                  )}
+                  <span className={`text-xs font-semibold px-3 py-1.5 rounded-full ${
+                    b.status === 'Na čekanju' ? 'bg-peach/50 text-peach-dark' : 'bg-sage/30 text-sage-foreground'
+                  }`}>
+                    {b.status}
+                  </span>
+                </div>
               </div>
             ))}
           </div>

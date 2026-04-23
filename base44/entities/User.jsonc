@@ -35,6 +35,11 @@
     "phone": {
       "type": "string",
       "description": "Phone number"
+    },
+    "welcome_seen": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether user has dismissed the first-time welcome card on Home"
     }
   },
   "required": [

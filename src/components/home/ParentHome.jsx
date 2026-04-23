@@ -6,6 +6,7 @@ import { base44 } from '@/api/base44Client';
 import { Search, Calendar, MessageCircle, Shield, Heart, ArrowRight, Sparkles, Star, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import NannyCard from '@/components/shared/NannyCard';
+import WelcomeCard from './WelcomeCard';
 
 const greetingTime = () => {
   const h = new Date().getHours();
@@ -37,6 +38,8 @@ export default function ParentHome() {
 
   return (
     <div className="space-y-14 pb-8">
+
+      {user && !user.welcome_seen && <WelcomeCard role="parent" />}
 
       {/* ── Hero ── */}
       <section className="relative rounded-3xl bg-gradient-to-br from-rose-light via-peach/70 to-ivory border border-primary/10 shadow-sm">
