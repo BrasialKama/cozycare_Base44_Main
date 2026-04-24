@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import PageHeader from '@/components/shared/PageHeader';
 import EmptyState from '@/components/shared/EmptyState';
-import ReportConversationPanel from '@/components/admin/ReportConversationPanel';
+import ReportConversationPanels from '@/components/admin/ReportConversationPanels';
 import { toast } from 'sonner';
 
 const statusStyles = {
@@ -87,8 +87,8 @@ export default function AdminReports() {
                   </SelectContent>
                 </Select>
               </div>
-              {r.booking_id && r.reporter_email === 'bot@cozycare.hr' && (
-                <ReportConversationPanel reportId={r.id} />
+              {r.booking_id && (
+                <ReportConversationPanels reportId={r.id} />
               )}
             </Card>
           ))}
