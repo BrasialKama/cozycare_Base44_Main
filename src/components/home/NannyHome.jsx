@@ -60,13 +60,19 @@ export default function NannyHome() {
 
   const { data: bookings = [] } = useQuery({
     queryKey: ['nannyBookings', user?.email],
-    queryFn: () => base44.entities.Booking.filter({ nanny_user_email: user?.email }, '-date', 5),
+    queryFn: () => base44.entities.Booking.filter({ nanny_user_email: user?.email }, '-date', 50),
     enabled: !!user?.email,
   });
 
   const upcoming = bookings.filter(b => ['Potvrđeno', 'Na čekanju'].includes(b.status));
   const statusCfg = STATUS_CONFIG[profile?.status] || STATUS_CONFIG.pending;
   const StatusIcon = statusCfg.icon;
+
+  const now = new Date();
+  const monthEarnings = bookings
+    .filter(b => b.status === 'Završeno' && new Date(b.date).getMonth() === now.getMonth() && new Date(b.date).getFullYear() === now.getFullYear())
+    .reduce((sum, b) => sum + (b.total_price || 0), 0)
+    .toFixed(0);
 
   return (
     <div className="space-y-10 pb-8">
@@ -124,9 +130,9 @@ export default function NannyHome() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[
             { icon: Calendar, label: 'Ukupno termina', value: profile?.total_bookings || 0, path: '/NannyBookings', bg: 'bg-rose-light', fg: 'text-primary' },
-            { icon: Star, label: 'Prosj. ocjena', value: profile?.avg_rating ? profile.avg_rating.toFixed(1) : '—', path: '/NannyProfile', bg: 'bg-peach/50', fg: 'text-peach-dark' },
-            { icon: MessageCircle, label: 'Poruke', value: '—', path: '/Messages', bg: 'bg-sage/25', fg: 'text-sage-foreground' },
-            { icon: Euro, label: 'Zarada', value: '—', path: '/Earnings', bg: 'bg-powder-blue/40', fg: 'text-foreground/60' },
+            { icon: Star, label: 'Prosj. ocjena', value: profile?.rating ? profile.rating.toFixed(1) : '—', path: '/NannyReviews', bg: 'bg-peach/50', fg: 'text-peach-dark' },
+            { icon: Heart, label: 'Recenzije', value: profile?.review_count || 0, path: '/NannyReviews', bg: 'bg-sage/25', fg: 'text-sage-foreground' },
+            { icon: Euro, label: 'Zarada ovaj mjesec', value: `€${monthEarnings}`, path: '/Earnings', bg: 'bg-powder-blue/40', fg: 'text-foreground/60' },
           ].map(item => (
             <Link key={item.path} to={item.path}>
               <div className="bg-card border border-border/50 rounded-2xl p-5 hover:shadow-md hover:border-primary/20 transition-all group">
@@ -194,8 +200,8 @@ export default function NannyHome() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {[
             { icon: User, label: 'Uredi profil', sub: 'Ažuriraj bio i fotografije', path: '/NannyProfile', bg: 'bg-rose-light/60', fg: 'text-primary' },
-            { icon: MessageCircle, label: 'Poruke', sub: 'Razgovaraj s obiteljima', path: '/Messages', bg: 'bg-sage/20', fg: 'text-sage-foreground' },
-            { icon: Euro, label: 'Zarada', sub: 'Prati svoje prihode', path: '/Earnings', bg: 'bg-powder-blue/40', fg: 'text-foreground/60' },
+            { icon: Sparkles, label: 'Vaš portal', sub: 'Status profila i pregled', path: '/NannyPortal', bg: 'bg-sage/20', fg: 'text-sage-foreground' },
+            { icon: Star, label: 'Recenzije', sub: 'Pregled svih ocjena', path: '/NannyReviews', bg: 'bg-peach/40', fg: 'text-peach-dark' },
           ].map(item => (
             <Link key={item.path} to={item.path}>
               <div className="bg-card border border-border/50 rounded-2xl p-5 hover:shadow-md hover:border-primary/20 transition-all group h-full">

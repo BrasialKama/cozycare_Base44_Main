@@ -18,6 +18,7 @@ import NannyBookings from '@/pages/NannyBookings';
 import Messages from '@/pages/Messages';
 import FamilySettings from '@/pages/FamilySettings';
 import NannyProfile from '@/pages/NannyProfile';
+import NannyReviews from '@/pages/NannyReviews';
 import LeaveReview from '@/pages/LeaveReview';
 import Earnings from '@/pages/Earnings';
 import SafetyCenter from '@/pages/SafetyCenter';
@@ -87,6 +88,7 @@ const AuthenticatedApp = () => {
         <Route element={<RequireRole allowed={['nanny']} />}>
           <Route path="/NannyPortal" element={<NannyPortal />} />
           <Route path="/NannyProfile" element={<NannyProfile />} />
+          <Route path="/NannyReviews" element={<NannyReviews />} />
           <Route path="/NannyBookings" element={<NannyBookings />} />
           <Route path="/Earnings" element={<Earnings />} />
         </Route>
