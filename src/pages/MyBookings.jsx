@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { Link } from 'react-router-dom';
-import { Calendar, Clock, Star, Heart, ArrowRight, Search } from 'lucide-react';
+import { Calendar, Clock, Star, Heart, ArrowRight, Search, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
+import DisputeBookingDialog from '@/components/bookings/DisputeBookingDialog';
 
 const STATUS_STYLES = {
   'Na čekanju': 'bg-peach/50 text-peach-dark',
@@ -18,6 +19,17 @@ const STATUS_STYLES = {
 
 function BookingCard({ booking, onCancel }) {
   const initial = (booking.nanny_name || 'N')[0];
+  const [disputeOpen, setDisputeOpen] = useState(false);
+  const queryClient = useQueryClient();
+
+  const DISPUTE_WINDOW_DAYS = 7;
+  const withinDisputeWindow = (() => {
+    if (booking.status !== 'Završeno') return false;
+    if (!booking.date) return false;
+    const ageDays = (Date.now() - Date.parse(booking.date)) / (1000 * 60 * 60 * 24);
+    return ageDays <= DISPUTE_WINDOW_DAYS;
+  })();
+
   return (
     <div className="bg-card border border-border/50 rounded-2xl overflow-hidden hover:shadow-md hover:border-primary/15 transition-all duration-200">
       <div className="p-5">
@@ -79,14 +91,36 @@ function BookingCard({ booking, onCancel }) {
             </Link>
           )}
           {booking.status === 'Završeno' && (
-            <Link to={`/LeaveReview?booking_id=${booking.id}`}>
-              <Button variant="ghost" size="sm" className="text-xs text-primary hover:bg-primary/8 rounded-xl">
-                <Star className="w-3 h-3 mr-1.5 fill-current" /> Ostavi recenziju
-              </Button>
-            </Link>
+            <>
+              {booking.disputed ? (
+                <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200">
+                  <CheckCircle2 className="w-3 h-3" /> Prijavljeno — CozyCare tim provjerava
+                </span>
+              ) : withinDisputeWindow ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-xs text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl"
+                  onClick={() => setDisputeOpen(true)}
+                >
+                  <AlertTriangle className="w-3 h-3 mr-1.5" /> Prijavi problem
+                </Button>
+              ) : null}
+              <Link to={`/LeaveReview?booking_id=${booking.id}`}>
+                <Button variant="ghost" size="sm" className="text-xs text-primary hover:bg-primary/8 rounded-xl">
+                  <Star className="w-3 h-3 mr-1.5 fill-current" /> Ostavi recenziju
+                </Button>
+              </Link>
+            </>
           )}
         </div>
       )}
+      <DisputeBookingDialog
+        booking={booking}
+        open={disputeOpen}
+        onOpenChange={setDisputeOpen}
+        onSuccess={() => queryClient.invalidateQueries({ queryKey: ['parentBookings'] })}
+      />
     </div>
   );
 }

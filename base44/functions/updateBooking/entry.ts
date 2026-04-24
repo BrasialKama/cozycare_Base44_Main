@@ -56,7 +56,7 @@ async function flagEarlyCompletion(base44, booking) {
       reporter_email: BOT_EMAIL,
       reported_email: booking.nanny_user_email,
       booking_id: booking.id,
-      category: 'other',
+      category: 'early_completion',
       description,
       status: 'open',
     });

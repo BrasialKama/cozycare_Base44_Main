@@ -1,0 +1,84 @@
+{
+  "name": "Report",
+  "type": "object",
+  "properties": {
+    "reporter_email": {
+      "type": "string",
+      "description": "Who filed the report"
+    },
+    "reported_email": {
+      "type": "string",
+      "description": "Who is being reported"
+    },
+    "booking_id": {
+      "type": "string",
+      "description": "Related booking if applicable"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "safety_concern",
+        "inappropriate_behavior",
+        "no_show",
+        "payment_dispute",
+        "early_completion",
+        "parent_dispute",
+        "other"
+      ],
+      "description": "Report category"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "investigating",
+        "resolved",
+        "dismissed"
+      ],
+      "default": "open",
+      "description": "Report status"
+    },
+    "admin_notes": {
+      "type": "string",
+      "description": "Admin notes on the report"
+    }
+  },
+  "required": [
+    "reporter_email",
+    "category",
+    "description"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.reporter_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

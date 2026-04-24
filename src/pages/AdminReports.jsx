@@ -54,6 +54,8 @@ export default function AdminReports() {
                       r.category === 'inappropriate_behavior' ? 'Neprimjereno ponašanje' :
                       r.category === 'no_show' ? 'Nedolazak' :
                       r.category === 'payment_dispute' ? 'Spor oko plaćanja' :
+                      r.category === 'early_completion' ? 'Prerani završetak' :
+                      r.category === 'parent_dispute' ? 'Prijava obitelji' :
                       r.category === 'other' ? 'Ostalo' :
                       r.category?.replace(/_/g, ' ')
                     }</Badge>

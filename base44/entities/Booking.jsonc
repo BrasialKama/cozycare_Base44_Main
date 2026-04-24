@@ -82,6 +82,16 @@
     "special_notes": {
       "type": "string",
       "description": "Any special needs or instructions"
+    },
+    "disputed": {
+      "type": "boolean",
+      "default": false,
+      "description": "True if parent has opened a dispute on this Zavr\u0161eno booking. Kept in sync by disputeBookingCompletion function."
+    },
+    "dispute_reported_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when parent raised the dispute. Null until disputed."
     }
   },
   "required": [
