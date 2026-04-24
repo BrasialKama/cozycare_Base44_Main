@@ -42,8 +42,8 @@ export default function LandingNannyCard({ nanny }) {
             <h3 className="font-display font-bold text-lg text-foreground leading-tight truncate">{name}</h3>
             {nanny.rating > 0 ? (
               <span className="inline-flex items-center gap-1 flex-shrink-0">
-                <Star className="w-3.5 h-3.5 text-primary fill-primary" />
-                <span className="text-sm font-semibold text-primary">{nanny.rating.toFixed(1)}</span>
+                <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                <span className="text-sm font-semibold text-foreground">{nanny.rating.toFixed(1)}</span>
               </span>
             ) : (
               <NewNannyBadge size="sm" />
