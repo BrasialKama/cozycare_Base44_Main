@@ -102,7 +102,15 @@ export default function MyBookings() {
   });
 
   const cancelMutation = useMutation({
-    mutationFn: (id) => base44.entities.Booking.update(id, { status: 'Otkazano' }),
+    mutationFn: async (id) => {
+      const resp = await base44.functions.invoke('updateBooking', {
+        booking_id: id,
+        updates: { status: 'Otkazano' },
+      });
+      const data = resp?.data || resp;
+      if (!data?.success) throw new Error(data?.error || 'Otkazivanje nije uspjelo.');
+      return data.booking;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['parentBookings'] });
       toast.success('Rezervacija otkazana');

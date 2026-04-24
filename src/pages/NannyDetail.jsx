@@ -87,7 +87,11 @@ export default function NannyDetail() {
   const nannyProfileId = nanny?.nanny_profile_id;
   const { data: reviews = [] } = useQuery({
     queryKey: ['nannyReviews', nannyProfileId],
-    queryFn: () => base44.entities.Review.filter({ nanny_profile_id: nannyProfileId }, '-created_date', 10),
+    queryFn: async () => {
+      const resp = await base44.functions.invoke('listReviewsForNanny', { nanny_profile_id: nannyProfileId });
+      const data = resp?.data || resp;
+      return data?.reviews || [];
+    },
     enabled: !!nannyProfileId,
   });
 
