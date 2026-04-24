@@ -92,6 +92,47 @@ Deno.serve(async (req) => {
 
     const created = await base44.asServiceRole.entities.Review.create(reviewData);
 
+    // Recompute aggregate rating + count for the nanny. Full recompute (not
+    // incremental) so we self-heal any prior drift from seed data or deletions.
+    // Best-effort: a failure here does not invalidate the review that was just created.
+    try {
+      const nannyProfileId = reviewData.nanny_profile_id;
+      if (nannyProfileId) {
+        const allReviews = await base44.asServiceRole.entities.Review.filter(
+          { nanny_profile_id: nannyProfileId },
+          '-created_date',
+          500
+        );
+        const ratings = (allReviews || [])
+          .map(r => Number(r.rating))
+          .filter(n => Number.isFinite(n) && n > 0);
+        const reviewCount = ratings.length;
+        const avgRating = reviewCount > 0
+          ? +(ratings.reduce((a, b) => a + b, 0) / reviewCount).toFixed(2)
+          : 0;
+
+        await base44.asServiceRole.entities.NannyProfile.update(nannyProfileId, {
+          rating: avgRating,
+          review_count: reviewCount,
+        });
+
+        // Mirror to PublicNannyProfile so browsing parents see fresh numbers.
+        const publicProfiles = await base44.asServiceRole.entities.PublicNannyProfile.filter(
+          { nanny_profile_id: nannyProfileId },
+          '-created_date',
+          1
+        );
+        if (publicProfiles && publicProfiles[0]) {
+          await base44.asServiceRole.entities.PublicNannyProfile.update(publicProfiles[0].id, {
+            rating: avgRating,
+            review_count: reviewCount,
+          });
+        }
+      }
+    } catch (aggErr) {
+      console.error('createReview: aggregate recompute failed (non-fatal):', aggErr?.message);
+    }
+
     return Response.json({ success: true, review: created });
   } catch (err) {
     console.error('createReview error:', err?.message, err?.stack);
