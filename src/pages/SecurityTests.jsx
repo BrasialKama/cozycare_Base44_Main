@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 
@@ -15,6 +15,40 @@ export default function SecurityTests() {
   const [results, setResults] = useState(null);
   const [running, setRunning] = useState(false);
   const [bookingId, setBookingId] = useState('');
+  const [myBookings, setMyBookings] = useState([]);
+  const [loadingBookings, setLoadingBookings] = useState(false);
+
+  // Load the current user's bookings (as parent OR nanny) so they can pick one
+  // from a dropdown instead of fishing the ID out of devtools.
+  useEffect(() => {
+    if (!user?.email) return;
+    setLoadingBookings(true);
+    (async () => {
+      try {
+        const [asParent, asNanny] = await Promise.all([
+          base44.entities.Booking.filter({ family_user_email: user.email }, '-date', 50),
+          base44.entities.Booking.filter({ nanny_user_email: user.email }, '-date', 50),
+        ]);
+        const merged = [...(asParent || []), ...(asNanny || [])];
+        // Dedup by id
+        const seen = new Set();
+        const unique = merged.filter(b => {
+          if (seen.has(b.id)) return false;
+          seen.add(b.id);
+          return true;
+        });
+        setMyBookings(unique);
+      } catch (err) {
+        console.error('Failed to load bookings for picker', err);
+      } finally {
+        setLoadingBookings(false);
+      }
+    })();
+  }, [user?.email]);
+
+  const copyToClipboard = (id) => {
+    try { navigator.clipboard.writeText(id); } catch (_) { /* ignore */ }
+  };
 
   const runAll = async () => {
     setRunning(true);
@@ -228,18 +262,40 @@ export default function SecurityTests() {
 
       <div style={{ marginBottom: 12 }}>
         <label style={{ display: 'block', marginBottom: 4 }}>
-          Booking ID (needed for tests 12 & 13 — must be a booking you own):
+          Booking (needed for tests 12 & 13 — your bookings only):
         </label>
-        <input
-          type="text"
-          value={bookingId}
-          onChange={(e) => setBookingId(e.target.value)}
-          placeholder="e.g. 680a1b2c..."
-          style={{ width: 400, padding: 8, fontFamily: 'monospace', fontSize: 13, border: '1px solid #ccc', borderRadius: 4 }}
-        />
-        <div style={{ fontSize: 11, color: '#666', marginTop: 4 }}>
-          Tip: open /MyBookings in another tab, pick any booking, copy its id from the URL or inspect element. Leave blank to skip tests 12 &amp; 13.
-        </div>
+        {loadingBookings ? (
+          <div style={{ fontSize: 12, color: '#666' }}>Loading your bookings…</div>
+        ) : myBookings.length === 0 ? (
+          <div style={{ fontSize: 12, color: '#666' }}>No bookings found for {user?.email}. Tests 12 &amp; 13 will be skipped.</div>
+        ) : (
+          <>
+            <select
+              value={bookingId}
+              onChange={(e) => setBookingId(e.target.value)}
+              style={{ width: 600, padding: 8, fontFamily: 'monospace', fontSize: 13, border: '1px solid #ccc', borderRadius: 4, background: 'white' }}
+            >
+              <option value="">— pick a booking (or leave blank to skip) —</option>
+              {myBookings.map(b => (
+                <option key={b.id} value={b.id}>
+                  {b.date} · {b.start_time}–{b.end_time} · {b.nanny_name || '?'} ↔ {b.family_name || '?'} · {b.status} · €{b.total_price} · {b.id}
+                </option>
+              ))}
+            </select>
+            {bookingId && (
+              <div style={{ fontSize: 11, color: '#666', marginTop: 6, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span>Selected id: <strong>{bookingId}</strong></span>
+                <button
+                  type="button"
+                  onClick={() => copyToClipboard(bookingId)}
+                  style={{ padding: '2px 8px', fontSize: 11, border: '1px solid #ccc', borderRadius: 4, background: 'white', cursor: 'pointer' }}
+                >
+                  Copy
+                </button>
+              </div>
+            )}
+          </>
+        )}
       </div>
 
       <button
