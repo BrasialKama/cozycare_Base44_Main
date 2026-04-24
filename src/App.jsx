@@ -29,6 +29,7 @@ import AdminReports from '@/pages/AdminReports';
 import Join from '@/pages/Join';
 import Landing from '@/pages/Landing';
 import NannyPortal from '@/pages/NannyPortal';
+import SecurityTests from '@/pages/SecurityTests';
 import RequireRole from '@/components/auth/RequireRole';
 import ErrorBoundary from '@/components/shared/ErrorBoundary';
 
@@ -75,6 +76,7 @@ const AuthenticatedApp = () => {
         <Route path="/FamilySettings" element={<ErrorBoundary><FamilySettings /></ErrorBoundary>} />
         <Route path="/LeaveReview" element={<ErrorBoundary><LeaveReview /></ErrorBoundary>} />
         <Route path="/SafetyCenter" element={<ErrorBoundary><SafetyCenter /></ErrorBoundary>} />
+        <Route path="/SecurityTests" element={<ErrorBoundary><SecurityTests /></ErrorBoundary>} />
 
         {/* Admin-only routes */}
         <Route element={<RequireRole allowed={['admin']} />}>
