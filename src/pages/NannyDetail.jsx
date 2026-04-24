@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/components/ui/use-toast';
+import NewNannyBadge from '@/components/shared/NewNannyBadge';
 
 
 
@@ -159,7 +160,7 @@ export default function NannyDetail() {
                     <img src={getNannyImage(nanny)} alt={name} className="w-full h-full object-cover" />
                   </div>
                 </div>
-                {nanny.rating > 0 && (
+                {nanny.rating > 0 ? (
                   <div className="pb-1 flex items-center gap-1.5">
                     {Array.from({ length: 5 }).map((_, i) => (
                       <Star key={i} className={`w-4 h-4 ${i < Math.round(nanny.rating) ? 'text-amber-400 fill-amber-400' : 'text-muted/30'}`} />
@@ -167,6 +168,8 @@ export default function NannyDetail() {
                     <span className="text-sm font-semibold text-foreground ml-1">{nanny.rating.toFixed(1)}</span>
                     {nanny.review_count > 0 && <span className="text-xs text-muted-foreground">({nanny.review_count} recenzija)</span>}
                   </div>
+                ) : (
+                  <div className="pb-1"><NewNannyBadge size="md" /></div>
                 )}
               </div>
 

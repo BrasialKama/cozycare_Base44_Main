@@ -4,6 +4,7 @@ import { MapPin, Clock, Award, CheckCircle2, Star, Video } from 'lucide-react';
 import { getNannyImage, getNannyBackgroundImage } from '@/lib/nannyImages';
 import { Badge } from '@/components/ui/badge';
 import NannyTrustBadges from '@/components/shared/NannyTrustBadges';
+import NewNannyBadge from './NewNannyBadge';
 
 const CERT_STYLE = {
   'Potvrđen ID': 'text-primary bg-primary/8',
@@ -47,7 +48,7 @@ export default function NannyCard({ nanny, onWatchVideo }) {
                 {name}
               </h3>
             </Link>
-            {nanny.rating > 0 && (
+            {nanny.rating > 0 ? (
               <div className="flex items-center gap-1 flex-shrink-0">
                 <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                 <span className="text-sm font-semibold text-foreground">{nanny.rating.toFixed(1)}</span>
@@ -55,6 +56,8 @@ export default function NannyCard({ nanny, onWatchVideo }) {
                   <span className="text-xs text-muted-foreground">({nanny.review_count})</span>
                 )}
               </div>
+            ) : (
+              <div className="flex-shrink-0"><NewNannyBadge size="sm" /></div>
             )}
           </div>
 

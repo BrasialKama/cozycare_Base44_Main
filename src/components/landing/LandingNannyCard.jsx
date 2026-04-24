@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Star, ShieldCheck, CheckCircle2, Video } from 'lucide-react';
 import { getNannyImage } from '@/lib/nannyImages';
 import { Button } from '@/components/ui/button';
+import NewNannyBadge from '../shared/NewNannyBadge';
 
 const CERT_CONFIG = {
   'Potvrđen ID': { label: 'Potvrđen ID', icon: ShieldCheck, color: 'text-primary', bg: 'bg-primary/8' },
@@ -39,11 +40,13 @@ export default function LandingNannyCard({ nanny }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <h3 className="font-display font-bold text-lg text-foreground leading-tight truncate">{name}</h3>
-            {nanny.rating > 0 && (
+            {nanny.rating > 0 ? (
               <span className="inline-flex items-center gap-1 flex-shrink-0">
                 <Star className="w-3.5 h-3.5 text-primary fill-primary" />
                 <span className="text-sm font-semibold text-primary">{nanny.rating.toFixed(1)}</span>
               </span>
+            ) : (
+              <NewNannyBadge size="sm" />
             )}
           </div>
           <p className="text-sm text-muted-foreground mt-0.5">
