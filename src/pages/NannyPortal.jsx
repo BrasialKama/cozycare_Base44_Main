@@ -12,7 +12,7 @@ export default function NannyPortal() {
   const { user } = useAuth();
   const role = user?.role;
 
-  const { data: profile } = useQuery({
+  const { data: profile, isLoading: loadingProfile } = useQuery({
     queryKey: ['portalProfile', user?.email],
     queryFn: async () => {
       const profiles = await base44.entities.NannyProfile.filter({ user_email: user?.email }, '-created_date', 1);
@@ -21,17 +21,19 @@ export default function NannyPortal() {
     enabled: !!user?.email && role === 'nanny',
   });
 
-  const { data: bookings = [] } = useQuery({
+  const { data: bookings = [], isLoading: loadingBookings } = useQuery({
     queryKey: ['portalBookings', user?.email],
     queryFn: () => base44.entities.Booking.filter({ nanny_user_email: user?.email }, '-date', 20),
     enabled: !!user?.email && role === 'nanny',
   });
 
-  const { data: reviews = [] } = useQuery({
+  const { data: reviews = [], isLoading: loadingReviews } = useQuery({
     queryKey: ['portalReviews', profile?.id],
     queryFn: () => base44.entities.Review.filter({ nanny_profile_id: profile?.id }, '-created_date', 5),
     enabled: !!profile?.id,
   });
+
+  const isLoading = loadingProfile || loadingBookings || loadingReviews;
 
   // Gate: only nanny role
   if (role && role !== 'nanny') {
@@ -42,6 +44,16 @@ export default function NannyPortal() {
         <p className="text-sm text-muted-foreground max-w-xs">
           Ako ste dadilja i želite pristupiti portalu, prijavite se sa svojim računom dadilje.
         </p>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="h-40 bg-muted/40 rounded-3xl animate-pulse" />
+        <div className="h-32 bg-muted/40 rounded-2xl animate-pulse" />
+        <div className="h-32 bg-muted/40 rounded-2xl animate-pulse" />
       </div>
     );
   }

@@ -35,7 +35,7 @@ export default function NannyBookings() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: bookings = [] } = useQuery({
+  const { data: bookings = [], isLoading } = useQuery({
     queryKey: ['nannyBookingsAll', user?.email],
     queryFn: () => base44.entities.Booking.filter({ nanny_user_email: user?.email }, '-date', 100),
     enabled: !!user?.email,
@@ -226,6 +226,12 @@ export default function NannyBookings() {
     <div>
       <PageHeader icon={Calendar} title="Moje rezervacije" subtitle="Upravljajte zahtjevima za čuvanje" />
 
+      {isLoading ? (
+        <div className="space-y-3">
+          {[1, 2, 3].map(i => <div key={i} className="h-36 bg-muted/40 rounded-2xl animate-pulse" />)}
+        </div>
+      ) : (
+      <>
       {pending.length > 0 && (
         <div className="mb-6">
           <h2 className="font-display font-semibold mb-3 text-sm text-primary">
@@ -245,7 +251,13 @@ export default function NannyBookings() {
 
         <TabsContent value="upcoming">
           {upcoming.length === 0 ? (
-            <EmptyState icon={Calendar} title="Nema nadolazećih rezervacija" />
+            <div className="text-center py-12 bg-card border border-dashed border-border/60 rounded-3xl">
+              <div className="w-16 h-16 rounded-2xl bg-rose-light flex items-center justify-center mx-auto mb-4">
+                <Calendar className="w-8 h-8 text-primary/40" />
+              </div>
+              <h3 className="font-display font-semibold text-lg text-foreground mb-1.5">Nema nadolazećih termina</h3>
+              <p className="text-sm text-muted-foreground max-w-xs mx-auto">Kad obitelji rezerviraju vaše vrijeme, novi termini će se pojaviti ovdje.</p>
+            </div>
           ) : (
             <div className="space-y-3">{upcoming.map(b => <BookingCard key={b.id} booking={b} />)}</div>
           )}
@@ -253,12 +265,19 @@ export default function NannyBookings() {
 
         <TabsContent value="past">
           {past.length === 0 ? (
-            <EmptyState icon={Calendar} title="Nema prošlih rezervacija" />
+            <div className="text-center py-12 bg-card border border-dashed border-border/60 rounded-3xl">
+              <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-4">
+                <Clock className="w-8 h-8 text-muted-foreground/40" />
+              </div>
+              <p className="text-muted-foreground text-sm">Vaši završeni termini će se pojaviti ovdje.</p>
+            </div>
           ) : (
             <div className="space-y-3">{past.map(b => <BookingCard key={b.id} booking={b} />)}</div>
           )}
         </TabsContent>
       </Tabs>
+      </>
+      )}
     </div>
   );
 }

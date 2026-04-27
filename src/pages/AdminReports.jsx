@@ -21,7 +21,7 @@ const statusStyles = {
 export default function AdminReports() {
   const queryClient = useQueryClient();
 
-  const { data: reports = [] } = useQuery({
+  const { data: reports = [], isLoading } = useQuery({
     queryKey: ['adminReports'],
     queryFn: () => base44.entities.Report.list('-created_date'),
   });
@@ -38,8 +38,18 @@ export default function AdminReports() {
     <div>
       <PageHeader icon={Shield} title="Prijave problema" subtitle="Upravljajte prijavama sigurnosti i sporovima" />
 
-      {reports.length === 0 ? (
-        <EmptyState icon={Shield} title="Nema prijava" description="Nema prijavljenih sigurnosnih problema" />
+      {isLoading ? (
+        <div className="space-y-3">
+          {[1, 2, 3].map(i => <div key={i} className="h-32 bg-muted/40 rounded-2xl animate-pulse" />)}
+        </div>
+      ) : reports.length === 0 ? (
+        <div className="text-center py-16 bg-card border border-dashed border-border/60 rounded-3xl">
+          <div className="w-16 h-16 rounded-2xl bg-sage/15 flex items-center justify-center mx-auto mb-4">
+            <Shield className="w-8 h-8 text-sage-foreground/40" />
+          </div>
+          <h3 className="font-display font-semibold text-lg text-foreground mb-1.5">Nema otvorenih prijava</h3>
+          <p className="text-sm text-muted-foreground max-w-xs mx-auto">Kad korisnici prijave problem ili sustav označi sumnjivu rezervaciju, prijave će se pojaviti ovdje.</p>
+        </div>
       ) : (
         <div className="space-y-3">
           {reports.map(r => (

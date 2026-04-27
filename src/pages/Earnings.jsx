@@ -23,7 +23,7 @@ export default function Earnings() {
   const nannyName = nannyProfile ? `${nannyProfile.first_name} ${nannyProfile.last_name}` : null;
 
   // Then fetch only bookings that belong to this nanny AND are completed
-  const { data: bookings = [] } = useQuery({
+  const { data: bookings = [], isLoading } = useQuery({
     queryKey: ['nannyEarnings', user?.email],
     queryFn: async () => {
       const all = await base44.entities.Booking.filter({ nanny_user_email: user?.email }, '-date');
@@ -60,8 +60,18 @@ export default function Earnings() {
 
       {/* Transaction history */}
       <h2 className="font-display font-semibold text-lg mb-4">Povijest zarade</h2>
-      {bookings.length === 0 ? (
-        <EmptyState icon={Euro} title="Još nema zarade" description="Završite rezervacije da počnete zarađivati" />
+      {isLoading ? (
+        <div className="space-y-3">
+          {[1, 2, 3].map(i => <div key={i} className="h-20 bg-muted/40 rounded-2xl animate-pulse" />)}
+        </div>
+      ) : bookings.length === 0 ? (
+        <div className="text-center py-16 bg-card border border-dashed border-border/60 rounded-3xl">
+          <div className="w-16 h-16 rounded-2xl bg-sage/15 flex items-center justify-center mx-auto mb-4">
+            <Euro className="w-8 h-8 text-sage-foreground/40" />
+          </div>
+          <h3 className="font-display font-semibold text-lg text-foreground mb-1.5">Još nema zarade</h3>
+          <p className="text-sm text-muted-foreground max-w-xs mx-auto">Vaša zarada će se pojaviti ovdje nakon što završite prve rezervacije.</p>
+        </div>
       ) : (
         <div className="space-y-2">
           {bookings.map(b => (

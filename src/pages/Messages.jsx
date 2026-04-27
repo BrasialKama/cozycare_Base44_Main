@@ -48,7 +48,7 @@ export default function Messages() {
     if (user?.email) markAllRead();
   }, [user?.email]);
 
-  const { data: conversations = [] } = useQuery({
+  const { data: conversations = [], isLoading: conversationsLoading } = useQuery({
     queryKey: ['conversations', user?.email],
     queryFn: async () => {
       const mine = await base44.entities.Conversation.filter(
@@ -66,7 +66,7 @@ export default function Messages() {
 
   // TODO: Replace polling with Base44 real-time subscriptions or WebSockets
   // when the platform supports them, to reduce unnecessary network requests.
-  const { data: messages = [], refetch: refetchMessages } = useQuery({
+  const { data: messages = [], refetch: refetchMessages, isLoading: messagesLoading } = useQuery({
     queryKey: ['messages', activeConv],
     queryFn: () => base44.entities.Message.filter({ conversation_id: String(activeConv) }, 'created_date', 100),
     enabled: !!activeConv,
@@ -155,7 +155,11 @@ export default function Messages() {
 
         {/* ── Conversation list ── */}
         <div className={`w-full lg:w-80 flex-shrink-0 flex flex-col min-h-0 ${activeConv ? 'hidden lg:flex' : 'flex'}`}>
-          {conversations.length === 0 ? (
+          {conversationsLoading ? (
+            <div className="space-y-2 p-2">
+              {[1, 2, 3].map(i => <div key={i} className="h-16 bg-muted/40 rounded-xl animate-pulse" />)}
+            </div>
+          ) : conversations.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center text-center py-12 bg-card border border-dashed border-border/60 rounded-3xl">
               <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                 <MessageCircle className="w-7 h-7 text-primary/50" />
@@ -245,7 +249,14 @@ export default function Messages() {
 
               {/* Messages */}
               <div className="flex-1 overflow-y-auto px-5 py-5 space-y-3">
-                {messages.length === 0 && (
+                {messagesLoading && messages.length === 0 && (
+                  <div className="space-y-3">
+                    {[1, 2, 3].map(i => (
+                      <div key={i} className={`h-10 bg-muted/40 rounded-2xl animate-pulse ${i % 2 === 0 ? 'ml-auto w-2/3' : 'w-2/3'}`} />
+                    ))}
+                  </div>
+                )}
+                {!messagesLoading && messages.length === 0 && (
                   <div className="flex flex-col items-center justify-center h-full text-center py-8 opacity-60">
                     <Heart className="w-8 h-8 text-primary/30 mb-2" fill="currentColor" />
                     <p className="text-sm text-muted-foreground">Pozdravite — započnite razgovor!</p>

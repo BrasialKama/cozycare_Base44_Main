@@ -16,7 +16,7 @@ const statusStyles = {
 };
 
 export default function AdminBookings() {
-  const { data: bookings = [] } = useQuery({
+  const { data: bookings = [], isLoading } = useQuery({
     queryKey: ['adminBookings'],
     queryFn: () => base44.entities.Booking.list('-created_date', 100),
   });
@@ -25,8 +25,17 @@ export default function AdminBookings() {
     <div>
       <PageHeader icon={Calendar} title="Sve rezervacije" subtitle="Pregled i upravljanje rezervacijama platforme" />
 
-      {bookings.length === 0 ? (
-        <EmptyState icon={Calendar} title="Još nema rezervacija" />
+      {isLoading ? (
+        <div className="space-y-3">
+          {[1, 2, 3, 4].map(i => <div key={i} className="h-24 bg-muted/40 rounded-2xl animate-pulse" />)}
+        </div>
+      ) : bookings.length === 0 ? (
+        <div className="text-center py-16 bg-card border border-dashed border-border/60 rounded-3xl">
+          <div className="w-16 h-16 rounded-2xl bg-rose-light flex items-center justify-center mx-auto mb-4">
+            <Calendar className="w-8 h-8 text-primary/40" />
+          </div>
+          <p className="text-muted-foreground text-sm">Još nema rezervacija u sustavu.</p>
+        </div>
       ) : (
         <div className="space-y-3">
           {bookings.map(b => (

@@ -8,20 +8,22 @@ import PageHeader from '@/components/shared/PageHeader';
 import { config } from '@/lib/config';
 
 export default function AdminDashboard() {
-  const { data: nannies = [] } = useQuery({
+  const { data: nannies = [], isLoading: loadingNannies } = useQuery({
     queryKey: ['allNannies'],
     queryFn: () => base44.entities.NannyProfile.list(),
   });
 
-  const { data: bookings = [] } = useQuery({
+  const { data: bookings = [], isLoading: loadingBookings } = useQuery({
     queryKey: ['adminBookings'],
     queryFn: () => base44.entities.Booking.list(),
   });
 
-  const { data: reports = [] } = useQuery({
+  const { data: reports = [], isLoading: loadingReports } = useQuery({
     queryKey: ['allReports'],
     queryFn: () => base44.entities.Report.list(),
   });
+
+  const isLoading = loadingNannies || loadingBookings || loadingReports;
 
   const pendingApps = nannies.filter(n => !n.is_active).length;
   const approvedNannies = nannies.filter(n => n.is_active).length;
@@ -44,19 +46,25 @@ export default function AdminDashboard() {
     <div>
       <PageHeader icon={BarChart3} title="Nadzorna ploča" subtitle="Pregled i upravljanje platformom" />
 
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-        {stats.map(stat => (
-          <Link key={stat.label} to={stat.link}>
-            <Card className="p-5 hover:shadow-md transition-all border-border/60 hover:border-primary/20 cursor-pointer">
-              <div className={`w-10 h-10 rounded-xl ${stat.color} flex items-center justify-center mb-3`}>
-                <stat.icon className="w-5 h-5" />
-              </div>
-              <p className="text-2xl font-display font-bold">{stat.value}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{stat.label}</p>
-            </Card>
-          </Link>
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3, 4, 5, 6].map(i => <div key={i} className="h-28 bg-muted/40 rounded-2xl animate-pulse" />)}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+          {stats.map(stat => (
+            <Link key={stat.label} to={stat.link}>
+              <Card className="p-5 hover:shadow-md transition-all border-border/60 hover:border-primary/20 cursor-pointer">
+                <div className={`w-10 h-10 rounded-xl ${stat.color} flex items-center justify-center mb-3`}>
+                  <stat.icon className="w-5 h-5" />
+                </div>
+                <p className="text-2xl font-display font-bold">{stat.value}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{stat.label}</p>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
