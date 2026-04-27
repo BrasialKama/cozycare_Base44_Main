@@ -52,16 +52,23 @@ export default function SafetyCenter() {
   const [description, setDescription] = useState('');
 
   const reportMutation = useMutation({
-    mutationFn: () => base44.entities.Report.create({
-      reporter_email: user.email,
-      category,
-      description,
-    }),
+    mutationFn: async () => {
+      const resp = await base44.functions.invoke('createSafetyReport', {
+        category,
+        description,
+      });
+      const data = resp?.data || resp;
+      if (!data?.success) throw new Error(data?.error || 'Prijava nije poslana.');
+      return data;
+    },
     onSuccess: () => {
       toast.success('Prijava poslana. Naš tim će je pregledati unutar 24 sata.');
       setReportOpen(false);
       setCategory('');
       setDescription('');
+    },
+    onError: (err) => {
+      toast.error(err?.message || 'Prijava nije poslana.');
     },
   });
 

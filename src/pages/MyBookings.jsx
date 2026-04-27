@@ -17,7 +17,7 @@ const STATUS_STYLES = {
   'Odbijeno': 'bg-destructive/10 text-destructive',
 };
 
-function BookingCard({ booking, onCancel }) {
+function BookingCard({ booking, onCancel, userEmail }) {
   const initial = (booking.nanny_name || 'N')[0];
   const [disputeOpen, setDisputeOpen] = useState(false);
   const queryClient = useQueryClient();
@@ -119,7 +119,7 @@ function BookingCard({ booking, onCancel }) {
         booking={booking}
         open={disputeOpen}
         onOpenChange={setDisputeOpen}
-        onSuccess={() => queryClient.invalidateQueries({ queryKey: ['parentBookings'] })}
+        onSuccess={() => queryClient.invalidateQueries({ queryKey: ['parentBookings', userEmail] })}
       />
     </div>
   );
@@ -146,7 +146,7 @@ export default function MyBookings() {
       return data.booking;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['parentBookings'] });
+      queryClient.invalidateQueries({ queryKey: ['parentBookings', user?.email] });
       toast.success('Rezervacija otkazana');
     },
   });
@@ -198,7 +198,7 @@ export default function MyBookings() {
               </div>
             ) : (
               <div className="space-y-3">
-                {upcoming.map(b => <BookingCard key={b.id} booking={b} onCancel={cancelMutation.mutate} />)}
+                {upcoming.map(b => <BookingCard key={b.id} booking={b} onCancel={cancelMutation.mutate} userEmail={user?.email} />)}
               </div>
             )}
           </TabsContent>
@@ -213,7 +213,7 @@ export default function MyBookings() {
               </div>
             ) : (
               <div className="space-y-3">
-                {past.map(b => <BookingCard key={b.id} booking={b} onCancel={cancelMutation.mutate} />)}
+                {past.map(b => <BookingCard key={b.id} booking={b} onCancel={cancelMutation.mutate} userEmail={user?.email} />)}
                 <div className="text-center pt-4">
                   <Link to="/FindNannies" className="text-sm text-primary font-medium inline-flex items-center gap-1.5 hover:underline">
                     Rezerviraj novi termin <ArrowRight className="w-3.5 h-3.5" />

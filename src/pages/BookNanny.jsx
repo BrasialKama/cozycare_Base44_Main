@@ -270,7 +270,7 @@ export default function BookNanny() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['parentBookings'] });
+      queryClient.invalidateQueries({ queryKey: ['parentBookings', user?.email] });
       setSubmitted(true);
     },
     onError: (error) => {

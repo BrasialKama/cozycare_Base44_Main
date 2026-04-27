@@ -14,7 +14,7 @@ export default function AdminDashboard() {
   });
 
   const { data: bookings = [] } = useQuery({
-    queryKey: ['allBookings'],
+    queryKey: ['adminBookings'],
     queryFn: () => base44.entities.Booking.list(),
   });
 
