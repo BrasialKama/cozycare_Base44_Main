@@ -1,5 +1,44 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
+// ───────────────────────── Email helpers (inlined — Base44 functions cannot share local modules) ─────────────────────────
+const BRAND_NAME = 'CozyCare';
+const SUPPORT_EMAIL = 'podrska@cozycare.hr';
+
+function buildBookingSummary(booking) {
+  const lines = [];
+  if (booking?.date) {
+    lines.push('Datum: ' + booking.date + (booking.start_time ? ' ' + booking.start_time + '–' + (booking.end_time || '') : ''));
+  }
+  if (booking?.nanny_name) lines.push('Dadilja: ' + booking.nanny_name);
+  if (booking?.family_display_name || booking?.family_name) {
+    lines.push('Obitelj: ' + (booking.family_display_name || booking.family_name));
+  }
+  if (booking?.address) lines.push('Adresa: ' + booking.address);
+  if (booking?.total_price) lines.push('Iznos: €' + booking.total_price.toFixed(2));
+  return lines.join('\n');
+}
+
+function emailFooter() {
+  return '\n\n—\n' + BRAND_NAME + ' — pouzdana obiteljska skrb\n' +
+    'Pitanja? Pišite nam na ' + SUPPORT_EMAIL + '.\n' +
+    'Ovu poruku primate jer koristite CozyCare. Upravljanje obavijestima dostupno je u postavkama računa.';
+}
+
+async function safeSendEmail(base44, { to, subject, body }) {
+  if (!to || !subject || !body) {
+    console.error('safeSendEmail: missing required field', { hasTo: !!to, hasSubject: !!subject, hasBody: !!body });
+    return { sent: false, reason: 'missing_field' };
+  }
+  try {
+    await base44.integrations.Core.SendEmail({ to, subject, body, from_name: BRAND_NAME });
+    return { sent: true };
+  } catch (err) {
+    console.error('safeSendEmail: send failed (non-fatal):', err?.message);
+    return { sent: false, reason: err?.message || 'send_error' };
+  }
+}
+// ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
 function parseTimeToMinutes(t) {
   if (!t) return null;
   const s = String(t).replace(/\s/g, '');
@@ -90,6 +129,27 @@ Deno.serve(async (req) => {
       : 1;
 
     const created = await base44.asServiceRole.entities.Booking.create(bookingData);
+
+    // Best-effort email to nanny about the new request.
+    // Non-blocking — a mail failure must not fail the booking.
+    try {
+      const nannySubject = 'Nova rezervacija — ' + (bookingData.family_display_name || bookingData.family_name || 'obitelj');
+      const nannyBody =
+        'Pozdrav' + (nannyProfile.first_name ? ' ' + nannyProfile.first_name : '') + ',\n\n' +
+        'Imate novu rezervaciju koja čeka vaš odgovor:\n\n' +
+        buildBookingSummary(created) + '\n\n' +
+        (created.message ? 'Poruka obitelji:\n"' + created.message + '"\n\n' : '') +
+        'Prijavite se u CozyCare kako biste potvrdili ili odbili rezervaciju.' +
+        emailFooter();
+      await safeSendEmail(base44, {
+        to: nannyProfile.user_email,
+        subject: nannySubject,
+        body: nannyBody,
+      });
+    } catch (mailErr) {
+      console.error('createBooking: nanny notification email failed (non-fatal):', mailErr?.message);
+    }
+
     return Response.json({ success: true, booking: created });
   } catch (err) {
     console.error('createBooking error:', err?.message, err?.stack);

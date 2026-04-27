@@ -1,5 +1,44 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
+// ───────────────────────── Email helpers (inlined — Base44 functions cannot share local modules) ─────────────────────────
+const BRAND_NAME = 'CozyCare';
+const SUPPORT_EMAIL = 'podrska@cozycare.hr';
+
+function buildBookingSummary(booking) {
+  const lines = [];
+  if (booking?.date) {
+    lines.push('Datum: ' + booking.date + (booking.start_time ? ' ' + booking.start_time + '–' + (booking.end_time || '') : ''));
+  }
+  if (booking?.nanny_name) lines.push('Dadilja: ' + booking.nanny_name);
+  if (booking?.family_display_name || booking?.family_name) {
+    lines.push('Obitelj: ' + (booking.family_display_name || booking.family_name));
+  }
+  if (booking?.address) lines.push('Adresa: ' + booking.address);
+  if (booking?.total_price) lines.push('Iznos: €' + booking.total_price.toFixed(2));
+  return lines.join('\n');
+}
+
+function emailFooter() {
+  return '\n\n—\n' + BRAND_NAME + ' — pouzdana obiteljska skrb\n' +
+    'Pitanja? Pišite nam na ' + SUPPORT_EMAIL + '.\n' +
+    'Ovu poruku primate jer koristite CozyCare. Upravljanje obavijestima dostupno je u postavkama računa.';
+}
+
+async function safeSendEmail(base44, { to, subject, body }) {
+  if (!to || !subject || !body) {
+    console.error('safeSendEmail: missing required field', { hasTo: !!to, hasSubject: !!subject, hasBody: !!body });
+    return { sent: false, reason: 'missing_field' };
+  }
+  try {
+    await base44.integrations.Core.SendEmail({ to, subject, body, from_name: BRAND_NAME });
+    return { sent: true };
+  } catch (err) {
+    console.error('safeSendEmail: send failed (non-fatal):', err?.message);
+    return { sent: false, reason: err?.message || 'send_error' };
+  }
+}
+// ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
 // Tolerance for early-completion flagging. A nanny marking a booking "Završeno"
 // more than this many minutes before the scheduled end time is considered
 // suspicious and gets flagged (but not blocked).
@@ -196,6 +235,55 @@ Deno.serve(async (req) => {
       && filtered.status === 'Zavr\u0161eno'
       && isEarlyCompletion(booking)) {
       await flagEarlyCompletion(base44, updated);
+    }
+
+    // Best-effort email on meaningful status transitions.
+    // Only fire when status actually changed. Recipient is the OTHER party.
+    if (filtered.status && filtered.status !== booking.status) {
+      try {
+        const newStatus = filtered.status;
+        const parentEmail = updated.family_user_email;
+        const nannyEmail = updated.nanny_user_email;
+        const parentName = updated.family_display_name || updated.family_name || 'obitelj';
+        const nannyName = updated.nanny_name || 'dadilja';
+        const summary = buildBookingSummary(updated);
+
+        let to = null, subject = null, mailBody = null;
+
+        if (newStatus === 'Potvr\u0111eno' && role === 'nanny') {
+          to = parentEmail;
+          subject = 'Rezervacija potvrđena — ' + nannyName;
+          mailBody = 'Dobra vijest! Vaša rezervacija je potvrđena.\n\n' +
+            summary + '\n\n' +
+            nannyName + ' vas očekuje. Ako imate dodatna pitanja, možete joj poslati poruku izravno u aplikaciji.' +
+            emailFooter();
+        } else if (newStatus === 'Odbijeno' && role === 'nanny') {
+          to = parentEmail;
+          subject = 'Rezervacija nije prihvaćena — ' + nannyName;
+          mailBody = 'Nažalost, ' + nannyName + ' ne može prihvatiti ovu rezervaciju.\n\n' +
+            summary + '\n\n' +
+            'Potražite drugu dadilju u aplikaciji — mnoge su dostupne.' +
+            emailFooter();
+        } else if (newStatus === 'Otkazano' && role === 'parent') {
+          to = nannyEmail;
+          subject = 'Rezervacija otkazana — ' + parentName;
+          mailBody = parentName + ' je otkazala rezervaciju:\n\n' + summary + emailFooter();
+        } else if (newStatus === 'Otkazano' && role === 'nanny') {
+          to = parentEmail;
+          subject = 'Rezervacija otkazana — ' + nannyName;
+          mailBody = nannyName + ' je otkazala rezervaciju:\n\n' + summary + '\n\n' +
+            'Možete odabrati drugu dadilju u aplikaciji.' +
+            emailFooter();
+        }
+        // Intentionally NOT emailing on Potvrđeno → Završeno (completion) —
+        // covered by in-app review prompt + bot flow.
+
+        if (to && subject && mailBody) {
+          await safeSendEmail(base44, { to, subject, body: mailBody });
+        }
+      } catch (mailErr) {
+        console.error('updateBooking: notification email failed (non-fatal):', mailErr?.message);
+      }
     }
 
     return Response.json({ success: true, booking: updated });
