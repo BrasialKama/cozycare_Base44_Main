@@ -131,6 +131,12 @@ Deno.serve(async (req) => {
     }
 
     bookingData.status = 'Na \u010dekanju';
+    bookingData.status_history = [{
+      status: 'Na \u010dekanju',
+      at: new Date().toISOString(),
+      by_email: user.email,
+      by_role: 'parent',
+    }];
 
     const childrenCount = Number(bookingData.children_count);
     bookingData.children_count = Number.isFinite(childrenCount)

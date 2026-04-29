@@ -92,6 +92,28 @@
       "type": "string",
       "format": "date-time",
       "description": "Timestamp when parent raised the dispute. Null until disputed."
+    },
+    "status_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "by_email": {
+            "type": "string"
+          },
+          "by_role": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Append-only log of status transitions. Entry pushed by createBooking and every status-changing updateBooking call. Read-only for clients; only updated server-side."
     }
   },
   "required": [

@@ -235,6 +235,21 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Nema dopu\u0161tenih polja za promjenu.' }, { status: 400 });
     }
 
+    // Append to status_history if status is actually changing.
+    // Done server-side so client-supplied status_history values can never be trusted.
+    if (filtered.status && filtered.status !== booking.status) {
+      const existingHistory = Array.isArray(booking.status_history) ? booking.status_history : [];
+      filtered.status_history = [
+        ...existingHistory,
+        {
+          status: filtered.status,
+          at: new Date().toISOString(),
+          by_email: user.email,
+          by_role: role,
+        },
+      ];
+    }
+
     const updated = await base44.asServiceRole.entities.Booking.update(bookingId, filtered);
 
     // Early-completion flagging: nanny marked Potvrđeno → Završeno before scheduled end.

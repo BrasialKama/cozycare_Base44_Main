@@ -20,6 +20,7 @@ import FamilySettings from '@/pages/FamilySettings';
 import NannyProfile from '@/pages/NannyProfile';
 import NannyReviews from '@/pages/NannyReviews';
 import LeaveReview from '@/pages/LeaveReview';
+import BookingDetail from '@/pages/BookingDetail';
 import Earnings from '@/pages/Earnings';
 import SafetyCenter from '@/pages/SafetyCenter';
 import AdminDashboard from '@/pages/AdminDashboard';
@@ -74,6 +75,7 @@ const AuthenticatedApp = () => {
         <Route path="/Messages" element={<ErrorBoundary><Messages /></ErrorBoundary>} />
         <Route path="/FamilySettings" element={<ErrorBoundary><FamilySettings /></ErrorBoundary>} />
         <Route path="/LeaveReview" element={<ErrorBoundary><LeaveReview /></ErrorBoundary>} />
+        <Route path="/BookingDetail" element={<ErrorBoundary><BookingDetail /></ErrorBoundary>} />
 
         {/* Authenticated-but-any-role routes */}
         <Route element={<RequireRole allowed={['parent', 'nanny', 'admin']} />}>

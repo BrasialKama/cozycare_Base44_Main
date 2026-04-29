@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
@@ -34,6 +35,7 @@ const statusStyles = {
 export default function NannyBookings() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const { data: bookings = [], isLoading } = useQuery({
     queryKey: ['nannyBookingsAll', user?.email],
@@ -117,7 +119,10 @@ export default function NannyBookings() {
   const past = bookings.filter(b => ['Završeno', 'Otkazano', 'Odbijeno'].includes(b.status));
 
   const BookingCard = ({ booking }) => (
-    <Card className="p-4 border-border/60">
+    <Card
+      className="p-4 border-border/60 cursor-pointer hover:shadow-md transition-shadow"
+      onClick={() => navigate(`/BookingDetail?id=${booking.id}`)}
+    >
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
@@ -148,17 +153,18 @@ export default function NannyBookings() {
           <p className="font-display font-semibold text-primary">€{booking.total_price?.toFixed(2)}</p>
 
           {booking.status === 'Potvrđeno' && (
-            <div className="flex gap-1.5 mt-2 justify-end">
+            <div className="flex gap-1.5 mt-2 justify-end" onClick={(e) => e.stopPropagation()}>
               <Button
                 size="sm"
                 className="h-7 px-2.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
-                onClick={() =>
+                onClick={(e) => {
+                  e.stopPropagation();
                   updateMutation.mutate({
                     id: booking.id,
                     data: { status: 'Završeno' },
                     booking,
-                  })
-                }
+                  });
+                }}
               >
                 <CheckCircle2 className="w-3 h-3 mr-1" /> Završi
               </Button>
@@ -166,17 +172,18 @@ export default function NannyBookings() {
           )}
 
           {booking.status === 'Na čekanju' && (
-            <div className="flex gap-1.5 mt-2">
+            <div className="flex gap-1.5 mt-2" onClick={(e) => e.stopPropagation()}>
               <Button
                 size="sm"
                 className="h-7 px-2.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
-                onClick={() =>
+                onClick={(e) => {
+                  e.stopPropagation();
                   updateMutation.mutate({
                     id: booking.id,
                     data: { status: 'Potvrđeno' },
                     booking,
-                  })
-                }
+                  });
+                }}
               >
                 <Check className="w-3 h-3 mr-1" /> Prihvati
               </Button>
@@ -187,11 +194,12 @@ export default function NannyBookings() {
                     size="sm"
                     variant="outline"
                     className="h-7 px-2.5 text-xs border-destructive/40 text-destructive hover:bg-destructive/10"
+                    onClick={(e) => e.stopPropagation()}
                   >
                     <X className="w-3 h-3 mr-1" /> Odbij
                   </Button>
                 </AlertDialogTrigger>
-                <AlertDialogContent>
+                <AlertDialogContent onClick={(e) => e.stopPropagation()}>
                   <AlertDialogHeader>
                     <AlertDialogTitle>Jesi li siguran/sigurna?</AlertDialogTitle>
                     <AlertDialogDescription>
@@ -202,15 +210,16 @@ export default function NannyBookings() {
                     <AlertDialogCancel>Odustani</AlertDialogCancel>
                     <AlertDialogAction
                       className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
-                      onClick={() =>
+                      onClick={(e) => {
+                        e.stopPropagation();
                         updateMutation.mutate({
                           id: booking.id,
                           data: { status: 'Odbijeno' },
                           booking,
-                          })
-                          }
-                          >
-                          Odbij rezervaciju
+                        });
+                      }}
+                    >
+                      Odbij rezervaciju
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>

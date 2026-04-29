@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Calendar, Clock, Star, Heart, ArrowRight, Search, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -21,6 +21,7 @@ function BookingCard({ booking, onCancel, userEmail }) {
   const initial = (booking.nanny_name || 'N')[0];
   const [disputeOpen, setDisputeOpen] = useState(false);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const DISPUTE_WINDOW_DAYS = 7;
   const withinDisputeWindow = (() => {
@@ -31,7 +32,10 @@ function BookingCard({ booking, onCancel, userEmail }) {
   })();
 
   return (
-    <div className="bg-card border border-border/50 rounded-2xl overflow-hidden hover:shadow-md hover:border-primary/15 transition-all duration-200">
+    <div
+      className="bg-card border border-border/50 rounded-2xl overflow-hidden hover:shadow-md hover:border-primary/15 transition-all duration-200 cursor-pointer"
+      onClick={() => navigate(`/BookingDetail?id=${booking.id}`)}
+    >
       <div className="p-5">
         <div className="flex items-start gap-4">
           {/* Nanny avatar */}
@@ -78,13 +82,13 @@ function BookingCard({ booking, onCancel, userEmail }) {
               variant="ghost"
               size="sm"
               className="text-xs text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl"
-              onClick={() => onCancel(booking.id)}
+              onClick={(e) => { e.stopPropagation(); onCancel(booking.id); }}
             >
               Otkaži rezervaciju
             </Button>
           )}
           {booking.status === 'Odbijeno' && (
-            <Link to="/FindNannies">
+            <Link to="/FindNannies" onClick={(e) => e.stopPropagation()}>
               <Button variant="ghost" size="sm" className="text-xs text-primary hover:bg-primary/8 rounded-xl">
                 <Search className="w-3 h-3 mr-1.5" /> Pronađi drugu dadilju
               </Button>
@@ -101,12 +105,12 @@ function BookingCard({ booking, onCancel, userEmail }) {
                   variant="ghost"
                   size="sm"
                   className="text-xs text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl"
-                  onClick={() => setDisputeOpen(true)}
+                  onClick={(e) => { e.stopPropagation(); setDisputeOpen(true); }}
                 >
                   <AlertTriangle className="w-3 h-3 mr-1.5" /> Prijavi problem
                 </Button>
               ) : null}
-              <Link to={`/LeaveReview?booking_id=${booking.id}`}>
+              <Link to={`/LeaveReview?booking_id=${booking.id}`} onClick={(e) => e.stopPropagation()}>
                 <Button variant="ghost" size="sm" className="text-xs text-primary hover:bg-primary/8 rounded-xl">
                   <Star className="w-3 h-3 mr-1.5 fill-current" /> Ostavi recenziju
                 </Button>
