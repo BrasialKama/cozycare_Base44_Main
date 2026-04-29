@@ -55,6 +55,10 @@ export default function LeaveReview() {
       toast.success('Hvala na vašoj recenziji!');
       navigate('/MyBookings');
     },
+    onError: (err) => {
+      console.error('submitReview failed:', err);
+      toast.error(err?.message || 'Recenzija nije poslana. Pokušajte ponovno.');
+    },
   });
 
   if (!bookingId) {

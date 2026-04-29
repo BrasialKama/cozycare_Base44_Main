@@ -149,6 +149,10 @@ export default function MyBookings() {
       queryClient.invalidateQueries({ queryKey: ['parentBookings', user?.email] });
       toast.success('Rezervacija otkazana');
     },
+    onError: (err) => {
+      console.error('cancelBooking failed:', err);
+      toast.error(err?.message || 'Otkazivanje nije uspjelo. Pokušajte ponovno.');
+    },
   });
 
   const upcoming = bookings.filter(b => ['Na čekanju', 'Potvrđeno'].includes(b.status));

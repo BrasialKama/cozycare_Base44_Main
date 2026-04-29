@@ -1,6 +1,14 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
-// ───────────────────────── Email helpers (inlined — Base44 functions cannot share local modules) ─────────────────────────
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━ EMAIL HELPERS (MIRRORED) ━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Base44 functions are deployed as isolated units and cannot import shared modules.
+// This block is duplicated VERBATIM in:
+//   - functions/createBooking/entry.ts
+//   - functions/updateBooking/entry.ts
+// If you change this block in one file, you MUST apply the same change to the other.
+// Keep these copies byte-for-byte identical to prevent silent behavioural drift.
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 const BRAND_NAME = 'CozyCare';
 const SUPPORT_EMAIL = 'podrska@cozycare.hr';
 
@@ -37,7 +45,8 @@ async function safeSendEmail(base44, { to, subject, body }) {
     return { sent: false, reason: err?.message || 'send_error' };
   }
 }
-// ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+// ━━━━━━━━━━━━━━━━━━━━━━ END MIRRORED HELPERS ━━━━━━━━━━━━━━━━━━━━━━
 
 function parseTimeToMinutes(t) {
   if (!t) return null;

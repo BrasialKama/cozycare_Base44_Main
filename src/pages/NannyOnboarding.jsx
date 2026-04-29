@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 import { useMutation } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { toast } from 'sonner';
 import {
   ArrowRight, ArrowLeft, User, FileText, Camera, CheckCircle2,
   Heart, Upload, Sparkles, Shield, Star
@@ -186,6 +187,10 @@ export default function NannyOnboarding() {
       await refreshUser();
     },
     onSuccess: () => navigate('/Home'),
+    onError: (err) => {
+      console.error('NannyOnboarding submit failed:', err);
+      toast.error(err?.message || 'Slanje prijave nije uspjelo. Provjerite unose i pokušajte ponovno.');
+    },
   });
 
   // Show loading while auth is resolving or while redirecting unauthenticated users.

@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import useUnreadMessages from '@/hooks/useUnreadMessages';
 import SwipeableConversationItem from '@/components/messages/SwipeableConversationItem';
+import { toast } from 'sonner';
 
 export default function Messages() {
   const [searchParams] = useSearchParams();
@@ -103,6 +104,10 @@ export default function Messages() {
       setNewMessage('');
       refetchMessages();
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
+    },
+    onError: (err) => {
+      console.error('sendMessage failed:', err);
+      toast.error('Poruka nije poslana. Pokušajte ponovno.');
     },
   });
 

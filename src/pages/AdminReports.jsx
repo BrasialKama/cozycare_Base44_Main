@@ -32,6 +32,10 @@ export default function AdminReports() {
       queryClient.invalidateQueries({ queryKey: ['adminReports'] });
       toast.success('Prijava ažurirana');
     },
+    onError: (err) => {
+      console.error('updateReport failed:', err);
+      toast.error('Ažuriranje nije uspjelo.');
+    },
   });
 
   return (
