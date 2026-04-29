@@ -62,7 +62,10 @@ export default function SafetyCenter() {
         });
       } catch (invokeErr) {
         console.error('[SafetyCenter] invoke threw:', invokeErr);
-        // Common shapes: invokeErr.response.data?.error, invokeErr.message
+        const status = invokeErr?.response?.status || invokeErr?.status;
+        if (status === 401 || invokeErr?.message?.includes('401') || invokeErr?.message?.includes('Authentication')) {
+          throw new Error('Vaša sesija je istekla. Molimo osvježite stranicu i prijavite se ponovno.');
+        }
         const serverErr = invokeErr?.response?.data?.error || invokeErr?.data?.error;
         throw new Error(serverErr || invokeErr?.message || 'Veza s poslužiteljem nije uspjela.');
       }

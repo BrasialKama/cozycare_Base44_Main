@@ -74,7 +74,11 @@ const AuthenticatedApp = () => {
         <Route path="/Messages" element={<ErrorBoundary><Messages /></ErrorBoundary>} />
         <Route path="/FamilySettings" element={<ErrorBoundary><FamilySettings /></ErrorBoundary>} />
         <Route path="/LeaveReview" element={<ErrorBoundary><LeaveReview /></ErrorBoundary>} />
-        <Route path="/SafetyCenter" element={<ErrorBoundary><SafetyCenter /></ErrorBoundary>} />
+
+        {/* Authenticated-but-any-role routes */}
+        <Route element={<RequireRole allowed={['parent', 'nanny', 'admin']} />}>
+          <Route path="/SafetyCenter" element={<ErrorBoundary><SafetyCenter /></ErrorBoundary>} />
+        </Route>
 
         {/* Admin-only routes */}
         <Route element={<RequireRole allowed={['admin']} />}>
