@@ -53,12 +53,24 @@ export default function SafetyCenter() {
 
   const reportMutation = useMutation({
     mutationFn: async () => {
-      const resp = await base44.functions.invoke('createSafetyReport', {
-        category,
-        description,
-      });
+      console.log('[SafetyCenter] invoking createSafetyReport with:', { category, descriptionLength: description.length });
+      let resp;
+      try {
+        resp = await base44.functions.invoke('createSafetyReport', {
+          category,
+          description,
+        });
+      } catch (invokeErr) {
+        console.error('[SafetyCenter] invoke threw:', invokeErr);
+        // Common shapes: invokeErr.response.data?.error, invokeErr.message
+        const serverErr = invokeErr?.response?.data?.error || invokeErr?.data?.error;
+        throw new Error(serverErr || invokeErr?.message || 'Veza s poslužiteljem nije uspjela.');
+      }
+      console.log('[SafetyCenter] response:', resp);
       const data = resp?.data || resp;
-      if (!data?.success) throw new Error(data?.error || 'Prijava nije poslana.');
+      if (!data?.success) {
+        throw new Error(data?.error || 'Prijava nije poslana.');
+      }
       return data;
     },
     onSuccess: () => {
@@ -68,6 +80,7 @@ export default function SafetyCenter() {
       setDescription('');
     },
     onError: (err) => {
+      console.error('[SafetyCenter] mutation onError:', err);
       toast.error(err?.message || 'Prijava nije poslana.');
     },
   });

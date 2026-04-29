@@ -35,17 +35,26 @@ export default function LeaveReview() {
 
   const submitMutation = useMutation({
     mutationFn: async () => {
-      const res = await base44.functions.invoke('createReview', {
-        review: {
-          booking_id: bookingId,
-          parent_name: user.display_name || user.full_name,
-          rating,
-          warmth_rating: warmth,
-          reliability_rating: reliability,
-          communication_rating: communication,
-          comment,
-        },
-      });
+      console.log('[LeaveReview] invoking createReview');
+      let res;
+      try {
+        res = await base44.functions.invoke('createReview', {
+          review: {
+            booking_id: bookingId,
+            parent_name: user.display_name || user.full_name,
+            rating,
+            warmth_rating: warmth,
+            reliability_rating: reliability,
+            communication_rating: communication,
+            comment,
+          },
+        });
+      } catch (invokeErr) {
+        console.error('[LeaveReview] invoke threw:', invokeErr);
+        const serverErr = invokeErr?.response?.data?.error || invokeErr?.data?.error;
+        throw new Error(serverErr || invokeErr?.message || 'Veza s poslužiteljem nije uspjela.');
+      }
+      console.log('[LeaveReview] response:', res);
       const data = res?.data || res;
       if (!data?.success) {
         throw new Error(data?.error || 'Recenzija nije poslana.');
@@ -56,7 +65,7 @@ export default function LeaveReview() {
       navigate('/MyBookings');
     },
     onError: (err) => {
-      console.error('submitReview failed:', err);
+      console.error('[LeaveReview] mutation onError:', err);
       toast.error(err?.message || 'Recenzija nije poslana. Pokušajte ponovno.');
     },
   });
