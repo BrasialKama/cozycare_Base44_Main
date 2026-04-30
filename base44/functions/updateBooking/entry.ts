@@ -90,16 +90,10 @@ function isEarlyCompletion(booking) {
   }
 }
 
-// Best-effort side effect: create a Report and notify parent via bot chat.
-// Never throws — a failure here must not undo the booking completion.
+// Best-effort side effect: notify parent via bot chat that the booking was marked
+// completed early. Admins are NOT auto-notified — a Report is only created when the
+// parent disputes via the dispute flow. Never throws.
 async function flagEarlyCompletion(base44, booking) {
-  try {
-    // Report.create removed intentionally — admins should only get a Report when the
-    // parent actually disputes via the dispute flow. Bot message to parent (below)
-    // remains so the parent is alerted and can choose to dispute.
-  } catch (err) {
-    console.error('flagEarlyCompletion: pre-notify step failed (non-fatal):', err?.message);
-  }
 
   // Notify parent via bot conversation — best-effort.
   try {
@@ -145,6 +139,73 @@ async function flagEarlyCompletion(base44, booking) {
     });
   } catch (err) {
     console.error('flagEarlyCompletion: parent notification failed (non-fatal):', err?.message);
+  }
+}
+
+async function notifyOtherPartyOfStatusChange(base44, booking, oldStatus, newStatus, role) {
+  let recipientEmail = null;
+  let recipientName = null;
+  let message = null;
+
+  const otherPartyName = booking.nanny_name || 'dadilja';
+  const familyName = booking.family_display_name || booking.family_name || 'obitelj';
+  const dateLabel = booking.date + (booking.start_time ? ' ' + booking.start_time : '');
+
+  if (newStatus === 'Odbijeno' && role === 'nanny') {
+    recipientEmail = booking.family_user_email;
+    recipientName = familyName;
+    message = 'Vaš zahtjev za rezervaciju (' + dateLabel + ') s dadiljom ' + otherPartyName +
+      ' nije prihvaćen. Možete pretražiti druge dostupne dadilje u aplikaciji.';
+  } else if (newStatus === 'Otkazano' && role === 'parent') {
+    recipientEmail = booking.nanny_user_email;
+    recipientName = otherPartyName;
+    message = 'Obitelj ' + familyName + ' je otkazala rezervaciju za ' + dateLabel + '.' +
+      (oldStatus === 'Potvr\u0111eno' ? ' (Rezervacija je bila potvrđena.)' : '');
+  } else if (newStatus === 'Otkazano' && role === 'nanny') {
+    recipientEmail = booking.family_user_email;
+    recipientName = familyName;
+    message = 'Dadilja ' + otherPartyName + ' je otkazala potvrđenu rezervaciju za ' + dateLabel + '. ' +
+      'Pretražite druge dostupne dadilje u aplikaciji.';
+  } else {
+    return;
+  }
+
+  if (!recipientEmail) return;
+
+  try {
+    const conversationKey = [BOT_EMAIL.toLowerCase(), String(recipientEmail).toLowerCase()].sort().join('__');
+    const existing = await base44.asServiceRole.entities.Conversation.filter(
+      { conversation_key: conversationKey },
+      '-updated_date',
+      1
+    );
+    let conv = existing?.[0];
+    if (!conv) {
+      conv = await base44.asServiceRole.entities.Conversation.create({
+        conversation_key: conversationKey,
+        participant_emails: [BOT_EMAIL, recipientEmail],
+        participant_names: [BOT_NAME, recipientName],
+        last_message: message,
+        last_message_date: new Date().toISOString(),
+        hidden_for: [],
+      });
+    } else {
+      await base44.asServiceRole.entities.Conversation.update(conv.id, {
+        last_message: message,
+        last_message_date: new Date().toISOString(),
+        hidden_for: (conv.hidden_for || []).filter(e => e !== recipientEmail),
+      });
+    }
+    await base44.asServiceRole.entities.Message.create({
+      conversation_id: String(conv.id),
+      sender_email: BOT_EMAIL,
+      sender_name: BOT_NAME,
+      receiver_email: recipientEmail,
+      content: message,
+      read: false,
+    });
+  } catch (err) {
+    console.error('notifyOtherPartyOfStatusChange failed (non-fatal):', err?.message);
   }
 }
 
@@ -248,6 +309,11 @@ Deno.serve(async (req) => {
       && filtered.status === 'Zavr\u0161eno'
       && isEarlyCompletion(booking)) {
       await flagEarlyCompletion(base44, updated);
+    }
+
+    // Best-effort: bot notification for cancel/decline transitions.
+    if (filtered.status && filtered.status !== booking.status) {
+      await notifyOtherPartyOfStatusChange(base44, updated, booking.status, filtered.status, role);
     }
 
     // Best-effort email on meaningful status transitions.

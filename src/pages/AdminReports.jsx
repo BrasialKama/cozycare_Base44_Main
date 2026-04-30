@@ -27,14 +27,19 @@ export default function AdminReports() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, status }) => base44.entities.Report.update(id, { status }),
+    mutationFn: async ({ id, status }) => {
+      const resp = await base44.functions.invoke('updateReportStatus', { report_id: id, status });
+      const data = resp?.data || resp;
+      if (!data?.success) throw new Error(data?.error || 'Ažuriranje nije uspjelo.');
+      return data;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminReports'] });
       toast.success('Prijava ažurirana');
     },
     onError: (err) => {
       console.error('updateReport failed:', err);
-      toast.error('Ažuriranje nije uspjelo.');
+      toast.error(err?.message || 'Ažuriranje nije uspjelo.');
     },
   });
 
