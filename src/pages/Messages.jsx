@@ -4,12 +4,26 @@ import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { MessageCircle, Send, ArrowLeft, Heart, Pencil, Search } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { format, parseISO, isToday, isYesterday } from 'date-fns';
+import { hr } from 'date-fns/locale';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import useUnreadMessages from '@/hooks/useUnreadMessages';
 import SwipeableConversationItem from '@/components/messages/SwipeableConversationItem';
 import { toast } from 'sonner';
+
+function formatMessageTime(iso) {
+  if (!iso) return '';
+  try {
+    const d = parseISO(iso);
+    if (isToday(d)) return format(d, 'HH:mm', { locale: hr });
+    if (isYesterday(d)) return 'jučer ' + format(d, 'HH:mm', { locale: hr });
+    return format(d, 'd. MMM HH:mm', { locale: hr });
+  } catch {
+    return '';
+  }
+}
 
 export default function Messages() {
   const [searchParams] = useSearchParams();
@@ -276,12 +290,15 @@ export default function Messages() {
                           <span className="text-[10px] font-bold text-primary">{otherName[0]}</span>
                         </div>
                       )}
-                      <div className={`max-w-[72%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
-                        isMine
-                          ? 'bg-primary text-primary-foreground rounded-br-md shadow-sm shadow-primary/20'
-                          : 'bg-muted/70 text-foreground rounded-bl-md'
-                      }`}>
-                        {msg.content}
+                      <div className={`max-w-[72%] flex flex-col ${isMine ? 'items-end' : 'items-start'}`}>
+                        <div className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
+                          isMine
+                            ? 'bg-primary text-primary-foreground rounded-br-md shadow-sm shadow-primary/20'
+                            : 'bg-muted/70 text-foreground rounded-bl-md'
+                        }`}>
+                          {msg.content}
+                        </div>
+                        <p className="text-[10px] mt-1 opacity-50 text-muted-foreground">{formatMessageTime(msg.created_date)}</p>
                       </div>
                     </div>
                   );

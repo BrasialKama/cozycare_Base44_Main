@@ -26,7 +26,7 @@ import SafetyCenter from '@/pages/SafetyCenter';
 import AdminDashboard from '@/pages/AdminDashboard';
 import AdminApplications from '@/pages/AdminApplications';
 import AdminBookings from '@/pages/AdminBookings';
-import AdminReports from '@/pages/AdminReports';
+import AdminReports from '@/pages/AdminReports.jsx';
 import Join from '@/pages/Join';
 import Landing from '@/pages/Landing';
 import NannyPortal from '@/pages/NannyPortal';

@@ -8,6 +8,17 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import DisputeBookingDialog from '@/components/bookings/DisputeBookingDialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 const STATUS_STYLES = {
   'Na čekanju': 'bg-peach/50 text-peach-dark',
@@ -25,10 +36,21 @@ function BookingCard({ booking, onCancel, userEmail }) {
 
   const DISPUTE_WINDOW_DAYS = 7;
   const withinDisputeWindow = (() => {
-    if (booking.status !== 'Završeno') return false;
     if (!booking.date) return false;
     const ageDays = (Date.now() - Date.parse(booking.date)) / (1000 * 60 * 60 * 24);
-    return ageDays <= DISPUTE_WINDOW_DAYS;
+    if (ageDays > DISPUTE_WINDOW_DAYS) return false;
+
+    // Završeno: parent can always dispute within window
+    if (booking.status === 'Završeno') return true;
+
+    // Otkazano: parent can dispute IF the nanny was the one who cancelled
+    if (booking.status === 'Otkazano') {
+      const history = Array.isArray(booking.status_history) ? booking.status_history : [];
+      const lastTransition = [...history].reverse().find(h => h.status === 'Otkazano');
+      return lastTransition?.by_role === 'nanny';
+    }
+
+    return false;
   })();
 
   return (
@@ -76,7 +98,7 @@ function BookingCard({ booking, onCancel, userEmail }) {
       </div>
 
       {/* Actions */}
-      {(booking.status === 'Na čekanju' || booking.status === 'Završeno' || booking.status === 'Odbijeno') && (
+      {(booking.status === 'Na čekanju' || booking.status === 'Potvrđeno' || booking.status === 'Završeno' || booking.status === 'Odbijeno' || (booking.status === 'Otkazano' && withinDisputeWindow)) && (
         <div className="border-t border-border/40 px-5 py-3 flex justify-end gap-2 bg-muted/20">
           {booking.status === 'Na čekanju' && (
             <Button
@@ -87,6 +109,53 @@ function BookingCard({ booking, onCancel, userEmail }) {
             >
               Otkaži rezervaciju
             </Button>
+          )}
+          {booking.status === 'Potvrđeno' && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-xs text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Otkaži rezervaciju
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Otkazati potvrđenu rezervaciju?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Dadilja se već pripremila za ovaj termin. Otkazujte samo u opravdanim slučajevima. Dadilja će biti odmah obaviještena.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Ne, ostavi</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                    onClick={(e) => { e.stopPropagation(); onCancel(booking.id); }}
+                  >
+                    Da, otkaži
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+          {booking.status === 'Otkazano' && withinDisputeWindow && (
+            booking.disputed ? (
+              <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200">
+                <CheckCircle2 className="w-3 h-3" /> Prijavljeno — CozyCare tim provjerava
+              </span>
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl"
+                onClick={(e) => { e.stopPropagation(); setDisputeOpen(true); }}
+              >
+                <AlertTriangle className="w-3 h-3 mr-1.5" /> Prijavi problem
+              </Button>
+            )
           )}
           {booking.status === 'Odbijeno' && (
             <Link to="/FindNannies" onClick={(e) => e.stopPropagation()}>

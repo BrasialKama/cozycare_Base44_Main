@@ -60,12 +60,15 @@ Deno.serve(async (req) => {
         const categoryLabel = REPORT_CATEGORY_LABELS[report.category] || 'prijava';
         const statusLabel = STATUS_LABELS[status] || status;
         let message = 'Status vaše prijave (' + categoryLabel + ') promijenjen je: ' + statusLabel + '.';
-        if (report.admin_notes) {
-          // Include admin's note as the verdict context.
+        const verdictNote = (body?.verdict_note || '').toString().trim();
+        if (verdictNote) {
+          // Admin's clean verdict note — preferred over raw admin_notes audit log
+          message += '\n\nNapomena tima: ' + verdictNote;
+        } else if (report.admin_notes) {
+          // Fallback to admin_notes if no explicit verdict was written
           message += '\n\nNapomena tima: ' + report.admin_notes;
         }
         if (report.booking_id) {
-          // Deep link so user can see the full booking + report side-by-side.
           message += '\n\nPogledajte detalje: https://cozy-care-nest.base44.app/BookingDetail?id=' + report.booking_id;
         }
         message += '\n\nAko imate dodatna pitanja, javite nam.';

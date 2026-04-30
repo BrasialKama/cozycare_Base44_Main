@@ -10,7 +10,7 @@ import {
   ArrowLeft, Calendar, Clock, MapPin, Users, Euro, MessageCircle,
   AlertTriangle, Star, ChevronRight, Shield, CheckCircle2, History
 } from 'lucide-react';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, isToday, isYesterday } from 'date-fns';
 import { hr } from 'date-fns/locale';
 
 const STATUS_BADGE_TONE = {
@@ -44,6 +44,18 @@ function formatTimestamp(iso) {
     return format(parseISO(iso), "d. MMM yyyy. 'u' HH:mm", { locale: hr });
   } catch {
     return iso;
+  }
+}
+
+function formatMessageTime(iso) {
+  if (!iso) return '';
+  try {
+    const d = parseISO(iso);
+    if (isToday(d)) return format(d, 'HH:mm', { locale: hr });
+    if (isYesterday(d)) return 'jučer ' + format(d, 'HH:mm', { locale: hr });
+    return format(d, 'd. MMM HH:mm', { locale: hr });
+  } catch {
+    return '';
   }
 }
 
@@ -236,13 +248,16 @@ export default function BookingDetail() {
                 const fromMe = m.sender_email === user?.email;
                 return (
                   <div key={m.id} className={`flex ${fromMe ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[80%] rounded-xl px-3 py-2 text-sm ${
-                      fromMe ? 'bg-primary/10 text-foreground' : 'bg-muted text-foreground'
-                    }`}>
-                      <p className="text-[10px] font-semibold mb-0.5 opacity-70">
-                        {fromMe ? 'Vi' : (m.sender_name || otherPartyName)}
-                      </p>
-                      <p className="whitespace-pre-wrap">{m.content}</p>
+                    <div className={`max-w-[80%] flex flex-col ${fromMe ? 'items-end' : 'items-start'}`}>
+                      <div className={`rounded-xl px-3 py-2 text-sm ${
+                        fromMe ? 'bg-primary/10 text-foreground' : 'bg-muted text-foreground'
+                      }`}>
+                        <p className="text-[10px] font-semibold mb-0.5 opacity-70">
+                          {fromMe ? 'Vi' : (m.sender_name || otherPartyName)}
+                        </p>
+                        <p className="whitespace-pre-wrap">{m.content}</p>
+                      </div>
+                      <p className="text-[10px] mt-1 opacity-50 text-muted-foreground">{formatMessageTime(m.created_date)}</p>
                     </div>
                   </div>
                 );

@@ -49,9 +49,17 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Ovu rezervaciju ne možete prijaviti.' }, { status: 403 });
     }
 
-    // Must be a completed booking
-    if (booking.status !== 'Završeno') {
-      return Response.json({ error: 'Prijava je moguća samo za završene rezervacije.' }, { status: 400 });
+    // Must be a completed booking, OR a booking the nanny cancelled (parent disputes nanny no-show/late-cancel).
+    // Parent-cancelled bookings are not disputable — the parent did it themselves.
+    if (booking.status !== 'Završeno' && booking.status !== 'Otkazano') {
+      return Response.json({ error: 'Prijava je moguća samo za završene ili otkazane rezervacije.' }, { status: 400 });
+    }
+    if (booking.status === 'Otkazano') {
+      const history = Array.isArray(booking.status_history) ? booking.status_history : [];
+      const lastCancelEntry = [...history].reverse().find(h => h.status === 'Otkazano');
+      if (lastCancelEntry?.by_role !== 'nanny') {
+        return Response.json({ error: 'Prijava nije moguća za rezervacije koje ste sami otkazali.' }, { status: 400 });
+      }
     }
 
     // Must be within the dispute window (counted from booking date, not completion time)
