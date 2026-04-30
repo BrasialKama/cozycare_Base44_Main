@@ -118,6 +118,13 @@ export default function BookingDetail() {
         <ArrowLeft className="w-4 h-4 mr-1.5" /> Natrag
       </Button>
 
+      {viewer_role === 'admin' && (
+        <div className="bg-amber-50/80 border border-amber-200/60 rounded-xl px-4 py-2 text-xs text-amber-900 flex items-center gap-2">
+          <Shield className="w-3.5 h-3.5" />
+          Pregled administratora — vidite sve podatke i sve prijave o ovoj rezervaciji.
+        </div>
+      )}
+
       {/* Header card — booking essentials */}
       <Card className="p-6 border-border/60 rounded-3xl">
         <div className="flex items-start justify-between gap-3 mb-4">
@@ -205,15 +212,14 @@ export default function BookingDetail() {
       )}
 
       {/* Chat preview + link */}
-      {viewer_role !== 'admin' && (
-        <Card className="p-5 border-border/60 rounded-2xl">
+      <Card className="p-5 border-border/60 rounded-2xl">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <MessageCircle className="w-4 h-4 text-muted-foreground" />
               <h2 className="font-display font-semibold text-foreground">Razgovor</h2>
             </div>
             {conversation && (
-              <Link to="/Messages">
+              <Link to={`/Messages?conversation_id=${conversation.id}`}>
                 <Button variant="ghost" size="sm" className="text-primary text-xs">
                   Otvori razgovor <ChevronRight className="w-3 h-3 ml-1" />
                 </Button>
@@ -249,7 +255,6 @@ export default function BookingDetail() {
             </div>
           )}
         </Card>
-      )}
 
       {/* Reports related to this booking */}
       {reports.length > 0 && (
@@ -310,7 +315,7 @@ export default function BookingDetail() {
             </Link>
           )}
           {viewer_role !== 'admin' && (
-            <Link to="/Messages">
+            <Link to={conversation ? `/Messages?conversation_id=${conversation.id}` : '/Messages'}>
               <Button size="sm" variant="outline" className="rounded-xl">
                 <MessageCircle className="w-3.5 h-3.5 mr-1.5" /> {otherPartyEmail ? `Poruka — ${otherPartyLabel}` : 'Poruke'}
               </Button>

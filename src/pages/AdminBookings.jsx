@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Calendar, Clock } from 'lucide-react';
@@ -16,6 +17,7 @@ const statusStyles = {
 };
 
 export default function AdminBookings() {
+  const navigate = useNavigate();
   const { data: bookings = [], isLoading } = useQuery({
     queryKey: ['adminBookings'],
     queryFn: () => base44.entities.Booking.list('-created_date', 100),
@@ -39,7 +41,11 @@ export default function AdminBookings() {
       ) : (
         <div className="space-y-3">
           {bookings.map(b => (
-            <Card key={b.id} className="p-4 border-border/60">
+            <Card
+              key={b.id}
+              className="p-4 border-border/60 cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => navigate(`/BookingDetail?id=${b.id}`)}
+            >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">

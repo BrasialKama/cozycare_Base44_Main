@@ -94,22 +94,11 @@ function isEarlyCompletion(booking) {
 // Never throws — a failure here must not undo the booking completion.
 async function flagEarlyCompletion(base44, booking) {
   try {
-    const description =
-      'Dadilja je ozna\u010dila rezervaciju kao zavr\u0161enu prije dogovorenog vremena. ' +
-      'Rezervacija: ' + booking.date + ' ' + booking.start_time + '\u2013' + booking.end_time + '. ' +
-      'Obitelj: ' + (booking.family_display_name || booking.family_name || booking.family_user_email || 'nepoznato') + '. ' +
-      'Dadilja: ' + (booking.nanny_name || booking.nanny_user_email || 'nepoznato') + '.';
-
-    await base44.asServiceRole.entities.Report.create({
-      reporter_email: BOT_EMAIL,
-      reported_email: booking.nanny_user_email,
-      booking_id: booking.id,
-      category: 'early_completion',
-      description,
-      status: 'open',
-    });
+    // Report.create removed intentionally — admins should only get a Report when the
+    // parent actually disputes via the dispute flow. Bot message to parent (below)
+    // remains so the parent is alerted and can choose to dispute.
   } catch (err) {
-    console.error('flagEarlyCompletion: Report.create failed (non-fatal):', err?.message);
+    console.error('flagEarlyCompletion: pre-notify step failed (non-fatal):', err?.message);
   }
 
   // Notify parent via bot conversation — best-effort.

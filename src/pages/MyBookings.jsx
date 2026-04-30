@@ -32,6 +32,7 @@ function BookingCard({ booking, onCancel, userEmail }) {
   })();
 
   return (
+    <>
     <div
       className="bg-card border border-border/50 rounded-2xl overflow-hidden hover:shadow-md hover:border-primary/15 transition-all duration-200 cursor-pointer"
       onClick={() => navigate(`/BookingDetail?id=${booking.id}`)}
@@ -119,13 +120,14 @@ function BookingCard({ booking, onCancel, userEmail }) {
           )}
         </div>
       )}
-      <DisputeBookingDialog
-        booking={booking}
-        open={disputeOpen}
-        onOpenChange={setDisputeOpen}
-        onSuccess={() => queryClient.invalidateQueries({ queryKey: ['parentBookings', userEmail] })}
-      />
     </div>
+    <DisputeBookingDialog
+      booking={booking}
+      open={disputeOpen}
+      onOpenChange={setDisputeOpen}
+      onSuccess={() => queryClient.invalidateQueries({ queryKey: ['parentBookings', userEmail] })}
+    />
+    </>
   );
 }
 
