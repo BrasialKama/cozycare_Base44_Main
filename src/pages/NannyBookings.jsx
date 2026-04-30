@@ -154,6 +154,42 @@ export default function NannyBookings() {
 
           {booking.status === 'Potvrđeno' && (
             <div className="flex gap-1.5 mt-2 justify-end" onClick={(e) => e.stopPropagation()}>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 px-2.5 text-xs border-destructive/40 text-destructive hover:bg-destructive/10"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <X className="w-3 h-3 mr-1" /> Otkaži
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Otkazati potvrđenu rezervaciju?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Obitelj se već pripremila za ovaj termin. Otkazivanje potvrđene rezervacije može utjecati na vašu ocjenu pouzdanosti. Otkazujte samo u opravdanim slučajevima (bolest, hitan slučaj). Obitelj će biti odmah obaviještena.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Ne, ostavi</AlertDialogCancel>
+                    <AlertDialogAction
+                      className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        updateMutation.mutate({
+                          id: booking.id,
+                          data: { status: 'Otkazano' },
+                          booking,
+                        });
+                      }}
+                    >
+                      Da, otkaži
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
               <Button
                 size="sm"
                 className="h-7 px-2.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"

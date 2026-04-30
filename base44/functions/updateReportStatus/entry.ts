@@ -59,8 +59,16 @@ Deno.serve(async (req) => {
       try {
         const categoryLabel = REPORT_CATEGORY_LABELS[report.category] || 'prijava';
         const statusLabel = STATUS_LABELS[status] || status;
-        const message = 'Status vaše prijave (' + categoryLabel + ') promijenjen je: ' + statusLabel + '. ' +
-          'Ako imate dodatna pitanja, javite nam.';
+        let message = 'Status vaše prijave (' + categoryLabel + ') promijenjen je: ' + statusLabel + '.';
+        if (report.admin_notes) {
+          // Include admin's note as the verdict context.
+          message += '\n\nNapomena tima: ' + report.admin_notes;
+        }
+        if (report.booking_id) {
+          // Deep link so user can see the full booking + report side-by-side.
+          message += '\n\nPogledajte detalje: https://cozy-care-nest.base44.app/BookingDetail?id=' + report.booking_id;
+        }
+        message += '\n\nAko imate dodatna pitanja, javite nam.';
         const conversationKey = [BOT_EMAIL.toLowerCase(), String(reporterEmail).toLowerCase()].sort().join('__');
         const existing = await base44.asServiceRole.entities.Conversation.filter(
           { conversation_key: conversationKey },
