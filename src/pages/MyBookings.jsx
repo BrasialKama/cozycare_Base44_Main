@@ -7,6 +7,18 @@ import { Calendar, Clock, Star, Heart, ArrowRight, Search, AlertTriangle, CheckC
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
+import { format, parseISO } from 'date-fns';
+import { hr } from 'date-fns/locale';
+
+function formatCreated(iso) {
+  if (!iso) return '';
+  try {
+    const normalized = iso.endsWith('Z') || /[+-]\d{2}:\d{2}$/.test(iso) ? iso : iso + 'Z';
+    return format(parseISO(normalized), 'd. MMM yyyy.', { locale: hr });
+  } catch {
+    return '';
+  }
+}
 import DisputeBookingDialog from '@/components/bookings/DisputeBookingDialog';
 import {
   AlertDialog,
@@ -87,6 +99,11 @@ function BookingCard({ booking, onCancel, userEmail }) {
                 {booking.duration_hours ? ` (${booking.duration_hours}h)` : ''}
               </span>
             </div>
+            {booking.created_date && (
+              <p className="text-[11px] text-muted-foreground/70 mt-2">
+                Kreirano {formatCreated(booking.created_date)}
+              </p>
+            )}
 
             {booking.message && (
               <p className="text-xs text-muted-foreground mt-2.5 italic line-clamp-1 leading-relaxed">
@@ -233,6 +250,24 @@ export default function MyBookings() {
   const upcoming = bookings.filter(b => ['Na čekanju', 'Potvrđeno'].includes(b.status));
   const past = bookings.filter(b => ['Završeno', 'Otkazano', 'Odbijeno'].includes(b.status));
 
+  // Group past bookings by status, most-recently-created first within each group.
+  const pastByStatus = (() => {
+    const groups = { 'Završeno': [], 'Otkazano': [], 'Odbijeno': [] };
+    for (const b of past) {
+      if (groups[b.status]) groups[b.status].push(b);
+    }
+    for (const k of Object.keys(groups)) {
+      groups[k].sort((a, b) => Date.parse(b.created_date) - Date.parse(a.created_date));
+    }
+    return groups;
+  })();
+  const PAST_SECTION_ORDER = ['Završeno', 'Otkazano', 'Odbijeno'];
+  const PAST_SECTION_LABELS = {
+    'Završeno': 'Završene',
+    'Otkazano': 'Otkazane',
+    'Odbijeno': 'Odbijene',
+  };
+
   return (
     <div className="space-y-8 pb-8">
       {/* Header */}
@@ -292,7 +327,20 @@ export default function MyBookings() {
               </div>
             ) : (
               <div className="space-y-3">
-                {past.map(b => <BookingCard key={b.id} booking={b} onCancel={cancelMutation.mutate} userEmail={user?.email} />)}
+                {PAST_SECTION_ORDER.map(status => {
+                  const items = pastByStatus[status] || [];
+                  if (items.length === 0) return null;
+                  return (
+                    <div key={status} className="space-y-3">
+                      <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mt-6 first:mt-0 mb-2">
+                        {PAST_SECTION_LABELS[status]} ({items.length})
+                      </h3>
+                      {items.map(b => (
+                        <BookingCard key={b.id} booking={b} onCancel={cancelMutation.mutate} userEmail={user?.email} />
+                      ))}
+                    </div>
+                  );
+                })}
                 <div className="text-center pt-4">
                   <Link to="/FindNannies" className="text-sm text-primary font-medium inline-flex items-center gap-1.5 hover:underline">
                     Rezerviraj novi termin <ArrowRight className="w-3.5 h-3.5" />

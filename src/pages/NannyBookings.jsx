@@ -23,6 +23,18 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { buildConversationKey } from '@/lib/chat';
+import { format, parseISO } from 'date-fns';
+import { hr } from 'date-fns/locale';
+
+function formatCreated(iso) {
+  if (!iso) return '';
+  try {
+    const normalized = iso.endsWith('Z') || /[+-]\d{2}:\d{2}$/.test(iso) ? iso : iso + 'Z';
+    return format(parseISO(normalized), 'd. MMM yyyy.', { locale: hr });
+  } catch {
+    return '';
+  }
+}
 
 const statusStyles = {
   'Na čekanju': 'bg-peach/50 text-peach-dark',
@@ -118,6 +130,24 @@ export default function NannyBookings() {
   const upcoming = bookings.filter(b => b.status === 'Potvrđeno');
   const past = bookings.filter(b => ['Završeno', 'Otkazano', 'Odbijeno'].includes(b.status));
 
+  // Group past bookings by status, most-recently-created first within each group.
+  const pastByStatus = (() => {
+    const groups = { 'Završeno': [], 'Otkazano': [], 'Odbijeno': [] };
+    for (const b of past) {
+      if (groups[b.status]) groups[b.status].push(b);
+    }
+    for (const k of Object.keys(groups)) {
+      groups[k].sort((a, b) => Date.parse(b.created_date) - Date.parse(a.created_date));
+    }
+    return groups;
+  })();
+  const PAST_SECTION_ORDER = ['Završeno', 'Otkazano', 'Odbijeno'];
+  const PAST_SECTION_LABELS = {
+    'Završeno': 'Završene',
+    'Otkazano': 'Otkazane',
+    'Odbijeno': 'Odbijene',
+  };
+
   const BookingCard = ({ booking }) => (
     <Card
       className="p-4 border-border/60 cursor-pointer hover:shadow-md transition-shadow"
@@ -144,6 +174,11 @@ export default function NannyBookings() {
           <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
             <Clock className="w-3 h-3" /> {booking.start_time} - {booking.end_time}
           </p>
+          {booking.created_date && (
+            <p className="text-[11px] text-muted-foreground/70 mt-1">
+              Kreirano {formatCreated(booking.created_date)}
+            </p>
+          )}
           {booking.special_notes && (
             <p className="text-xs text-muted-foreground mt-1">Napomene: {booking.special_notes}</p>
           )}
@@ -317,7 +352,20 @@ export default function NannyBookings() {
               <p className="text-muted-foreground text-sm">Vaši završeni termini će se pojaviti ovdje.</p>
             </div>
           ) : (
-            <div className="space-y-3">{past.map(b => <BookingCard key={b.id} booking={b} />)}</div>
+            <div className="space-y-3">
+              {PAST_SECTION_ORDER.map(status => {
+                const items = pastByStatus[status] || [];
+                if (items.length === 0) return null;
+                return (
+                  <div key={status} className="space-y-3">
+                    <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mt-6 first:mt-0 mb-2">
+                      {PAST_SECTION_LABELS[status]} ({items.length})
+                    </h3>
+                    {items.map(b => <BookingCard key={b.id} booking={b} />)}
+                  </div>
+                );
+              })}
+            </div>
           )}
         </TabsContent>
       </Tabs>

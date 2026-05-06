@@ -16,13 +16,49 @@ import { toast } from 'sonner';
 function formatMessageTime(iso) {
   if (!iso) return '';
   try {
-    const d = parseISO(iso);
+    // Base44 timestamps come without Z suffix despite being UTC. Normalize before parsing.
+    const normalized = iso.endsWith('Z') || /[+-]\d{2}:\d{2}$/.test(iso) ? iso : iso + 'Z';
+    const d = parseISO(normalized);
     if (isToday(d)) return format(d, 'HH:mm', { locale: hr });
     if (isYesterday(d)) return 'jučer ' + format(d, 'HH:mm', { locale: hr });
     return format(d, 'd. MMM HH:mm', { locale: hr });
   } catch {
     return '';
   }
+}
+
+function renderMessageContent(content) {
+  if (!content) return null;
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  const parts = content.split(urlRegex);
+  return parts.map((part, i) => {
+    if (urlRegex.test(part)) {
+      // Reset regex state because .test() advances lastIndex on /g regex
+      urlRegex.lastIndex = 0;
+      let label = part;
+      try {
+        const u = new URL(part);
+        const lastSeg = u.pathname.split('/').filter(Boolean).pop() || '';
+        label = u.host.replace(/^www\./, '') + (lastSeg ? '/' + lastSeg : '');
+        if (u.host.endsWith('base44.app') && u.pathname.includes('BookingDetail')) {
+          label = 'Otvori detalje rezervacije →';
+        }
+      } catch (_) { /* keep raw */ }
+      return (
+        <a
+          key={i}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary underline underline-offset-2 hover:text-primary/80"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {label}
+        </a>
+      );
+    }
+    return <span key={i}>{part}</span>;
+  });
 }
 
 export default function Messages() {
@@ -105,13 +141,9 @@ export default function Messages() {
         sender_name: user.display_name || user.full_name || (user.email ? user.email.split('@')[0] : 'Korisnik'),
         read: false,
       });
-      // Unhide conversation for receiver if they had hidden it
-      const currentHidden = conv?.hidden_for || [];
-      const updatedHidden = currentHidden.filter(e => e !== receiverEmail);
-      await base44.entities.Conversation.update(activeConv, {
+      await base44.functions.invoke('updateConversationOnSend', {
+        conversation_id: activeConv,
         last_message: newMessage,
-        last_message_date: new Date().toISOString(),
-        hidden_for: updatedHidden,
       });
     },
     onSuccess: () => {
@@ -296,7 +328,7 @@ export default function Messages() {
                             ? 'bg-primary text-primary-foreground rounded-br-md shadow-sm shadow-primary/20'
                             : 'bg-muted/70 text-foreground rounded-bl-md'
                         }`}>
-                          {msg.content}
+                          <p className="whitespace-pre-wrap">{renderMessageContent(msg.content)}</p>
                         </div>
                         <p className="text-[10px] mt-1 opacity-50 text-muted-foreground">{formatMessageTime(msg.created_date)}</p>
                       </div>

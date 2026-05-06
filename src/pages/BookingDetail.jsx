@@ -38,10 +38,16 @@ const REPORT_STATUS_LABEL = {
   dismissed: 'Odbačeno',
 };
 
+// Base44 timestamps come without Z suffix despite being UTC. Normalize before parsing.
+function normalizeIso(iso) {
+  if (!iso) return iso;
+  return iso.endsWith('Z') || /[+-]\d{2}:\d{2}$/.test(iso) ? iso : iso + 'Z';
+}
+
 function formatTimestamp(iso) {
   if (!iso) return '';
   try {
-    return format(parseISO(iso), "d. MMM yyyy. 'u' HH:mm", { locale: hr });
+    return format(parseISO(normalizeIso(iso)), "d. MMM yyyy. 'u' HH:mm", { locale: hr });
   } catch {
     return iso;
   }
@@ -50,13 +56,46 @@ function formatTimestamp(iso) {
 function formatMessageTime(iso) {
   if (!iso) return '';
   try {
-    const d = parseISO(iso);
+    const d = parseISO(normalizeIso(iso));
     if (isToday(d)) return format(d, 'HH:mm', { locale: hr });
     if (isYesterday(d)) return 'jučer ' + format(d, 'HH:mm', { locale: hr });
     return format(d, 'd. MMM HH:mm', { locale: hr });
   } catch {
     return '';
   }
+}
+
+function renderMessageContent(content) {
+  if (!content) return null;
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  const parts = content.split(urlRegex);
+  return parts.map((part, i) => {
+    if (urlRegex.test(part)) {
+      urlRegex.lastIndex = 0;
+      let label = part;
+      try {
+        const u = new URL(part);
+        const lastSeg = u.pathname.split('/').filter(Boolean).pop() || '';
+        label = u.host.replace(/^www\./, '') + (lastSeg ? '/' + lastSeg : '');
+        if (u.host.endsWith('base44.app') && u.pathname.includes('BookingDetail')) {
+          label = 'Otvori detalje rezervacije →';
+        }
+      } catch (_) { /* keep raw */ }
+      return (
+        <a
+          key={i}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary underline underline-offset-2 hover:text-primary/80"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {label}
+        </a>
+      );
+    }
+    return <span key={i}>{part}</span>;
+  });
 }
 
 export default function BookingDetail() {
@@ -255,7 +294,7 @@ export default function BookingDetail() {
                         <p className="text-[10px] font-semibold mb-0.5 opacity-70">
                           {fromMe ? 'Vi' : (m.sender_name || otherPartyName)}
                         </p>
-                        <p className="whitespace-pre-wrap">{m.content}</p>
+                        <p className="whitespace-pre-wrap">{renderMessageContent(m.content)}</p>
                       </div>
                       <p className="text-[10px] mt-1 opacity-50 text-muted-foreground">{formatMessageTime(m.created_date)}</p>
                     </div>

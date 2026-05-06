@@ -7,6 +7,18 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import PageHeader from '@/components/shared/PageHeader';
 import EmptyState from '@/components/shared/EmptyState';
+import { format, parseISO } from 'date-fns';
+import { hr } from 'date-fns/locale';
+
+function formatCreated(iso) {
+  if (!iso) return '';
+  try {
+    const normalized = iso.endsWith('Z') || /[+-]\d{2}:\d{2}$/.test(iso) ? iso : iso + 'Z';
+    return format(parseISO(normalized), 'd. MMM yyyy.', { locale: hr });
+  } catch {
+    return '';
+  }
+}
 
 const statusStyles = {
   'Na čekanju': 'bg-peach/50 text-peach-dark',
@@ -62,6 +74,11 @@ export default function AdminBookings() {
                     <Calendar className="w-3 h-3" /> {b.date}
                     <Clock className="w-3 h-3 ml-2" /> {b.start_time} - {b.end_time}
                   </p>
+                  {b.created_date && (
+                    <p className="text-[11px] text-muted-foreground/70 mt-1">
+                      Kreirano {formatCreated(b.created_date)}
+                    </p>
+                  )}
                 </div>
                 <div className="text-right text-xs space-y-0.5">
                   <p className="font-semibold">Ukupno: €{b.total_price?.toFixed(2)}</p>
