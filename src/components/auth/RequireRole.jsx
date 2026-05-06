@@ -1,9 +1,10 @@
 import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, Link } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
-import { ShieldAlert } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { base44 } from '@/api/base44Client';
+import { ShieldAlert, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
 
 /**
  * Route guard that restricts access by user role.
@@ -18,19 +19,51 @@ import { Link } from 'react-router-dom';
  *   redirect – optional path to redirect unauthenticated users (default: "/")
  */
 export default function RequireRole({ allowed = [], redirect = '/' }) {
-  const { user, isAuthenticated, navigateToLogin } = useAuth();
+  const { user, isAuthenticated } = useAuth();
+
+  const realRole = user?.app_role || (user?.role === 'admin' ? 'admin' : null);
+  const isNannyRoute = allowed.includes('nanny');
+
+  // Pre-fetch this user's NannyProfile so we can detect the "pending approval" case below.
+  // Only fetch when the user is a self-declared nanny on a nanny route — keeps it cheap.
+  const { data: nannyProfile } = useQuery({
+    queryKey: ['myNannyProfile', user?.email],
+    queryFn: async () => {
+      const list = await base44.entities.NannyProfile.filter({ user_email: user?.email }, '-updated_date', 1);
+      return list?.[0] || null;
+    },
+    enabled: !!user?.email && realRole === 'nanny' && isNannyRoute,
+  });
 
   // Not logged in → redirect to landing / login
   if (!isAuthenticated || !user) {
     return <Navigate to={redirect} replace />;
   }
 
-  const realRole = user.app_role || (user.role === 'admin' ? 'admin' : null);
-
   // Admins always pass — they may be viewing as another role
   // but should still access admin-only or nanny-only routes via the role switcher
   if (realRole === 'admin' || user.role === 'admin') {
     return <Outlet />;
+  }
+
+  // Nanny on a nanny-only route, but profile isn't approved yet → friendly "in review" screen
+  if (isNannyRoute && realRole === 'nanny' && nannyProfile && nannyProfile.status !== 'approved') {
+    return (
+      <div className="max-w-md mx-auto py-12 text-center space-y-4 px-4">
+        <Clock className="w-12 h-12 text-amber-500 mx-auto" />
+        <h2 className="text-xl font-semibold">Vaš profil je u obradi</h2>
+        <p className="text-muted-foreground">
+          Naš tim trenutno pregledava vaš profil. Javit ćemo vam čim bude odobren.
+          Obično traje 1-2 radna dana.
+        </p>
+        <p className="text-xs text-muted-foreground">
+          U međuvremenu možete pregledati i ažurirati svoj profil.
+        </p>
+        <Link to="/NannyOnboarding">
+          <Button variant="outline">Uredi profil</Button>
+        </Link>
+      </div>
+    );
   }
 
   // Logged in but wrong role → show friendly "access denied"

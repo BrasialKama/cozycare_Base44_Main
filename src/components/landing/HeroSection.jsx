@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Search } from 'lucide-react';
+import { useAuth } from '@/lib/AuthContext';
 
 const KVARTOVI = ['Gornji Grad', 'Maksimir', 'Trešnjevka', 'Črnomerec', 'Trnje', 'Novi Zagreb', 'Sesvete'];
 
 export default function HeroSection() {
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const handleSearch = () => {
     if (query.trim()) {
@@ -141,20 +143,22 @@ export default function HeroSection() {
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-0.5" />
               </Link>
             </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              asChild
-              className="h-14 px-10 text-lg text-foreground group"
-              style={{
-                background: 'rgba(255,253,248,0.45)',
-                border: '1px solid rgba(200,142,142,0.30)',
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)',
-              }}
-            >
-              <Link to="/Join">Pridruži se CozyCare-u</Link>
-            </Button>
+            {!user && (
+              <Button
+                variant="outline"
+                size="lg"
+                asChild
+                className="h-14 px-10 text-lg text-foreground group"
+                style={{
+                  background: 'rgba(255,253,248,0.45)',
+                  border: '1px solid rgba(200,142,142,0.30)',
+                  backdropFilter: 'blur(12px)',
+                  WebkitBackdropFilter: 'blur(12px)',
+                }}
+              >
+                <Link to="/Join">Pridruži se CozyCare-u</Link>
+              </Button>
+            )}
           </div>
 
           <p

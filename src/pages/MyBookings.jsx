@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
@@ -40,7 +40,7 @@ const STATUS_STYLES = {
   'Odbijeno': 'bg-destructive/10 text-destructive',
 };
 
-function BookingCard({ booking, onCancel, userEmail }) {
+function BookingCard({ booking, onCancel, userEmail, relatedReport }) {
   const initial = (booking.nanny_name || 'N')[0];
   const [disputeOpen, setDisputeOpen] = useState(false);
   const queryClient = useQueryClient();
@@ -159,10 +159,20 @@ function BookingCard({ booking, onCancel, userEmail }) {
             </AlertDialog>
           )}
           {booking.status === 'Otkazano' && withinDisputeWindow && (
-            booking.disputed ? (
-              <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200">
-                <CheckCircle2 className="w-3 h-3" /> Prijavljeno — CozyCare tim provjerava
-              </span>
+            relatedReport ? (
+              relatedReport.status === 'resolved' ? (
+                <span className="inline-flex items-center gap-1.5 text-xs text-emerald-700 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200">
+                  <CheckCircle2 className="w-3 h-3" /> Prijava riješena
+                </span>
+              ) : relatedReport.status === 'dismissed' ? (
+                <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground px-3 py-1.5 rounded-xl bg-muted/40 border border-border/50">
+                  <CheckCircle2 className="w-3 h-3" /> Prijava odbačena
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200">
+                  <CheckCircle2 className="w-3 h-3" /> Prijavljeno — CozyCare tim provjerava
+                </span>
+              )
             ) : (
               <Button
                 variant="ghost"
@@ -183,10 +193,20 @@ function BookingCard({ booking, onCancel, userEmail }) {
           )}
           {booking.status === 'Završeno' && (
             <>
-              {booking.disputed ? (
-                <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200">
-                  <CheckCircle2 className="w-3 h-3" /> Prijavljeno — CozyCare tim provjerava
-                </span>
+              {relatedReport ? (
+                relatedReport.status === 'resolved' ? (
+                  <span className="inline-flex items-center gap-1.5 text-xs text-emerald-700 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200">
+                    <CheckCircle2 className="w-3 h-3" /> Prijava riješena
+                  </span>
+                ) : relatedReport.status === 'dismissed' ? (
+                  <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground px-3 py-1.5 rounded-xl bg-muted/40 border border-border/50">
+                    <CheckCircle2 className="w-3 h-3" /> Prijava odbačena
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200">
+                    <CheckCircle2 className="w-3 h-3" /> Prijavljeno — CozyCare tim provjerava
+                  </span>
+                )
               ) : withinDisputeWindow ? (
                 <Button
                   variant="ghost"
@@ -226,6 +246,22 @@ export default function MyBookings() {
     queryFn: () => base44.entities.Booking.filter({ family_user_email: user?.email }, '-date'),
     enabled: !!user?.email,
   });
+
+  const { data: myReports = [] } = useQuery({
+    queryKey: ['myReports', user?.email],
+    queryFn: () => base44.entities.Report.filter({ reporter_email: user?.email }, '-created_date', 100),
+    enabled: !!user?.email,
+  });
+
+  const reportByBookingId = useMemo(() => {
+    const map = {};
+    for (const r of myReports) {
+      if (!r.booking_id) continue;
+      // Reports are sorted -created_date already; keep first occurrence (most recent)
+      if (!map[r.booking_id]) map[r.booking_id] = r;
+    }
+    return map;
+  }, [myReports]);
 
   const cancelMutation = useMutation({
     mutationFn: async (id) => {
@@ -312,7 +348,7 @@ export default function MyBookings() {
               </div>
             ) : (
               <div className="space-y-3">
-                {upcoming.map(b => <BookingCard key={b.id} booking={b} onCancel={cancelMutation.mutate} userEmail={user?.email} />)}
+                {upcoming.map(b => <BookingCard key={b.id} booking={b} onCancel={cancelMutation.mutate} userEmail={user?.email} relatedReport={reportByBookingId[b.id]} />)}
               </div>
             )}
           </TabsContent>
@@ -336,7 +372,7 @@ export default function MyBookings() {
                         {PAST_SECTION_LABELS[status]} ({items.length})
                       </h3>
                       {items.map(b => (
-                        <BookingCard key={b.id} booking={b} onCancel={cancelMutation.mutate} userEmail={user?.email} />
+                        <BookingCard key={b.id} booking={b} onCancel={cancelMutation.mutate} userEmail={user?.email} relatedReport={reportByBookingId[b.id]} />
                       ))}
                     </div>
                   );

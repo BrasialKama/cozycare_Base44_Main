@@ -1,8 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/lib/AuthContext';
 
 export default function CTABanner() {
+  const { user } = useAuth();
   return (
     <section className="py-20 bg-primary/5 border-y border-primary/10">
       <div className="max-w-3xl mx-auto px-4 text-center">
@@ -21,14 +23,16 @@ export default function CTABanner() {
           >
             <Link to="/FindNannies">Pronađi dadilju kojoj vjeruješ</Link>
           </Button>
-          <Button
-            size="lg"
-            variant="outline"
-            asChild
-            className="h-14 px-10 text-lg border-border hover:border-secondary/50 hover:bg-secondary/5"
-          >
-            <Link to="/Join?for=nanny">Ja sam dadilja</Link>
-          </Button>
+          {!user && (
+            <Button
+              size="lg"
+              variant="outline"
+              asChild
+              className="h-14 px-10 text-lg border-border hover:border-secondary/50 hover:bg-secondary/5"
+            >
+              <Link to="/Join?for=nanny">Ja sam dadilja</Link>
+            </Button>
+          )}
         </div>
       </div>
     </section>
