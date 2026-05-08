@@ -96,6 +96,20 @@ export default function NannyDetail() {
     enabled: !!nannyProfileId,
   });
 
+  // Real activity signal — only renders a banner when there's demonstrable demand.
+  // PublicNannyProfile doesn't expose user_email (PII), so the backend resolves it via service role.
+  const { data: activity } = useQuery({
+    queryKey: ['nannyActivity', nannyProfileId],
+    queryFn: async () => {
+      const resp = await base44.functions.invoke('getNannyActivitySignal', {
+        nanny_profile_id: nannyProfileId,
+      });
+      return resp?.data || resp;
+    },
+    enabled: !!nannyProfileId,
+    staleTime: 60_000,
+  });
+
   const handleMessage = async () => {
     if (!nanny?.nanny_profile_id) return;
     setIsSendingMessage(true);
@@ -306,11 +320,23 @@ export default function NannyDetail() {
               </div>
               <Separator className="mb-4 opacity-40" />
 
-              {/* Scarcity signal */}
-              <div className="flex items-center gap-2 bg-amber-50 text-amber-700 text-xs font-medium px-3.5 py-2 rounded-xl mb-4">
-                <Flame className="w-3.5 h-3.5 flex-shrink-0" />
-                Ova dadilja ima samo 2 slobodna termina ovaj tjedan
-              </div>
+              {/* Activity signal — only shown if backend reports a real signal */}
+              {activity?.success && (() => {
+                const { confirmed_this_week = 0, requests_last_7d = 0 } = activity;
+                let label = null;
+                if (confirmed_this_week >= 3) {
+                  label = `Popularna ovaj tjedan — već ima ${confirmed_this_week} potvrđenih termina`;
+                } else if (requests_last_7d >= 3) {
+                  label = `Tražena dadilja — ${requests_last_7d} zahtjeva u zadnjih 7 dana`;
+                }
+                if (!label) return null;
+                return (
+                  <div className="flex items-center gap-2 bg-amber-50 text-amber-700 text-xs font-medium px-3.5 py-2 rounded-xl mb-4">
+                    <Flame className="w-3.5 h-3.5 flex-shrink-0" />
+                    <span>{label}</span>
+                  </div>
+                );
+              })()}
 
               <div className="space-y-2.5">
                 {nanny.nanny_profile_id && (

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
@@ -48,6 +48,7 @@ export default function NannyBookings() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const [pastSubTab, setPastSubTab] = useState('all');
 
   const { data: bookings = [], isLoading } = useQuery({
     queryKey: ['nannyBookingsAll', user?.email],
@@ -353,18 +354,49 @@ export default function NannyBookings() {
             </div>
           ) : (
             <div className="space-y-3">
-              {PAST_SECTION_ORDER.map(status => {
-                const items = pastByStatus[status] || [];
-                if (items.length === 0) return null;
-                return (
-                  <div key={status} className="space-y-3">
-                    <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mt-6 first:mt-0 mb-2">
-                      {PAST_SECTION_LABELS[status]} ({items.length})
-                    </h3>
-                    {items.map(b => <BookingCard key={b.id} booking={b} />)}
-                  </div>
-                );
-              })}
+              {/* Sub-tabs to filter past by status */}
+              <div className="flex gap-1 mb-4 overflow-x-auto -mx-1 px-1">
+                {[
+                  { key: 'all', label: 'Sve', count: past.length },
+                  { key: 'Završeno', label: 'Završene', count: (pastByStatus['Završeno'] || []).length },
+                  { key: 'Otkazano', label: 'Otkazane', count: (pastByStatus['Otkazano'] || []).length },
+                  { key: 'Odbijeno', label: 'Odbijene', count: (pastByStatus['Odbijeno'] || []).length },
+                ].map(({ key, label, count }) => {
+                  if (key !== 'all' && count === 0) return null;
+                  const isActive = pastSubTab === key;
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => setPastSubTab(key)}
+                      className={`text-xs px-3 py-1.5 rounded-full whitespace-nowrap transition-colors ${
+                        isActive
+                          ? 'bg-foreground text-background font-medium'
+                          : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                      }`}
+                      style={{ touchAction: 'manipulation' }}
+                    >
+                      {label} ({count})
+                    </button>
+                  );
+                })}
+              </div>
+
+              {pastSubTab === 'all' ? (
+                PAST_SECTION_ORDER.map(status => {
+                  const items = pastByStatus[status] || [];
+                  if (items.length === 0) return null;
+                  return (
+                    <div key={status} className="space-y-3">
+                      <h3 className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mt-6 first:mt-0 mb-2">
+                        {PAST_SECTION_LABELS[status]} ({items.length})
+                      </h3>
+                      {items.map(b => <BookingCard key={b.id} booking={b} />)}
+                    </div>
+                  );
+                })
+              ) : (
+                (pastByStatus[pastSubTab] || []).map(b => <BookingCard key={b.id} booking={b} />)
+              )}
             </div>
           )}
         </TabsContent>
