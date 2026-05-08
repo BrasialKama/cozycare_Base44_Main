@@ -19,8 +19,11 @@ export default function NannyPortal() {
   const { data: profile, isLoading: loadingProfile } = useQuery({
     queryKey: ['portalProfile', user?.email],
     queryFn: async () => {
-      const profiles = await base44.entities.NannyProfile.filter({ user_email: user?.email }, '-created_date', 1);
-      return profiles[0] || null;
+      // Defensive: prefer an approved profile if duplicates exist from earlier buggy edits.
+      const profiles = await base44.entities.NannyProfile.filter({ user_email: user?.email }, '-created_date', 5);
+      if (!profiles?.length) return null;
+      const approved = profiles.find(p => p.status === 'approved');
+      return approved || profiles[0];
     },
     enabled: !!user?.email && canFetch,
   });

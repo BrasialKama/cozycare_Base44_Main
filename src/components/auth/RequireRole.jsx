@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button';
  *   redirect – optional path to redirect unauthenticated users (default: "/")
  */
 export default function RequireRole({ allowed = [], redirect = '/' }) {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, refreshUser } = useAuth();
   const queryClient = useQueryClient();
 
   const realRole = user?.app_role || (user?.role === 'admin' ? 'admin' : null);
@@ -28,11 +28,15 @@ export default function RequireRole({ allowed = [], redirect = '/' }) {
   // Pre-fetch this user's NannyProfile so we can detect the "pending approval" case below.
   // Only fetch when the user is a self-declared nanny on a nanny route — keeps it cheap.
   // Tight staleTime + window-focus refetch so newly-approved nannies pick up the change quickly.
+  // Defensively prefer an approved profile when one exists — robust to duplicate rows that
+  // may exist from earlier buggy edit-flow attempts.
   const { data: nannyProfile } = useQuery({
     queryKey: ['myNannyProfile', user?.email],
     queryFn: async () => {
-      const list = await base44.entities.NannyProfile.filter({ user_email: user?.email }, '-updated_date', 1);
-      return list?.[0] || null;
+      const list = await base44.entities.NannyProfile.filter({ user_email: user?.email }, '-updated_date', 5);
+      if (!list?.length) return null;
+      const approved = list.find(p => p.status === 'approved');
+      return approved || list[0];
     },
     enabled: !!user?.email && realRole === 'nanny' && isNannyRoute,
     staleTime: 30000,
@@ -70,7 +74,12 @@ export default function RequireRole({ allowed = [], redirect = '/' }) {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => queryClient.invalidateQueries({ queryKey: ['myNannyProfile', user?.email] })}
+            onClick={async () => {
+              // Refresh the User entity FIRST — this picks up any admin-side
+              // app_role / status changes that haven't propagated to the client yet.
+              try { await refreshUser?.(); } catch (_) { /* noop */ }
+              await queryClient.invalidateQueries({ queryKey: ['myNannyProfile', user?.email] });
+            }}
           >
             <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
             Provjeri ponovno

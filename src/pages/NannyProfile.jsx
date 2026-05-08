@@ -21,13 +21,17 @@ export default function NannyProfile() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: profiles = [], isLoading } = useQuery({
+  const { data: profile, isLoading } = useQuery({
     queryKey: ['myNannyProfile', user?.email],
-    queryFn: () => base44.entities.NannyProfile.filter({ user_email: user?.email }, '-created_date', 1),
+    queryFn: async () => {
+      // Defensive: prefer an approved profile if duplicates exist from earlier buggy edits.
+      const profiles = await base44.entities.NannyProfile.filter({ user_email: user?.email }, '-created_date', 5);
+      if (!profiles?.length) return null;
+      const approved = profiles.find(p => p.status === 'approved');
+      return approved || profiles[0];
+    },
     enabled: !!user?.email,
   });
-
-  const profile = profiles[0];
 
   const [form, setForm] = useState({
     first_name: '', last_name: '', bio: '', hourly_rate: 25, location: '',
