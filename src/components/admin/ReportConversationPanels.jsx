@@ -5,6 +5,26 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { MessageCircle, Send, ChevronDown, ChevronUp, Loader2, Users, User } from 'lucide-react';
 import { toast } from 'sonner';
+import { format, parseISO, isToday, isYesterday } from 'date-fns';
+import { hr } from 'date-fns/locale';
+
+// Mirrored from Messages.jsx / BookingDetail.jsx — keep in sync.
+function normalizeIso(iso) {
+  if (!iso) return iso;
+  return iso.endsWith('Z') || /[+-]\d{2}:\d{2}$/.test(iso) ? iso : iso + 'Z';
+}
+
+function formatMessageTime(iso) {
+  if (!iso) return '';
+  try {
+    const d = parseISO(normalizeIso(iso));
+    if (isToday(d)) return format(d, 'HH:mm', { locale: hr });
+    if (isYesterday(d)) return 'jučer ' + format(d, 'HH:mm', { locale: hr });
+    return format(d, 'd. MMM HH:mm', { locale: hr });
+  } catch {
+    return '';
+  }
+}
 
 /**
  * Inline admin panel on a Report card — renders TWO collapsible threads:
@@ -104,6 +124,7 @@ function RecipientThread({ reportId, recipient, label, icon: Icon }) {
                         {fromBot ? (m.sender_name || 'CozyCare Bot') : label}
                       </p>
                       <p className="whitespace-pre-wrap">{m.content}</p>
+                      <p className="text-[10px] mt-1 opacity-50">{formatMessageTime(m.created_date)}</p>
                     </div>
                   </div>
                 );

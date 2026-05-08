@@ -72,27 +72,45 @@ function renderMessageContent(content) {
   return parts.map((part, i) => {
     if (urlRegex.test(part)) {
       urlRegex.lastIndex = 0;
-      let label = part;
       try {
         const u = new URL(part);
-        const lastSeg = u.pathname.split('/').filter(Boolean).pop() || '';
-        label = u.host.replace(/^www\./, '') + (lastSeg ? '/' + lastSeg : '');
-        if (u.host.endsWith('base44.app') && u.pathname.includes('BookingDetail')) {
-          label = 'Otvori detalje rezervacije →';
+        const isInternal = u.host.endsWith('base44.app');
+        if (isInternal) {
+          // Internal nav — keep user inside the app shell via react-router
+          const path = u.pathname + u.search;
+          let label = u.host.replace(/^www\./, '') + (u.pathname.split('/').filter(Boolean).pop() ? '/' + u.pathname.split('/').filter(Boolean).pop() : '');
+          if (u.pathname.includes('BookingDetail')) {
+            label = 'Otvori detalje rezervacije →';
+          }
+          return (
+            <Link
+              key={i}
+              to={path}
+              className="text-primary underline underline-offset-2 hover:text-primary/80"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {label}
+            </Link>
+          );
         }
-      } catch (_) { /* keep raw */ }
-      return (
-        <a
-          key={i}
-          href={part}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-primary underline underline-offset-2 hover:text-primary/80"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {label}
-        </a>
-      );
+        // External URL — keep new-tab behavior
+        const lastSeg = u.pathname.split('/').filter(Boolean).pop() || '';
+        const label = u.host.replace(/^www\./, '') + (lastSeg ? '/' + lastSeg : '');
+        return (
+          <a
+            key={i}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary underline underline-offset-2 hover:text-primary/80"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {label}
+          </a>
+        );
+      } catch (_) {
+        return <span key={i}>{part}</span>;
+      }
     }
     return <span key={i}>{part}</span>;
   });

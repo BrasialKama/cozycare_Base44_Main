@@ -2,7 +2,7 @@ import React from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Sparkles, Heart } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import NannyChecklist from '@/components/portal/NannyChecklist';
 import PortalUpcomingBookings from '@/components/portal/PortalUpcomingBookings';
 import PortalEarningsCard from '@/components/portal/PortalEarningsCard';
@@ -10,7 +10,11 @@ import PortalReviewsCard from '@/components/portal/PortalReviewsCard';
 
 export default function NannyPortal() {
   const { user } = useAuth();
-  const role = user?.role;
+  // Use app_role (parent/nanny/admin), not user.role (platform role, usually "user").
+  // Route-level RequireRole already ensures only nannies/admins reach this page,
+  // so we just need the right role for the data-fetch enable flag.
+  const appRole = user?.app_role || (user?.role === 'admin' ? 'admin' : null);
+  const canFetch = appRole === 'nanny' || appRole === 'admin';
 
   const { data: profile, isLoading: loadingProfile } = useQuery({
     queryKey: ['portalProfile', user?.email],
@@ -18,13 +22,13 @@ export default function NannyPortal() {
       const profiles = await base44.entities.NannyProfile.filter({ user_email: user?.email }, '-created_date', 1);
       return profiles[0] || null;
     },
-    enabled: !!user?.email && role === 'nanny',
+    enabled: !!user?.email && canFetch,
   });
 
   const { data: bookings = [], isLoading: loadingBookings } = useQuery({
     queryKey: ['portalBookings', user?.email],
     queryFn: () => base44.entities.Booking.filter({ nanny_user_email: user?.email }, '-date', 20),
-    enabled: !!user?.email && role === 'nanny',
+    enabled: !!user?.email && canFetch,
   });
 
   const { data: reviews = [], isLoading: loadingReviews } = useQuery({
@@ -34,19 +38,6 @@ export default function NannyPortal() {
   });
 
   const isLoading = loadingProfile || loadingBookings || loadingReviews;
-
-  // Gate: only nanny role
-  if (role && role !== 'nanny') {
-    return (
-      <div className="flex flex-col items-center justify-center py-24 text-center">
-        <Heart className="w-10 h-10 text-primary/30 mb-4" />
-        <h2 className="font-display text-xl font-semibold text-foreground mb-1">Ova stranica je namijenjena dadiljama.</h2>
-        <p className="text-sm text-muted-foreground max-w-xs">
-          Ako ste dadilja i želite pristupiti portalu, prijavite se sa svojim računom dadilje.
-        </p>
-      </div>
-    );
-  }
 
   if (isLoading) {
     return (

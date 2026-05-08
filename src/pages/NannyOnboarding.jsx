@@ -21,6 +21,13 @@ const STEPS = [
   { id: 3, icon: CheckCircle2, label: 'Pregled', sub: 'Završna provjera' },
 ];
 
+// Per-field upload labels in proper Croatian accusative case.
+const UPLOAD_LABELS = {
+  'Profilna fotografija': 'Učitaj profilnu fotografiju',
+  'Video predstavljanje': 'Učitaj video predstavljanje',
+  'Osobna iskaznica': 'Učitaj osobnu iskaznicu',
+};
+
 function UploadZone({ label, hint, accept, file, onChange, icon: Icon }) {
   return (
     <div>
@@ -34,7 +41,7 @@ function UploadZone({ label, hint, accept, file, onChange, icon: Icon }) {
         </div>
         <div>
           <p className={`text-sm font-medium ${file ? 'text-primary' : 'text-muted-foreground'}`}>
-            {file ? file.name : `Upload ${label.toLowerCase()}`}
+            {file ? file.name : (UPLOAD_LABELS[label] || `Učitaj ${label.toLowerCase()}`)}
           </p>
           {!file && <p className="text-xs text-muted-foreground mt-0.5">Kliknite za odabir datoteke</p>}
         </div>
@@ -318,10 +325,10 @@ export default function NannyOnboarding() {
                     <Input value={form.specialties} onChange={e => update('specialties', e.target.value)} placeholder="Njega dojenčadi, Posebne potrebe, Podučavanje" className="rounded-xl" />
                   </div>
                   <div>
-                    <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Obrazovanje i tečajevi <span className="normal-case font-normal">(odvojeno zarezima)</span></Label>
-                    <Input value={form.certifications} onChange={e => update('certifications', e.target.value)} placeholder="Tečaj prve pomoći, Diploma predškolskog odgoja" className="rounded-xl" />
+                    <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 block">Tečajevi i certifikati <span className="normal-case font-normal">(odvojeno zarezima)</span></Label>
+                    <Input value={form.certifications} onChange={e => update('certifications', e.target.value)} placeholder="Tečaj prve pomoći, Certifikat za rad s djecom s posebnim potrebama" className="rounded-xl" />
                     <p className="text-[11px] text-muted-foreground mt-1.5 leading-relaxed">
-                      Navedite stvarne tečajeve i obrazovanje. Službene oznake povjerenja dodjeljuje CozyCare tim nakon provjere dokumenata.
+                      Navedite tečajeve, treninge i certifikate koje ste završili. Službene oznake povjerenja dodjeljuje CozyCare tim nakon provjere dokumenata.
                     </p>
                   </div>
                   <div>

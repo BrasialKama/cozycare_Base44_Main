@@ -1,0 +1,86 @@
+{
+  "name": "CheckIn",
+  "type": "object",
+  "properties": {
+    "booking_id": {
+      "type": "string",
+      "description": "Associated booking"
+    },
+    "nanny_email": {
+      "type": "string",
+      "description": "Nanny email"
+    },
+    "parent_email": {
+      "type": "string",
+      "description": "Parent email"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "arrival",
+        "scheduled_checkin",
+        "departure",
+        "emergency",
+        "photo_update"
+      ],
+      "description": "Type of check-in"
+    },
+    "message": {
+      "type": "string",
+      "description": "Check-in message"
+    },
+    "photo_url": {
+      "type": "string",
+      "description": "Optional photo"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When check-in occurred"
+    }
+  },
+  "required": [
+    "booking_id",
+    "nanny_email",
+    "type"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "nanny"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "data.parent_email": "{{user.email}}"
+        },
+        {
+          "data.nanny_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "data.nanny_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
