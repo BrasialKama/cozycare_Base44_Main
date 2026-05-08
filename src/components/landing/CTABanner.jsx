@@ -7,7 +7,7 @@ export default function CTABanner() {
   const { user } = useAuth();
   return (
     <section className="py-20 bg-primary/5 border-y border-primary/10">
-      <div className="max-w-3xl mx-auto px-4 text-center">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
           Spremni pronaći dadilju kojoj stvarno vjerujete?
         </h2>

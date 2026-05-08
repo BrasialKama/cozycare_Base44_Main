@@ -1,9 +1,9 @@
 import React from 'react';
 import { Navigate, Outlet, Link } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { ShieldAlert, Clock } from 'lucide-react';
+import { ShieldAlert, Clock, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 /**
@@ -20,12 +20,14 @@ import { Button } from '@/components/ui/button';
  */
 export default function RequireRole({ allowed = [], redirect = '/' }) {
   const { user, isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
 
   const realRole = user?.app_role || (user?.role === 'admin' ? 'admin' : null);
   const isNannyRoute = allowed.includes('nanny');
 
   // Pre-fetch this user's NannyProfile so we can detect the "pending approval" case below.
   // Only fetch when the user is a self-declared nanny on a nanny route — keeps it cheap.
+  // Tight staleTime + window-focus refetch so newly-approved nannies pick up the change quickly.
   const { data: nannyProfile } = useQuery({
     queryKey: ['myNannyProfile', user?.email],
     queryFn: async () => {
@@ -33,6 +35,8 @@ export default function RequireRole({ allowed = [], redirect = '/' }) {
       return list?.[0] || null;
     },
     enabled: !!user?.email && realRole === 'nanny' && isNannyRoute,
+    staleTime: 30000,
+    refetchOnWindowFocus: true,
   });
 
   // Not logged in → redirect to landing / login
@@ -59,9 +63,19 @@ export default function RequireRole({ allowed = [], redirect = '/' }) {
         <p className="text-xs text-muted-foreground">
           U međuvremenu možete pregledati i ažurirati svoj profil.
         </p>
-        <Link to="/NannyOnboarding">
-          <Button variant="outline">Uredi profil</Button>
-        </Link>
+        <div className="flex items-center justify-center gap-2 flex-wrap">
+          <Link to="/NannyOnboarding">
+            <Button variant="outline">Uredi profil</Button>
+          </Link>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => queryClient.invalidateQueries({ queryKey: ['myNannyProfile', user?.email] })}
+          >
+            <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+            Provjeri ponovno
+          </Button>
+        </div>
       </div>
     );
   }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
 import {
@@ -28,22 +28,31 @@ const UPLOAD_LABELS = {
   'Osobna iskaznica': 'Učitaj osobnu iskaznicu',
 };
 
-function UploadZone({ label, hint, accept, file, onChange, icon: Icon }) {
+function UploadZone({ label, hint, accept, file, onChange, icon: Icon, existingUrl }) {
+  const hasExisting = !!existingUrl && !file;
   return (
     <div>
       <Label className="text-sm font-semibold text-foreground mb-1.5 block">{label}</Label>
       {hint && <p className="text-xs text-muted-foreground mb-2.5 leading-relaxed">{hint}</p>}
+      {hasExisting && (
+        <p className="text-xs text-emerald-700 mb-2 flex items-center gap-1.5">
+          <CheckCircle2 className="w-3.5 h-3.5" />
+          Trenutna datoteka učitana ✓ — učitajte novu samo ako je želite zamijeniti
+        </p>
+      )}
       <label className={`flex items-center gap-3.5 p-5 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${
-        file ? 'border-primary/40 bg-primary/5' : 'border-border hover:border-primary/30 hover:bg-primary/3'
+        file ? 'border-primary/40 bg-primary/5'
+          : hasExisting ? 'border-emerald-300/60 bg-emerald-50/40 hover:border-primary/30'
+          : 'border-border hover:border-primary/30 hover:bg-primary/3'
       }`}>
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${file ? 'bg-primary/10' : 'bg-muted'}`}>
-          {file ? <CheckCircle2 className="w-5 h-5 text-primary" /> : <Icon className="w-5 h-5 text-muted-foreground" />}
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${(file || hasExisting) ? 'bg-primary/10' : 'bg-muted'}`}>
+          {file || hasExisting ? <CheckCircle2 className="w-5 h-5 text-primary" /> : <Icon className="w-5 h-5 text-muted-foreground" />}
         </div>
         <div>
-          <p className={`text-sm font-medium ${file ? 'text-primary' : 'text-muted-foreground'}`}>
-            {file ? file.name : (UPLOAD_LABELS[label] || `Učitaj ${label.toLowerCase()}`)}
+          <p className={`text-sm font-medium ${file ? 'text-primary' : hasExisting ? 'text-emerald-700' : 'text-muted-foreground'}`}>
+            {file ? file.name : hasExisting ? 'Zamijeni datoteku' : (UPLOAD_LABELS[label] || `Učitaj ${label.toLowerCase()}`)}
           </p>
-          {!file && <p className="text-xs text-muted-foreground mt-0.5">Kliknite za odabir datoteke</p>}
+          {!file && !hasExisting && <p className="text-xs text-muted-foreground mt-0.5">Kliknite za odabir datoteke</p>}
         </div>
         <input type="file" accept={accept} className="hidden" onChange={e => onChange(e.target.files?.[0])} />
       </label>
@@ -103,13 +112,44 @@ export default function NannyOnboarding() {
   const [idFile, setIdFile] = useState(null);
   const [stepErrors, setStepErrors] = useState([]);
 
-  // When user loads, seed full_name default
+  // Fetch existing nanny profile so we can decide between CREATE (fresh signup)
+  // and EDIT (returning approved/pending nanny) modes. Without this hydration,
+  // submitting from edit mode would create a duplicate NannyProfile for the same user.
+  const { data: existingProfile } = useQuery({
+    queryKey: ['myNannyProfileForEdit', user?.email],
+    queryFn: async () => {
+      const list = await base44.entities.NannyProfile.filter({ user_email: user?.email }, '-updated_date', 1);
+      return list?.[0] || null;
+    },
+    enabled: !!user?.email,
+    staleTime: 0,
+  });
+
+  const isEditMode = !!existingProfile;
+
+  // Hydrate the form whenever existingProfile resolves (edit mode) — otherwise just
+  // seed full_name from the auth user (fresh signup mode).
   useEffect(() => {
-    if (user?.full_name && !form.full_name) {
+    if (existingProfile) {
+      setForm({
+        full_name: [existingProfile.first_name, existingProfile.last_name].filter(Boolean).join(' ') || user?.full_name || '',
+        display_name: existingProfile.display_name || '',
+        bio: existingProfile.bio || '',
+        hourly_rate: existingProfile.hourly_rate ?? 25,
+        years_experience: existingProfile.years_experience ?? 0,
+        service_area: existingProfile.service_area || existingProfile.location || '',
+        education: existingProfile.education || '',
+        languages: Array.isArray(existingProfile.languages) ? existingProfile.languages.join(', ') : (existingProfile.languages || ''),
+        specialties: Array.isArray(existingProfile.specialties) ? existingProfile.specialties.join(', ') : (existingProfile.specialties || ''),
+        certifications: Array.isArray(existingProfile.certifications) ? existingProfile.certifications.join(', ') : (existingProfile.certifications || ''),
+        phone: user?.phone || '',
+        emergency_contact: existingProfile.emergency_contact || '',
+      });
+    } else if (user?.full_name && !form.full_name) {
       setForm(prev => ({ ...prev, full_name: user.full_name }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [existingProfile, user]);
 
   const update = (key, val) => setForm(prev => ({ ...prev, [key]: val }));
 
@@ -125,7 +165,10 @@ export default function NannyOnboarding() {
       if (!form.languages.trim()) errors.push('Unesite barem jedan jezik');
     }
     if (s === 2) {
-      if (!photoFile) errors.push('Dodajte profilnu fotografiju');
+      // In edit mode, an already-uploaded photo satisfies the requirement.
+      if (!photoFile && !(isEditMode && existingProfile?.photo_url)) {
+        errors.push('Dodajte profilnu fotografiju');
+      }
     }
     return errors;
   };
@@ -154,34 +197,59 @@ export default function NannyOnboarding() {
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
 
-      const resp = await base44.functions.invoke('createNannyProfile', {
-        profile: {
-          first_name: firstName,
-          last_name: lastName,
-          display_name: form.display_name || form.full_name,
-          bio: form.bio,
-          hourly_rate: Number(form.hourly_rate),
-          years_experience: Number(form.years_experience),
-          service_area: form.service_area,
-          location: form.service_area,
-          education: form.education,
-          languages: form.languages.split(',').map(s => s.trim()).filter(Boolean),
-          specialties: form.specialties.split(',').map(s => s.trim()).filter(Boolean),
-          certifications: form.certifications.split(',').map(s => s.trim()).filter(Boolean),
-          emergency_contact: form.emergency_contact,
-          photo_url,
-          intro_video_url,
-          video_url: intro_video_url,
-          id_document_url,
-        },
-      });
-      const respData = resp?.data || resp;
-      if (!respData?.success || !respData?.profile) {
-        throw new Error(respData?.error || 'Profil nije kreiran.');
-      }
-      const createdProfile = respData.profile;
+      const profilePayload = {
+        first_name: firstName,
+        last_name: lastName,
+        display_name: form.display_name || form.full_name,
+        bio: form.bio,
+        hourly_rate: Number(form.hourly_rate),
+        years_experience: Number(form.years_experience),
+        service_area: form.service_area,
+        location: form.service_area,
+        education: form.education,
+        languages: form.languages.split(',').map(s => s.trim()).filter(Boolean),
+        specialties: form.specialties.split(',').map(s => s.trim()).filter(Boolean),
+        certifications: form.certifications.split(',').map(s => s.trim()).filter(Boolean),
+        emergency_contact: form.emergency_contact,
+      };
 
-      await base44.functions.invoke('syncPublicNannyProfile', { nanny_profile_id: createdProfile.id });
+      // Only include URLs in the payload when a NEW file was uploaded — otherwise
+      // updateMyNannyProfile would overwrite existing URLs with empty strings.
+      if (photo_url) profilePayload.photo_url = photo_url;
+      if (intro_video_url) {
+        profilePayload.intro_video_url = intro_video_url;
+        profilePayload.video_url = intro_video_url;
+      }
+      if (id_document_url) profilePayload.id_document_url = id_document_url;
+
+      let savedProfileId;
+      if (isEditMode && existingProfile?.id) {
+        // EDIT mode — update existing profile via the backend wrapper.
+        // Backend signature (functions/updateMyNannyProfile/entry.ts):
+        //   body = { nanny_profile_id, updates }
+        //   returns { success: true, updated_fields: [...] }  (no `profile` field)
+        const resp = await base44.functions.invoke('updateMyNannyProfile', {
+          nanny_profile_id: existingProfile.id,
+          updates: profilePayload,
+        });
+        const respData = resp?.data || resp;
+        if (!respData?.success) {
+          throw new Error(respData?.error || 'Ažuriranje nije uspjelo.');
+        }
+        savedProfileId = existingProfile.id;
+      } else {
+        // CREATE mode — fresh signup
+        const resp = await base44.functions.invoke('createNannyProfile', {
+          profile: { ...profilePayload, photo_url, intro_video_url, video_url: intro_video_url, id_document_url },
+        });
+        const respData = resp?.data || resp;
+        if (!respData?.success || !respData?.profile) {
+          throw new Error(respData?.error || 'Profil nije kreiran.');
+        }
+        savedProfileId = respData.profile.id;
+      }
+
+      await base44.functions.invoke('syncPublicNannyProfile', { nanny_profile_id: savedProfileId });
 
       await base44.auth.updateMe({
         onboarding_complete: true,
@@ -229,9 +297,13 @@ export default function NannyOnboarding() {
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-peach/60 flex items-center justify-center mx-auto mb-3 shadow-md shadow-primary/10">
             <Heart className="w-8 h-8 text-primary" fill="currentColor" />
           </div>
-          <h1 className="font-display text-3xl font-bold text-foreground leading-tight">Pridruži se CozyCare-u</h1>
+          <h1 className="font-display text-3xl font-bold text-foreground leading-tight">
+            {isEditMode ? 'Uredi profil' : 'Pridruži se CozyCare-u'}
+          </h1>
           <p className="text-muted-foreground mt-1 text-sm leading-relaxed max-w-xs mx-auto">
-            Ispunite svoj profil i počnite se povezivati s obiteljima kojima trebate.
+            {isEditMode
+              ? 'Ažurirajte svoje podatke i medije. Promjene će biti vidljive obiteljima nakon spremanja.'
+              : 'Ispunite svoj profil i počnite se povezivati s obiteljima kojima trebate.'}
           </p>
         </div>
 
@@ -345,9 +417,9 @@ export default function NannyOnboarding() {
                     <h2 className="font-display text-2xl font-bold text-foreground">Verifikacija i mediji</h2>
                     <p className="text-sm text-muted-foreground mt-1">Pomozite obiteljima da vam vjeruju prije nego vas upoznaju.</p>
                   </div>
-                  <UploadZone label="Profilna fotografija" hint="Topla, prijateljska fotografija pomaže obiteljima da se povežu s vama." accept="image/*" file={photoFile} onChange={setPhotoFile} icon={Camera} />
-                  <UploadZone label="Video predstavljanje" hint="Video od 1–2 minute u kojem se predstavite gradi povjerenje obitelji." accept="video/*" file={videoFile} onChange={setVideoFile} icon={Sparkles} />
-                  <UploadZone label="Osobna iskaznica" hint="Potrebna za provjeru identiteta. Vaš dokument je sigurno pohranjen i nikad se ne dijeli s obiteljima." accept="image/*,.pdf" file={idFile} onChange={setIdFile} icon={Shield} />
+                  <UploadZone label="Profilna fotografija" hint="Topla, prijateljska fotografija pomaže obiteljima da se povežu s vama." accept="image/*" file={photoFile} onChange={setPhotoFile} icon={Camera} existingUrl={existingProfile?.photo_url} />
+                  <UploadZone label="Video predstavljanje" hint="Video od 1–2 minute u kojem se predstavite gradi povjerenje obitelji." accept="video/*" file={videoFile} onChange={setVideoFile} icon={Sparkles} existingUrl={existingProfile?.intro_video_url || existingProfile?.video_url} />
+                  <UploadZone label="Osobna iskaznica" hint="Potrebna za provjeru identiteta. Vaš dokument je sigurno pohranjen i nikad se ne dijeli s obiteljima." accept="image/*,.pdf" file={idFile} onChange={setIdFile} icon={Shield} existingUrl={existingProfile?.id_document_url} />
                 </div>
               )}
 
@@ -365,9 +437,9 @@ export default function NannyOnboarding() {
                       ['Iskustvo', `${form.years_experience} godina`],
                       ['Područje', form.service_area || '—'],
                       ['Jezici', form.languages || '—'],
-                      ['Fotografija', photoFile ? '✓ Učitano' : '— Nije dodano'],
-                      ['Video', videoFile ? '✓ Učitano' : '— Nije dodano'],
-                      ['Osobna iskaznica', idFile ? '✓ Učitano' : '— Nije dodano'],
+                      ['Fotografija', photoFile ? '✓ Učitano (novo)' : (isEditMode && existingProfile?.photo_url) ? '✓ Postojeće' : '— Nije dodano'],
+                      ['Video', videoFile ? '✓ Učitano (novo)' : (isEditMode && (existingProfile?.intro_video_url || existingProfile?.video_url)) ? '✓ Postojeće' : '— Nije dodano'],
+                      ['Osobna iskaznica', idFile ? '✓ Učitano (novo)' : (isEditMode && existingProfile?.id_document_url) ? '✓ Postojeće' : '— Nije dodano'],
                     ].map(([key, val]) => (
                       <div key={key} className="flex items-center justify-between">
                         <span className="text-xs font-semibold text-muted-foreground">{key}</span>
@@ -425,7 +497,7 @@ export default function NannyOnboarding() {
                       Šaljem…
                     </span>
                   ) : (
-                    <span className="flex items-center gap-2"><Heart className="w-4 h-4" fill="currentColor" /> Pošalji prijavu</span>
+                    <span className="flex items-center gap-2"><Heart className="w-4 h-4" fill="currentColor" /> {isEditMode ? 'Spremi izmjene' : 'Pošalji prijavu'}</span>
                   )}
                 </Button>
                 {createMutation.isError && (

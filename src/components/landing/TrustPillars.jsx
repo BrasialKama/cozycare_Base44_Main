@@ -5,7 +5,7 @@ import TrustCard from './TrustCard';
 export default function TrustPillars() {
   return (
     <section className="py-24 bg-card/30">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary mb-4">
             Zašto CozyCare
