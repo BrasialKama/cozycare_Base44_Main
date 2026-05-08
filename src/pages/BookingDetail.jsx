@@ -1,17 +1,29 @@
 import React from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import {
   ArrowLeft, Calendar, Clock, MapPin, Users, Euro, MessageCircle,
-  AlertTriangle, Star, ChevronRight, Shield, CheckCircle2, History
+  AlertTriangle, Star, ChevronRight, Shield, CheckCircle2, History, X
 } from 'lucide-react';
 import { format, parseISO, isToday, isYesterday } from 'date-fns';
 import { hr } from 'date-fns/locale';
+import { toast } from 'sonner';
 
 const STATUS_BADGE_TONE = {
   'Na čekanju': 'bg-amber-100 text-amber-800 border-amber-200',
@@ -122,6 +134,8 @@ export default function BookingDetail() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  const queryClient = useQueryClient();
+
   const { data, isLoading, error } = useQuery({
     queryKey: ['bookingDetail', bookingId, user?.email],
     queryFn: async () => {
@@ -132,6 +146,32 @@ export default function BookingDetail() {
     },
     enabled: !!bookingId && !!user?.email,
     refetchInterval: 15000,
+  });
+
+  // Status-change mutation (used by parent cancel + nanny cancel/complete buttons below).
+  const statusMutation = useMutation({
+    mutationFn: async (newStatus) => {
+      const resp = await base44.functions.invoke('updateBooking', {
+        booking_id: bookingId,
+        updates: { status: newStatus },
+      });
+      const d = resp?.data || resp;
+      if (!d?.success) throw new Error(d?.error || 'Ažuriranje nije uspjelo.');
+      return d.booking;
+    },
+    onSuccess: (_, newStatus) => {
+      queryClient.invalidateQueries({ queryKey: ['bookingDetail'] });
+      const msg = newStatus === 'Otkazano'
+        ? 'Rezervacija otkazana'
+        : newStatus === 'Završeno'
+        ? 'Rezervacija označena kao završena'
+        : 'Rezervacija ažurirana';
+      toast.success(msg);
+    },
+    onError: (err) => {
+      console.error('BookingDetail status change failed:', err);
+      toast.error(err?.message || 'Ažuriranje nije uspjelo.');
+    },
   });
 
   if (!bookingId) {
@@ -386,6 +426,137 @@ export default function BookingDetail() {
               </Button>
             </Link>
           )}
+
+          {/* Parent cancel — Na čekanju */}
+          {viewer_role === 'parent' && booking.status === 'Na čekanju' && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button size="sm" variant="outline" className="rounded-xl text-destructive border-destructive/40 hover:bg-destructive/10">
+                  Otkaži zahtjev
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Otkazati zahtjev?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Vaš zahtjev za rezervaciju bit će povučen. Možete pretražiti druge dadilje u bilo kojem trenutku.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Ne, ostavi</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                    onClick={() => statusMutation.mutate('Otkazano')}
+                  >
+                    Da, otkaži
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+
+          {/* Parent cancel — Potvrđeno */}
+          {viewer_role === 'parent' && booking.status === 'Potvrđeno' && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button size="sm" variant="outline" className="rounded-xl text-destructive border-destructive/40 hover:bg-destructive/10">
+                  Otkaži rezervaciju
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Otkazati potvrđenu rezervaciju?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Dadilja se već pripremila za ovaj termin. Otkazujte samo u opravdanim slučajevima. Dadilja će biti odmah obaviještena.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Ne, ostavi</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                    onClick={() => statusMutation.mutate('Otkazano')}
+                  >
+                    Da, otkaži
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+
+          {/* Nanny accept/reject — Na čekanju */}
+          {viewer_role === 'nanny' && booking.status === 'Na čekanju' && (
+            <>
+              <Button
+                size="sm"
+                className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white"
+                onClick={() => statusMutation.mutate('Potvrđeno')}
+              >
+                <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" /> Prihvati
+              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button size="sm" variant="outline" className="rounded-xl text-destructive border-destructive/40 hover:bg-destructive/10">
+                    <X className="w-3.5 h-3.5 mr-1.5" /> Odbij
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Jesi li siguran/sigurna?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Ova rezervacija će biti odbijena i obitelj će biti obaviještena.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Odustani</AlertDialogCancel>
+                    <AlertDialogAction
+                      className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                      onClick={() => statusMutation.mutate('Odbijeno')}
+                    >
+                      Odbij rezervaciju
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </>
+          )}
+
+          {/* Nanny complete/cancel — Potvrđeno */}
+          {viewer_role === 'nanny' && booking.status === 'Potvrđeno' && (
+            <>
+              <Button
+                size="sm"
+                className="rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white"
+                onClick={() => statusMutation.mutate('Završeno')}
+              >
+                <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" /> Završi
+              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button size="sm" variant="outline" className="rounded-xl text-destructive border-destructive/40 hover:bg-destructive/10">
+                    <X className="w-3.5 h-3.5 mr-1.5" /> Otkaži
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Otkazati potvrđenu rezervaciju?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Obitelj se već pripremila za ovaj termin. Otkazivanje potvrđene rezervacije može utjecati na vašu ocjenu pouzdanosti. Otkazujte samo u opravdanim slučajevima (bolest, hitan slučaj). Obitelj će biti odmah obaviještena.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Ne, ostavi</AlertDialogCancel>
+                    <AlertDialogAction
+                      className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                      onClick={() => statusMutation.mutate('Otkazano')}
+                    >
+                      Da, otkaži
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </>
+          )}
+
           {viewer_role !== 'admin' && (
             <Link to={conversation ? `/Messages?conversation_id=${conversation.id}` : '/Messages'}>
               <Button size="sm" variant="outline" className="rounded-xl">

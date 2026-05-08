@@ -118,14 +118,35 @@ function BookingCard({ booking, onCancel, userEmail, relatedReport }) {
       {(booking.status === 'Na čekanju' || booking.status === 'Potvrđeno' || booking.status === 'Završeno' || booking.status === 'Odbijeno' || (booking.status === 'Otkazano' && withinDisputeWindow)) && (
         <div className="border-t border-border/40 px-5 py-3 flex justify-end gap-2 bg-muted/20">
           {booking.status === 'Na čekanju' && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-xs text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl"
-              onClick={(e) => { e.stopPropagation(); onCancel(booking.id); }}
-            >
-              Otkaži rezervaciju
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-xs text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Otkaži zahtjev
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Otkazati zahtjev?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Vaš zahtjev za rezervaciju bit će povučen. Možete pretražiti druge dadilje u bilo kojem trenutku.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Ne, ostavi</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                    onClick={(e) => { e.stopPropagation(); onCancel(booking.id); }}
+                  >
+                    Da, otkaži
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           )}
           {booking.status === 'Potvrđeno' && (
             <AlertDialog>
