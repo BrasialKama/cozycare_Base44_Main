@@ -37,7 +37,7 @@ export default function LandingHeader() {
           borderBottom: '1px solid rgba(200,142,142,0.12)',
         }}
       >
-        <Link to="/" className="flex items-center gap-2.5 py-2 px-2 -mx-2 rounded-xl hover:bg-black/5 transition-colors">
+        <Link to="/" className="flex items-center gap-2.5 py-2 px-2 -mx-2 rounded-xl hover:bg-black/5 transition-colors" style={{ touchAction: 'manipulation' }}>
           <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-primary/90 flex items-center justify-center flex-shrink-0">
             <Heart className="w-4 h-4 text-white fill-white" />
           </div>
@@ -48,6 +48,7 @@ export default function LandingHeader() {
           <Link
             to="/FindNannies"
             className="hidden sm:flex items-center gap-1.5 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors px-3 lg:px-4 py-2 rounded-xl hover:bg-black/5 min-h-[36px]"
+            style={{ touchAction: 'manipulation' }}
           >
             <Search className="w-3.5 h-3.5" />
             Pronađi dadilju
@@ -58,6 +59,7 @@ export default function LandingHeader() {
               type="button"
               onClick={handleNannyPortalClick}
               className="hidden sm:flex items-center gap-1.5 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors px-3 lg:px-4 py-2 rounded-xl hover:bg-black/5 min-h-[36px]"
+              style={{ touchAction: 'manipulation' }}
             >
               <Users className="w-3.5 h-3.5" />
               Portal za dadilje
@@ -66,14 +68,15 @@ export default function LandingHeader() {
 
           {isAuthenticated ? (
             <div className="flex items-center gap-1 ml-1">
-              <Link to="/Home">
-                <Button size="sm" className="rounded-xl text-xs h-9 px-4">
+              <Link to="/Home" style={{ touchAction: 'manipulation' }}>
+                <Button size="sm" className="rounded-xl text-xs h-9 px-4" style={{ touchAction: 'manipulation' }}>
                   Moj račun
                 </Button>
               </Link>
               <button
                 onClick={() => logout()}
                 className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground/70 hover:text-foreground transition-colors px-3 py-2 rounded-xl hover:bg-black/5 min-h-[36px]"
+                style={{ touchAction: 'manipulation' }}
               >
                 <LogOut className="w-3.5 h-3.5" />
               </button>
@@ -84,6 +87,7 @@ export default function LandingHeader() {
               variant="outline"
               className="rounded-xl text-xs h-9 px-4 ml-1 border-primary/30 text-primary hover:bg-primary/5"
               onClick={() => navigateToLogin()}
+              style={{ touchAction: 'manipulation' }}
             >
               <LogIn className="w-3.5 h-3.5 mr-1.5" />
               Prijava

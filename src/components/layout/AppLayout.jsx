@@ -11,7 +11,7 @@ import PublicHeader from '@/components/shared/PublicHeader';
 import AdminRoleSwitcher from '@/components/layout/AdminRoleSwitcher';
 
 const Logo = () =>
-<Link to="/Landing" className="flex items-center gap-3 h-full px-3 -mx-2 group hover:bg-muted/40 transition-colors">
+<Link to="/Landing" className="flex items-center gap-3 h-full px-3 -mx-2 group hover:bg-muted/40 transition-colors" style={{ touchAction: 'manipulation' }}>
     <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-primary/25 to-peach/60 flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow flex-shrink-0">
       <Heart className="w-4 h-4 text-primary" fill="currentColor" />
     </div>
@@ -54,7 +54,8 @@ function NavLink({ item, active, onClick, badge }) {
       active ?
       'bg-primary/12 text-primary shadow-sm' :
       'text-muted-foreground hover:text-foreground hover:bg-muted/50'}`
-      }>
+      }
+      style={{ touchAction: 'manipulation' }}>
       
       <span className="relative flex-shrink-0">
         <item.icon className={`w-4 h-4 ${active ? 'text-primary' : ''}`} />
@@ -160,6 +161,7 @@ export default function AppLayout() {
               to={role === 'nanny' ? '/NannyProfile' : role === 'admin' ? '/AdminDashboard' : '/FamilySettings'}
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-muted/50 transition-colors cursor-pointer group"
               aria-label="Postavke profila"
+              style={{ touchAction: 'manipulation' }}
             >
               <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center text-xs font-bold text-primary flex-shrink-0">
                 {(user?.display_name || user?.full_name || user?.email || '?')[0]?.toUpperCase()}
@@ -177,7 +179,8 @@ export default function AppLayout() {
             <Button
               variant="ghost"
               className="w-full justify-start text-muted-foreground hover:text-foreground text-xs rounded-xl min-h-[36px] px-4 py-2"
-              onClick={() => logout()}>
+              onClick={() => logout()}
+              style={{ touchAction: 'manipulation' }}>
               <LogOut className="w-4 h-4 mr-2" />
               Odjava
             </Button>
@@ -194,14 +197,16 @@ export default function AppLayout() {
               <Button
                 variant="ghost"
                 className="text-xs text-muted-foreground hover:text-foreground gap-1.5 h-9 px-3"
-                onClick={() => logout()}>
+                onClick={() => logout()}
+                style={{ touchAction: 'manipulation' }}>
                 <LogOut className="w-4 h-4" />
                 Odjava
               </Button> :
               <Button
                 variant="ghost"
                 className="text-xs text-muted-foreground hover:text-foreground h-9 px-3"
-                onClick={() => navigateToLogin()}>
+                onClick={() => navigateToLogin()}
+                style={{ touchAction: 'manipulation' }}>
                 Prijava
               </Button>
             }
@@ -235,7 +240,8 @@ export default function AppLayout() {
                 to={item.path}
                 className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-[10px] font-semibold transition-colors min-w-0 ${
                 active ? 'text-primary' : 'text-muted-foreground'}`
-                }>
+                }
+                style={{ touchAction: 'manipulation' }}>
                 
                 <span className="relative">
                   <item.icon className={`w-5 h-5 mb-0.5 ${active ? 'text-primary' : 'text-muted-foreground/70'}`} />

@@ -26,7 +26,7 @@ export default function PublicHeader() {
         }}
       >
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2.5 py-2 px-2 -mx-2 rounded-xl hover:bg-black/5 transition-colors">
+        <Link to="/" className="flex items-center gap-2.5 py-2 px-2 -mx-2 rounded-xl hover:bg-black/5 transition-colors" style={{ touchAction: 'manipulation' }}>
           <div className="w-8 h-8 lg:w-9 lg:h-9 rounded-full bg-primary/90 flex items-center justify-center flex-shrink-0">
             <Heart className="w-4 h-4 text-white fill-white" />
           </div>
@@ -46,6 +46,7 @@ export default function PublicHeader() {
                     ? 'text-primary bg-primary/8'
                     : 'text-foreground/70 hover:text-foreground hover:bg-black/5'
                 }`}
+                style={{ touchAction: 'manipulation' }}
               >
                 <item.icon className="w-3.5 h-3.5" />
                 {item.label}
@@ -54,8 +55,8 @@ export default function PublicHeader() {
           })}
 
           {isAuthenticated ? (
-            <Link to="/Home">
-              <Button size="sm" className="rounded-xl text-xs h-9 px-4 ml-1">
+            <Link to="/Home" style={{ touchAction: 'manipulation' }}>
+              <Button size="sm" className="rounded-xl text-xs h-9 px-4 ml-1" style={{ touchAction: 'manipulation' }}>
                 Moj račun
               </Button>
             </Link>
@@ -65,6 +66,7 @@ export default function PublicHeader() {
               variant="outline"
               className="rounded-xl text-xs h-9 px-4 ml-1 border-primary/30 text-primary hover:bg-primary/5"
               onClick={() => navigateToLogin()}
+              style={{ touchAction: 'manipulation' }}
             >
               <LogIn className="w-3.5 h-3.5 mr-1.5" />
               Prijava
@@ -75,8 +77,8 @@ export default function PublicHeader() {
         {/* Mobile: Prijava + hamburger */}
         <div className="flex sm:hidden items-center gap-1.5">
           {isAuthenticated ? (
-            <Link to="/Home">
-              <Button size="sm" className="rounded-xl text-xs h-8 px-3">
+            <Link to="/Home" style={{ touchAction: 'manipulation' }}>
+              <Button size="sm" className="rounded-xl text-xs h-8 px-3" style={{ touchAction: 'manipulation' }}>
                 Moj račun
               </Button>
             </Link>
@@ -86,6 +88,7 @@ export default function PublicHeader() {
               variant="outline"
               className="rounded-xl text-xs h-8 px-3 border-primary/30 text-primary"
               onClick={() => navigateToLogin()}
+              style={{ touchAction: 'manipulation' }}
             >
               <LogIn className="w-3.5 h-3.5 mr-1" />
               Prijava
@@ -95,6 +98,7 @@ export default function PublicHeader() {
             onClick={() => setMobileOpen(!mobileOpen)}
             className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-black/5 transition-colors"
             aria-label="Izbornik"
+            style={{ touchAction: 'manipulation' }}
           >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -123,6 +127,7 @@ export default function PublicHeader() {
                     ? 'text-primary bg-primary/8'
                     : 'text-foreground/80 hover:bg-muted/40'
                 }`}
+                style={{ touchAction: 'manipulation' }}
               >
                 <item.icon className="w-4 h-4" />
                 {item.label}
