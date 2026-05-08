@@ -3,10 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { Calendar, Clock, Check, X, CheckCircle2 } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { Calendar, Clock, X, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import PageHeader from '@/components/shared/PageHeader';
 import EmptyState from '@/components/shared/EmptyState';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -150,55 +148,135 @@ export default function NannyBookings() {
   };
 
   const BookingCard = ({ booking }) => (
-    <Card
-      className="p-4 border-border/60 cursor-pointer hover:shadow-md transition-shadow"
+    <div
+      className="bg-card border border-border/50 rounded-2xl overflow-hidden hover:shadow-md hover:border-primary/15 transition-all duration-200 cursor-pointer"
       onClick={() => navigate(`/BookingDetail?id=${booking.id}`)}
     >
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <h3 className="font-semibold text-sm">
-              {booking.family_display_name || booking.family_name || 'Obitelj'}
-            </h3>
-            <Badge className={`text-[11px] ${statusStyles[booking.status]} border-0`}>
-              {booking.status}
-            </Badge>
+      <div className="p-5">
+        <div className="flex items-start gap-4">
+          {/* Family avatar (initial of family name) */}
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-sage/30 to-peach/40 flex items-center justify-center flex-shrink-0 text-lg font-display font-bold text-foreground shadow-sm">
+            {(booking.family_display_name || booking.family_name || 'O')[0]}
           </div>
-          {booking.family_name && booking.family_display_name && booking.family_name !== booking.family_display_name && (
-            <p className="text-xs text-muted-foreground mb-1">
-              Obitelj {booking.family_name}
-            </p>
-          )}
-          <p className="text-xs text-muted-foreground flex items-center gap-1">
-            <Calendar className="w-3 h-3" /> {booking.date}
-          </p>
-          <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-            <Clock className="w-3 h-3" /> {booking.start_time} - {booking.end_time}
-          </p>
-          {booking.created_date && (
-            <p className="text-[11px] text-muted-foreground/70 mt-1">
-              Kreirano {formatCreated(booking.created_date)}
-            </p>
-          )}
-          {booking.special_notes && (
-            <p className="text-xs text-muted-foreground mt-1">Napomene: {booking.special_notes}</p>
-          )}
+
+          <div className="flex-1 min-w-0">
+            {/* Top row: name + status badge on left, price on right */}
+            <div className="flex items-start justify-between gap-2 flex-wrap">
+              <div className="min-w-0">
+                <h3 className="font-display font-bold text-base text-foreground leading-tight">
+                  {booking.family_display_name || booking.family_name || 'Obitelj'}
+                </h3>
+                <span className={`inline-block text-[11px] font-semibold px-2.5 py-0.5 rounded-full mt-1 capitalize ${statusStyles[booking.status] || 'bg-muted text-muted-foreground'}`}>
+                  {booking.status}
+                </span>
+                {booking.family_name && booking.family_display_name && booking.family_name !== booking.family_display_name && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Obitelj {booking.family_name}
+                  </p>
+                )}
+              </div>
+              <p className="font-display font-bold text-primary text-lg flex-shrink-0">
+                €{booking.total_price?.toFixed(2)}
+              </p>
+            </div>
+
+            {/* Middle row: date + time chips */}
+            <div className="flex flex-wrap gap-3 mt-3 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1.5 bg-muted/50 px-2.5 py-1 rounded-lg">
+                <Calendar className="w-3 h-3" /> {booking.date}
+              </span>
+              <span className="flex items-center gap-1.5 bg-muted/50 px-2.5 py-1 rounded-lg">
+                <Clock className="w-3 h-3" /> {booking.start_time}–{booking.end_time}
+              </span>
+            </div>
+
+            {booking.created_date && (
+              <p className="text-[11px] text-muted-foreground/70 mt-2">
+                Kreirano {formatCreated(booking.created_date)}
+              </p>
+            )}
+
+            {booking.special_notes && (
+              <p className="text-xs text-muted-foreground mt-2.5 italic line-clamp-2 leading-relaxed">
+                Napomene: {booking.special_notes}
+              </p>
+            )}
+          </div>
         </div>
+      </div>
 
-        <div className="text-right">
-          <p className="font-display font-semibold text-primary">€{booking.total_price?.toFixed(2)}</p>
-
-          {booking.status === 'Potvrđeno' && (
-            <div className="flex gap-1.5 mt-2 justify-end" onClick={(e) => e.stopPropagation()}>
+      {/* Action footer */}
+      {(booking.status === 'Na čekanju' || booking.status === 'Potvrđeno') && (
+        <div
+          className="border-t border-border/40 px-5 py-3 flex justify-end gap-2 bg-muted/20"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {booking.status === 'Na čekanju' && (
+            <>
+              <Button
+                size="sm"
+                className="h-8 px-3 text-xs bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  updateMutation.mutate({
+                    id: booking.id,
+                    data: { status: 'Potvrđeno' },
+                    booking,
+                  });
+                }}
+              >
+                <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" /> Prihvati
+              </Button>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button
                     size="sm"
                     variant="outline"
-                    className="h-7 px-2.5 text-xs border-destructive/40 text-destructive hover:bg-destructive/10"
+                    className="h-8 px-3 text-xs border-destructive/40 text-destructive hover:bg-destructive/10 rounded-xl"
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <X className="w-3 h-3 mr-1" /> Otkaži
+                    <X className="w-3.5 h-3.5 mr-1.5" /> Odbij
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Odbiti zahtjev?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Obitelj će biti obaviještena da rezervacija nije prihvaćena.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Ne, ostavi</AlertDialogCancel>
+                    <AlertDialogAction
+                      className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        updateMutation.mutate({
+                          id: booking.id,
+                          data: { status: 'Odbijeno' },
+                          booking,
+                        });
+                      }}
+                    >
+                      Da, odbij
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </>
+          )}
+
+          {booking.status === 'Potvrđeno' && (
+            <>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-8 px-3 text-xs border-destructive/40 text-destructive hover:bg-destructive/10 rounded-xl"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <X className="w-3.5 h-3.5 mr-1.5" /> Otkaži
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent onClick={(e) => e.stopPropagation()}>
@@ -228,7 +306,7 @@ export default function NannyBookings() {
               </AlertDialog>
               <Button
                 size="sm"
-                className="h-7 px-2.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
+                className="h-8 px-3 text-xs bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl"
                 onClick={(e) => {
                   e.stopPropagation();
                   updateMutation.mutate({
@@ -238,69 +316,13 @@ export default function NannyBookings() {
                   });
                 }}
               >
-                <CheckCircle2 className="w-3 h-3 mr-1" /> Završi
+                <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" /> Završi
               </Button>
-            </div>
-          )}
-
-          {booking.status === 'Na čekanju' && (
-            <div className="flex gap-1.5 mt-2" onClick={(e) => e.stopPropagation()}>
-              <Button
-                size="sm"
-                className="h-7 px-2.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  updateMutation.mutate({
-                    id: booking.id,
-                    data: { status: 'Potvrđeno' },
-                    booking,
-                  });
-                }}
-              >
-                <Check className="w-3 h-3 mr-1" /> Prihvati
-              </Button>
-
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-7 px-2.5 text-xs border-destructive/40 text-destructive hover:bg-destructive/10"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <X className="w-3 h-3 mr-1" /> Odbij
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent onClick={(e) => e.stopPropagation()}>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Jesi li siguran/sigurna?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Ova rezervacija će biti odbijena i obitelj će biti obaviještena.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Odustani</AlertDialogCancel>
-                    <AlertDialogAction
-                      className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        updateMutation.mutate({
-                          id: booking.id,
-                          data: { status: 'Odbijeno' },
-                          booking,
-                        });
-                      }}
-                    >
-                      Odbij rezervaciju
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
+            </>
           )}
         </div>
-      </div>
-    </Card>
+      )}
+    </div>
   );
 
   return (
