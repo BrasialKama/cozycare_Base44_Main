@@ -5,19 +5,16 @@ const TESTIMONIALS = [
   {
     quote: 'Konačno dadilja kojoj stvarno vjerujem. Mala se veseli svakom njenom dolasku.',
     name: 'Ana',
-    neighborhood: 'Maksimir',
     rating: 5,
   },
   {
     quote: 'Provjera pozadine mi je dala mir. Sad mogu mirno otići na posao.',
     name: 'Ivana',
-    neighborhood: 'Trešnjevka',
     rating: 5,
   },
   {
     quote: 'Rezervirala sam u 2 minute. Dadilja je stigla točno na vrijeme — profesionalna i topla.',
     name: 'Maja',
-    neighborhood: 'Novi Zagreb',
     rating: 5,
   },
 ];
@@ -51,7 +48,6 @@ export default function Testimonials() {
               <div className="mt-5 pt-4 border-t border-border/30 flex items-center justify-between">
                 <div>
                   <p className="text-sm font-semibold text-foreground">{t.name}</p>
-                  <p className="text-xs text-muted-foreground">{t.neighborhood}, Zagreb</p>
                 </div>
                 <div className="flex gap-0.5">
                   {Array.from({ length: t.rating }).map((_, i) => (

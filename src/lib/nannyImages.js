@@ -4,9 +4,9 @@
  *
  * Usage:
  *   import { getNannyImage, getNannyOwnImage, getNannyBackgroundImage } from '@/lib/nannyImages';
- *   getNannyImage(nanny)        — always returns a curated fallback (for public-facing views)
- *   getNannyOwnImage(nanny)     — returns real uploaded photo if available, else fallback (for own-profile editing)
- *   getNannyBackgroundImage()   — single consistent lifestyle background for cards
+ *   getNannyImage(nanny)             — always returns a curated fallback portrait (for public-facing views)
+ *   getNannyOwnImage(nanny)          — returns real uploaded photo if available, else fallback (for own-profile editing)
+ *   getNannyBackgroundImage(nanny)   — cycles through 10 curated lifestyle backgrounds, deterministic per nanny
  */
 
 // ── Portrait fallbacks (6 curated images) ──
@@ -19,8 +19,21 @@ const PORTRAIT_FALLBACKS = [
   'https://media.base44.com/images/public/69b94f7a37d2e3ed888df054/ab377bb97_generated_image.png',
 ];
 
-// ── Single consistent background for all cards ──
-const CARD_BACKGROUND = 'https://media.base44.com/images/public/69b94f7a37d2e3ed888df054/7d09d0182_generated_image.png';
+// ── Card background fallbacks (10 curated lifestyle scenes, no people) ──
+// These render under an 84% white overlay on cards, so each scene is soft,
+// airy, and low-contrast. Cycled deterministically per nanny via stableKey.
+const CARD_BACKGROUND_FALLBACKS = [
+  'https://media.base44.com/images/public/69b94f7a37d2e3ed888df054/8199557f0_generated_image.png',
+  'https://media.base44.com/images/public/69b94f7a37d2e3ed888df054/e694c8fb9_generated_image.png',
+  'https://media.base44.com/images/public/69b94f7a37d2e3ed888df054/c9cf2de70_generated_image.png',
+  'https://media.base44.com/images/public/69b94f7a37d2e3ed888df054/4039352c4_generated_image.png',
+  'https://media.base44.com/images/public/69b94f7a37d2e3ed888df054/1e99edb02_generated_image.png',
+  'https://media.base44.com/images/public/69b94f7a37d2e3ed888df054/8d1bedb94_generated_image.png',
+  'https://media.base44.com/images/public/69b94f7a37d2e3ed888df054/0bd3707b8_generated_image.png',
+  'https://media.base44.com/images/public/69b94f7a37d2e3ed888df054/24ae07863_generated_image.png',
+  'https://media.base44.com/images/public/69b94f7a37d2e3ed888df054/7e4848c91_generated_image.png',
+  'https://media.base44.com/images/public/69b94f7a37d2e3ed888df054/6bb0515b9_generated_image.png',
+];
 
 /**
  * Simple deterministic hash from a string → positive integer.
@@ -74,8 +87,12 @@ export function hasRealPhoto(nanny) {
 }
 
 /**
- * Returns one consistent lifestyle background image for all cards.
+ * Returns a curated lifestyle background image for the nanny card.
+ * Cycles deterministically through CARD_BACKGROUND_FALLBACKS based on the
+ * nanny's stable key, so the same nanny always gets the same background but
+ * the gallery view feels visually varied.
  */
-export function getNannyBackgroundImage() {
-  return CARD_BACKGROUND;
+export function getNannyBackgroundImage(nanny) {
+  const idx = hashString(stableKey(nanny)) % CARD_BACKGROUND_FALLBACKS.length;
+  return CARD_BACKGROUND_FALLBACKS[idx];
 }
