@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Search, Calendar, MessageCircle, Shield, Heart, ArrowRight, Sparkles, Star, Clock } from 'lucide-react';
+import { Search, Calendar, MessageCircle, Shield, Heart, ArrowRight, Sparkles, Star, Clock, AlertTriangle, ChevronRight } from 'lucide-react';
+import { format, parseISO } from 'date-fns';
+import { hr } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
 import NannyCard from '@/components/shared/NannyCard';
 import WelcomeCard from './WelcomeCard';
@@ -35,6 +37,109 @@ export default function ParentHome() {
     queryFn: () => base44.entities.Booking.filter({ family_user_email: user?.email, status: 'Potvrđeno' }, '-date', 3),
     enabled: !!user?.email,
   });
+
+  // ── Active items / "Treba vaša pažnja" data fetches ──
+  const { data: myReports = [] } = useQuery({
+    queryKey: ['myActiveReports', user?.email],
+    queryFn: () => base44.entities.Report.filter(
+      { reporter_email: user?.email },
+      '-created_date',
+      20
+    ),
+    enabled: !!user?.email,
+    staleTime: 30_000,
+  });
+
+  const { data: myCompletedBookings = [] } = useQuery({
+    queryKey: ['myCompletedForReview', user?.email],
+    queryFn: () => base44.entities.Booking.filter(
+      { family_user_email: user?.email, status: 'Završeno' },
+      '-date',
+      20
+    ),
+    enabled: !!user?.email,
+    staleTime: 60_000,
+  });
+
+  const { data: myReviews = [] } = useQuery({
+    queryKey: ['myReviews', user?.email],
+    queryFn: () => base44.entities.Review.filter(
+      { parent_email: user?.email },
+      '-created_date',
+      50
+    ),
+    enabled: !!user?.email,
+    staleTime: 60_000,
+  });
+
+  const { data: myDeclinedBookings = [] } = useQuery({
+    queryKey: ['myDeclinedBookings', user?.email],
+    queryFn: () => base44.entities.Booking.filter(
+      { family_user_email: user?.email, status: 'Odbijeno' },
+      '-date',
+      10
+    ),
+    enabled: !!user?.email,
+    staleTime: 60_000,
+  });
+
+  const activeItems = useMemo(() => {
+    const items = [];
+
+    // 1. Open reports
+    for (const r of myReports) {
+      if (r.status === 'open' || r.status === 'investigating') {
+        items.push({
+          id: `report-${r.id}`,
+          icon: AlertTriangle,
+          iconBg: 'bg-amber-100',
+          iconFg: 'text-amber-700',
+          label: 'Vaša prijava se obrađuje',
+          sublabel: r.created_date
+            ? format(parseISO(r.created_date.endsWith('Z') || /[+-]\d{2}:\d{2}$/.test(r.created_date) ? r.created_date : r.created_date + 'Z'), 'd. MMM yyyy.', { locale: hr })
+            : '',
+          to: r.booking_id ? `/BookingDetail?id=${r.booking_id}` : '/Messages',
+        });
+      }
+    }
+
+    // 2. Unreviewed Završeno bookings within 7 days
+    const reviewedBookingIds = new Set(myReviews.map(rv => rv.booking_id).filter(Boolean));
+    const now = Date.now();
+    for (const b of myCompletedBookings) {
+      if (reviewedBookingIds.has(b.id)) continue;
+      if (!b.date) continue;
+      const ageDays = (now - Date.parse(b.date)) / (1000 * 60 * 60 * 24);
+      if (ageDays < 0 || ageDays > 7) continue;
+      items.push({
+        id: `review-${b.id}`,
+        icon: Star,
+        iconBg: 'bg-amber-50',
+        iconFg: 'text-amber-600',
+        label: `Ostavite recenziju za ${b.nanny_name || 'dadilju'}`,
+        sublabel: b.date,
+        to: `/LeaveReview?booking_id=${b.id}`,
+      });
+    }
+
+    // 3. Recently declined bookings (within 14 days)
+    for (const b of myDeclinedBookings) {
+      if (!b.date) continue;
+      const ageDays = (now - Date.parse(b.date)) / (1000 * 60 * 60 * 24);
+      if (ageDays < 0 || ageDays > 14) continue;
+      items.push({
+        id: `declined-${b.id}`,
+        icon: Search,
+        iconBg: 'bg-rose-light',
+        iconFg: 'text-primary',
+        label: `${b.nanny_name || 'Dadilja'} nije mogla — pronađite drugu`,
+        sublabel: b.date,
+        to: '/FindNannies',
+      });
+    }
+
+    return items.slice(0, 5);
+  }, [myReports, myCompletedBookings, myReviews, myDeclinedBookings]);
 
   return (
     <div className="space-y-14 pb-8">
@@ -83,6 +188,38 @@ export default function ParentHome() {
           </div>
         </div>
       </section>
+
+      {/* ── Active items / Treba vaša pažnja ── */}
+      {activeItems.length > 0 && (
+        <section>
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="font-display text-2xl font-semibold text-foreground">
+              Treba vaša pažnja
+            </h2>
+          </div>
+          <div className="space-y-2">
+            {activeItems.map(item => (
+              <Link
+                key={item.id}
+                to={item.to}
+                className="flex items-center gap-3 bg-card border border-border/50 rounded-2xl px-4 py-3 hover:shadow-md hover:border-primary/15 transition-all duration-200"
+                style={{ touchAction: 'manipulation' }}
+              >
+                <div className={`w-10 h-10 rounded-xl ${item.iconBg} flex items-center justify-center flex-shrink-0`}>
+                  <item.icon className={`w-4 h-4 ${item.iconFg}`} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm text-foreground leading-tight">{item.label}</p>
+                  {item.sublabel && (
+                    <p className="text-xs text-muted-foreground mt-0.5">{item.sublabel}</p>
+                  )}
+                </div>
+                <ChevronRight className="w-4 h-4 text-muted-foreground/60 flex-shrink-0" />
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ── Trust pillars ── */}
       <section>
