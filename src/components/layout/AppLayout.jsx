@@ -3,10 +3,11 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 import {
   Home, Search, Calendar, MessageCircle, User,
-  Shield, Heart, LogOut, Euro, ClipboardList, ChevronRight, Settings } from
+  Shield, Heart, LogOut, Euro, ClipboardList, ChevronRight, Settings, Bell } from
 'lucide-react';
 import { Button } from '@/components/ui/button';
 import useUnreadMessages from '@/hooks/useUnreadMessages';
+import useNotifications from '@/hooks/useNotifications';
 import PublicHeader from '@/components/shared/PublicHeader';
 import AdminRoleSwitcher from '@/components/layout/AdminRoleSwitcher';
 
@@ -28,6 +29,7 @@ const navItems = {
   { path: '/FindNannies', icon: Search, label: 'Pretraži dadilje' },
   { path: '/MyBookings', icon: Calendar, label: 'Rezervacije' },
   { path: '/Messages', icon: MessageCircle, label: 'Poruke' },
+  { path: '/Inbox', icon: Bell, label: 'Obavijesti' },
   { path: '/FamilySettings', icon: User, label: 'Moja obitelj' }],
 
   nanny: [
@@ -106,6 +108,7 @@ export default function AppLayout() {
   const items = navItems[role] || navItems.parent;
   const mobileTabItems = mobileTabNav[role] || mobileTabNav.parent;
   const { unreadCount } = useUnreadMessages();
+  const { count: notificationsCount } = useNotifications();
 
   // Public/guest users get a minimal shell with PublicHeader — no sidebar, no account UI
   if (!isAuthenticated) {
@@ -142,7 +145,7 @@ export default function AppLayout() {
                 key={item.path}
                 item={item}
                 active={active}
-                badge={item.path === '/Messages' ? unreadCount : 0} />);
+                badge={item.path === '/Inbox' ? notificationsCount : item.path === '/Messages' ? unreadCount : 0} />);
           })}
         </nav>
 
@@ -193,6 +196,20 @@ export default function AppLayout() {
         <div className="h-14 flex items-center justify-between px-4">
           <Logo />
           <div className="flex items-center gap-1">
+            {isAuthenticated && role === 'parent' && (
+              <Link
+                to="/Inbox"
+                className="relative inline-flex items-center justify-center h-9 w-9 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                aria-label="Obavijesti"
+                style={{ touchAction: 'manipulation' }}>
+                <Bell className="w-4 h-4" />
+                {notificationsCount > 0 && (
+                  <span className="absolute top-1 right-1 min-w-[16px] h-4 px-1 flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold leading-none">
+                    {notificationsCount > 99 ? '99+' : notificationsCount}
+                  </span>
+                )}
+              </Link>
+            )}
             {isAuthenticated ?
               <Button
                 variant="ghost"

@@ -30,6 +30,7 @@ import AdminBookings from '@/pages/AdminBookings';
 import AdminReports from '@/pages/AdminReports';
 import Join from '@/pages/Join';
 import Landing from '@/pages/Landing';
+import Inbox from '@/pages/Inbox';
 import NannyPortal from '@/pages/NannyPortal';
 import RequireRole from '@/components/auth/RequireRole';
 import ErrorBoundary from '@/components/shared/ErrorBoundary';
@@ -74,6 +75,7 @@ const AuthenticatedApp = () => {
         <Route path="/BookNanny" element={<ErrorBoundary><BookNanny /></ErrorBoundary>} />
         <Route path="/MyBookings" element={<ErrorBoundary><MyBookings /></ErrorBoundary>} />
         <Route path="/Messages" element={<ErrorBoundary><Messages /></ErrorBoundary>} />
+        <Route path="/Inbox" element={<ErrorBoundary><Inbox /></ErrorBoundary>} />
         <Route path="/FamilySettings" element={<ErrorBoundary><FamilySettings /></ErrorBoundary>} />
         <Route path="/LeaveReview" element={<ErrorBoundary><LeaveReview /></ErrorBoundary>} />
         <Route path="/BookingDetail" element={<ErrorBoundary><BookingDetail /></ErrorBoundary>} />
