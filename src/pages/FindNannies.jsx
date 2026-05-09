@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Search, X, Sparkles, ShieldCheck } from 'lucide-react';
 import { normalize } from '@/lib/normalize';
+import { setNannyBackgroundSeed } from '@/lib/nannyImages';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
@@ -58,6 +59,9 @@ export default function FindNannies() {
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [videoNanny, setVideoNanny] = useState(null);
+
+  // Pick one card-background per page mount so all cards on this browse match.
+  useEffect(() => { setNannyBackgroundSeed(); }, []);
 
   const activeCount = countActive(filters);
   const clearAll = () => setFilters({ ...DEFAULT_FILTERS });

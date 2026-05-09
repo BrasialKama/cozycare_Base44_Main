@@ -1,10 +1,16 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { format, parseISO } from 'date-fns';
 import { hr } from 'date-fns/locale';
 import { AlertTriangle, Star, Search } from 'lucide-react';
+import {
+  readDismissals,
+  gcDismissals,
+  dismissNotification,
+  dismissNotifications,
+} from '@/lib/notificationDismissals';
 
 /**
  * Normalize a Base44 ISO timestamp/date so parseISO treats it as UTC.
@@ -26,15 +32,48 @@ function formatHrDate(value) {
 /**
  * Aggregates "Treba vaša pažnja" actionable items for the current parent user.
  *
- * Returns { items, count, refetch }.
- * For non-parent roles (nanny / admin), returns empty items + count 0.
- * Mirrors the shape of useUnreadMessages — same focus/refetch lifecycle.
+ * Returns:
+ *   { items, count, previousItems, isLoading, dismiss, dismissAll, refetch }
+ *
+ * `items` are the active (undismissed) notifications. `count` mirrors the
+ * length of `items`. `previousItems` are items that have been dismissed
+ * within the last 7 days, kept so the user can see history in the Inbox
+ * "Prethodne" tab.
+ *
+ * For non-parent roles (nanny / admin), returns empty everything.
  */
 export default function useNotifications() {
   const { user, effectiveRole } = useAuth();
   const isParent = effectiveRole === 'parent';
   const enabled = isParent && !!user?.email;
 
+  // ── Local dismissal state, mirrored from localStorage ──
+  const [dismissals, setDismissals] = useState(() =>
+    enabled ? gcDismissals(readDismissals(user.email)) : {}
+  );
+
+  // Re-read when the user changes or queries become enabled.
+  useEffect(() => {
+    if (!enabled) {
+      setDismissals({});
+      return;
+    }
+    setDismissals(gcDismissals(readDismissals(user.email)));
+  }, [enabled, user?.email]);
+
+  // Listen for in-tab and cross-tab changes so multiple components stay in sync.
+  useEffect(() => {
+    if (!enabled) return undefined;
+    const refresh = () => setDismissals(gcDismissals(readDismissals(user.email)));
+    window.addEventListener('cozycare:notifications-changed', refresh);
+    window.addEventListener('storage', refresh);
+    return () => {
+      window.removeEventListener('cozycare:notifications-changed', refresh);
+      window.removeEventListener('storage', refresh);
+    };
+  }, [enabled, user?.email]);
+
+  // ── Data queries (parent only) ──
   const reportsQ = useQuery({
     queryKey: ['notifications', 'myActiveReports', user?.email],
     queryFn: () =>
@@ -87,23 +126,23 @@ export default function useNotifications() {
     staleTime: 60_000,
   });
 
-  const refetch = () => {
+  const refetch = useCallback(() => {
     if (!enabled) return;
     reportsQ.refetch();
     completedQ.refetch();
     reviewsQ.refetch();
     declinedQ.refetch();
-  };
+  }, [enabled, reportsQ, completedQ, reviewsQ, declinedQ]);
 
   useEffect(() => {
     if (!enabled) return undefined;
     const onFocus = () => refetch();
     window.addEventListener('focus', onFocus);
     return () => window.removeEventListener('focus', onFocus);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled]);
+  }, [enabled, refetch]);
 
-  const items = useMemo(() => {
+  // Build the full list of currently-eligible notifications (before dismissal filtering).
+  const allItems = useMemo(() => {
     if (!isParent) return [];
 
     const myReports = reportsQ.data || [];
@@ -166,12 +205,71 @@ export default function useNotifications() {
     return out;
   }, [isParent, reportsQ.data, completedQ.data, reviewsQ.data, declinedQ.data]);
 
+  // Active = currently eligible AND not dismissed.
+  const items = useMemo(
+    () => allItems.filter(item => !dismissals[item.id]),
+    [allItems, dismissals]
+  );
+
+  // Previous = anything in localStorage, joined back to its render shape if
+  // we still have an "eligible" entry; otherwise we render a minimal stub.
+  const previousItems = useMemo(() => {
+    if (!isParent) return [];
+    const eligibleById = new Map(allItems.map(i => [i.id, i]));
+    const out = [];
+    for (const [id, entry] of Object.entries(dismissals)) {
+      const base = eligibleById.get(id);
+      if (base) {
+        out.push({ ...base, dismissedAt: entry.dismissedAt });
+      } else {
+        // Not in current eligible list — keep a minimal historical row.
+        out.push({
+          id,
+          icon: AlertTriangle,
+          iconBg: 'bg-muted',
+          iconFg: 'text-muted-foreground',
+          label: 'Obavijest',
+          sublabel: '',
+          to: '/Inbox',
+          dismissedAt: entry.dismissedAt,
+        });
+      }
+    }
+    out.sort((a, b) => Date.parse(b.dismissedAt || 0) - Date.parse(a.dismissedAt || 0));
+    return out;
+  }, [isParent, allItems, dismissals]);
+
+  const dismiss = useCallback(
+    (id) => {
+      if (!enabled || !id) return;
+      dismissNotification(user.email, id);
+      setDismissals(prev => ({ ...prev, [id]: { dismissedAt: new Date().toISOString() } }));
+    },
+    [enabled, user?.email]
+  );
+
+  const dismissAll = useCallback(() => {
+    if (!enabled) return;
+    const ids = items.map(i => i.id);
+    if (ids.length === 0) return;
+    dismissNotifications(user.email, ids);
+    const now = new Date().toISOString();
+    setDismissals(prev => {
+      const next = { ...prev };
+      for (const id of ids) next[id] = { dismissedAt: now };
+      return next;
+    });
+  }, [enabled, items, user?.email]);
+
   const isLoading = enabled && (reportsQ.isLoading || completedQ.isLoading || reviewsQ.isLoading || declinedQ.isLoading);
 
   return {
     items,
     count: items.length,
+    previousItems,
     isLoading,
+    dismiss,
+    dismissAll,
     refetch,
   };
 }

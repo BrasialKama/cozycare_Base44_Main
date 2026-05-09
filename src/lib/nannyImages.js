@@ -3,10 +3,15 @@
  * All images are warm, trustworthy, feminine-leaning, family-safe.
  *
  * Usage:
- *   import { getNannyImage, getNannyOwnImage, getNannyBackgroundImage } from '@/lib/nannyImages';
+ *   import {
+ *     getNannyImage, getNannyOwnImage,
+ *     getNannyBackgroundImage, setNannyBackgroundSeed,
+ *   } from '@/lib/nannyImages';
+ *
  *   getNannyImage(nanny)             — always returns a curated fallback portrait (for public-facing views)
  *   getNannyOwnImage(nanny)          — returns real uploaded photo if available, else fallback (for own-profile editing)
- *   getNannyBackgroundImage(nanny)   — cycles through 10 curated lifestyle backgrounds, deterministic per nanny
+ *   getNannyBackgroundImage()        — returns the SAME card background for all cards on the current page mount.
+ *                                      Pages call setNannyBackgroundSeed() once on mount to pick a fresh background.
  */
 
 // ── Portrait fallbacks (6 curated images) ──
@@ -21,7 +26,9 @@ const PORTRAIT_FALLBACKS = [
 
 // ── Card background fallbacks (10 curated lifestyle scenes, no people) ──
 // These render under an 84% white overlay on cards, so each scene is soft,
-// airy, and low-contrast. Cycled deterministically per nanny via stableKey.
+// airy, and low-contrast. A single index is picked per page mount so all
+// cards on the same browse share the same background; switching/re-mounting
+// the page picks a fresh one.
 const CARD_BACKGROUND_FALLBACKS = [
   'https://media.base44.com/images/public/69b94f7a37d2e3ed888df054/8199557f0_generated_image.png',
   'https://media.base44.com/images/public/69b94f7a37d2e3ed888df054/e694c8fb9_generated_image.png',
@@ -34,6 +41,18 @@ const CARD_BACKGROUND_FALLBACKS = [
   'https://media.base44.com/images/public/69b94f7a37d2e3ed888df054/7e4848c91_generated_image.png',
   'https://media.base44.com/images/public/69b94f7a37d2e3ed888df054/6bb0515b9_generated_image.png',
 ];
+
+// Module-level seed → drives the active background index.
+// Initialised to a random index so the very first render isn't always #0.
+let _backgroundIndex = Math.floor(Math.random() * CARD_BACKGROUND_FALLBACKS.length);
+
+/**
+ * Pages should call this once on mount (useEffect with [] deps) to randomise
+ * the background used by all cards rendered during this page session.
+ */
+export function setNannyBackgroundSeed() {
+  _backgroundIndex = Math.floor(Math.random() * CARD_BACKGROUND_FALLBACKS.length);
+}
 
 /**
  * Simple deterministic hash from a string → positive integer.
@@ -56,13 +75,7 @@ function stableKey(nanny) {
 
 /**
  * Public-facing image — returns the real uploaded photo if available,
- * otherwise falls back to a deterministic curated stock portrait so the UI
- * never shows a broken/blank avatar.
- *
- * Used on browse cards, detail pages, booking pages, and home featured.
- * It is critical for a child-safety platform that parents see the actual
- * nanny — stock photos are only acceptable as a temporary placeholder
- * before a real photo is uploaded.
+ * otherwise falls back to a deterministic curated stock portrait.
  */
 export function getNannyImage(nanny) {
   const realPhoto = nanny?.profile_photo_url || nanny?.photo_url;
@@ -87,12 +100,11 @@ export function hasRealPhoto(nanny) {
 }
 
 /**
- * Returns a curated lifestyle background image for the nanny card.
- * Cycles deterministically through CARD_BACKGROUND_FALLBACKS based on the
- * nanny's stable key, so the same nanny always gets the same background but
- * the gallery view feels visually varied.
+ * Returns the active card background image — same value for every card on
+ * the current page. The `nanny` argument is ignored (kept for backwards
+ * compatibility with existing call sites).
  */
-export function getNannyBackgroundImage(nanny) {
-  const idx = hashString(stableKey(nanny)) % CARD_BACKGROUND_FALLBACKS.length;
-  return CARD_BACKGROUND_FALLBACKS[idx];
+// eslint-disable-next-line no-unused-vars
+export function getNannyBackgroundImage(_nanny) {
+  return CARD_BACKGROUND_FALLBACKS[_backgroundIndex];
 }

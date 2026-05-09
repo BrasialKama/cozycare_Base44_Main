@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Search, Calendar, MessageCircle, Shield, Heart, ArrowRight, Sparkles, Star, Clock } from 'lucide-react';
+import { setNannyBackgroundSeed } from '@/lib/nannyImages';
 import { Button } from '@/components/ui/button';
 import NannyCard from '@/components/shared/NannyCard';
 import WelcomeCard from './WelcomeCard';
@@ -17,6 +18,8 @@ const greetingTime = () => {
 
 export default function ParentHome() {
   const { user } = useAuth();
+  // Pick one card-background per page mount so all featured cards match.
+  useEffect(() => { setNannyBackgroundSeed(); }, []);
   // Prefer display_name (user's chosen name) → full_name → email prefix → fallback
   const emailPrefix = user?.email ? user.email.split('@')[0] : '';
   const fullSource = user?.display_name || user?.full_name || emailPrefix || 'there';

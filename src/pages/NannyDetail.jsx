@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { getNannyImage, getNannyBackgroundImage } from '@/lib/nannyImages';
+import { getNannyImage, getNannyBackgroundImage, setNannyBackgroundSeed } from '@/lib/nannyImages';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import {
   MapPin, Clock, Award, MessageCircle, Calendar,
@@ -62,6 +62,9 @@ export default function NannyDetail() {
   const { user, isAuthenticated, navigateToLogin } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Pick one background per detail-page mount.
+  useEffect(() => { setNannyBackgroundSeed(); }, []);
 
   const { data: nanny, isLoading } = useQuery({
     queryKey: ['publicNanny', id],
