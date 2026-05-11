@@ -195,7 +195,7 @@ export default function useNotifications() {
             icon: AlertTriangle,
             iconBg: 'bg-amber-100',
             iconFg: 'text-amber-700',
-            label: 'Vaša prijava se obrađuje',
+            label: 'Prijava u obradi',
             sublabel: formatHrDate(r.created_date),
             to: r.booking_id ? `/BookingDetail?id=${r.booking_id}` : '/Messages',
           });
@@ -215,7 +215,7 @@ export default function useNotifications() {
           icon: Star,
           iconBg: 'bg-amber-50',
           iconFg: 'text-amber-600',
-          label: `Ostavite recenziju za ${b.nanny_name || 'dadilju'}`,
+          label: `Ocijenite vaše iskustvo s ${b.nanny_name || 'dadiljom'}`,
           sublabel: formatHrDate(b.date),
           to: `/LeaveReview?booking_id=${b.id}`,
         });
@@ -231,7 +231,7 @@ export default function useNotifications() {
           icon: Search,
           iconBg: 'bg-rose-light',
           iconFg: 'text-primary',
-          label: `${b.nanny_name || 'Dadilja'} nije mogla — pronađite drugu`,
+          label: `Rezervacija s ${b.nanny_name || 'dadiljom'} nije prihvaćena`,
           sublabel: formatHrDate(b.date),
           to: '/FindNannies',
         });
@@ -250,7 +250,7 @@ export default function useNotifications() {
           icon: Calendar,
           iconBg: 'bg-peach/40',
           iconFg: 'text-peach-dark',
-          label: `Nova rezervacija od ${b.family_display_name || b.family_name || 'obitelji'}`,
+          label: `Zahtjev za rezervaciju — ${b.family_display_name || b.family_name || 'obitelj'}`,
           sublabel: formatHrDate(b.date),
           to: `/BookingDetail?id=${b.id}`,
         });
@@ -267,7 +267,7 @@ export default function useNotifications() {
           icon: Star,
           iconBg: 'bg-amber-50',
           iconFg: 'text-amber-600',
-          label: `${r.parent_name || 'Obitelj'} vam je ostavio recenziju`,
+          label: `Nova recenzija od ${r.parent_name || 'obitelji'}`,
           sublabel: formatHrDate(r.created_date),
           to: '/NannyReviews',
         });

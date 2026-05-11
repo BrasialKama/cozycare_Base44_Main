@@ -52,9 +52,6 @@ export default function Inbox() {
       <header className="flex items-start justify-between gap-3">
         <div>
           <h1 className="font-display text-3xl font-bold text-foreground">Obavijesti</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Stvari koje trebaju vašu pažnju.
-          </p>
         </div>
         {items.length > 0 && (
           <Button
@@ -95,7 +92,7 @@ export default function Inbox() {
                 Nema novih obavijesti
               </h2>
               <p className="text-sm text-muted-foreground max-w-xs mx-auto">
-                Ovdje ćete vidjeti stvari koje trebaju vašu pažnju.
+                Sve je pod kontrolom — nema novih obavijesti.
               </p>
             </div>
           ) : (
@@ -121,7 +118,7 @@ export default function Inbox() {
                 Nema prethodnih obavijesti
               </h2>
               <p className="text-sm text-muted-foreground max-w-xs mx-auto">
-                Obavijesti koje pročitate pojavit će se ovdje tijekom 7 dana.
+                Obavijesti koje pročitate vidljive su ovdje 7 dana.
               </p>
             </div>
           ) : (
