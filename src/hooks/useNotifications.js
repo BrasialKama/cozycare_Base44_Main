@@ -4,7 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { format, parseISO } from 'date-fns';
 import { hr } from 'date-fns/locale';
-import { AlertTriangle, Star, Search } from 'lucide-react';
+import { AlertTriangle, Star, Search, Calendar } from 'lucide-react';
 import {
   readDismissals,
   gcDismissals,
@@ -45,7 +45,8 @@ function formatHrDate(value) {
 export default function useNotifications() {
   const { user, effectiveRole } = useAuth();
   const isParent = effectiveRole === 'parent';
-  const enabled = isParent && !!user?.email;
+  const isNanny = effectiveRole === 'nanny';
+  const enabled = (isParent || isNanny) && !!user?.email;
 
   // ── Local dismissal state, mirrored from localStorage ──
   const [dismissals, setDismissals] = useState(() =>
@@ -73,7 +74,8 @@ export default function useNotifications() {
     };
   }, [enabled, user?.email]);
 
-  // ── Data queries (parent only) ──
+  // ── Parent queries ──
+  const parentEnabled = isParent && !!user?.email;
   const reportsQ = useQuery({
     queryKey: ['notifications', 'myActiveReports', user?.email],
     queryFn: () =>
@@ -82,7 +84,7 @@ export default function useNotifications() {
         '-created_date',
         20
       ),
-    enabled,
+    enabled: parentEnabled,
     refetchInterval: 30_000,
     staleTime: 30_000,
   });
@@ -95,7 +97,7 @@ export default function useNotifications() {
         '-date',
         20
       ),
-    enabled,
+    enabled: parentEnabled,
     refetchInterval: 30_000,
     staleTime: 60_000,
   });
@@ -108,7 +110,7 @@ export default function useNotifications() {
         '-created_date',
         50
       ),
-    enabled,
+    enabled: parentEnabled,
     refetchInterval: 30_000,
     staleTime: 60_000,
   });
@@ -121,18 +123,52 @@ export default function useNotifications() {
         '-date',
         10
       ),
-    enabled,
+    enabled: parentEnabled,
+    refetchInterval: 30_000,
+    staleTime: 60_000,
+  });
+
+  // ── Nanny queries ──
+  const nannyEnabled = isNanny && !!user?.email;
+  const pendingBookingsQ = useQuery({
+    queryKey: ['notifications', 'pendingNannyBookings', user?.email],
+    queryFn: () =>
+      base44.entities.Booking.filter(
+        { nanny_user_email: user?.email, status: 'Na čekanju' },
+        '-date',
+        20
+      ),
+    enabled: nannyEnabled,
+    refetchInterval: 30_000,
+    staleTime: 60_000,
+  });
+
+  const recentReviewsQ = useQuery({
+    queryKey: ['notifications', 'recentNannyReviews', user?.email],
+    queryFn: () =>
+      base44.entities.Review.filter(
+        { nanny_email: user?.email },
+        '-created_date',
+        20
+      ),
+    enabled: nannyEnabled,
     refetchInterval: 30_000,
     staleTime: 60_000,
   });
 
   const refetch = useCallback(() => {
     if (!enabled) return;
-    reportsQ.refetch();
-    completedQ.refetch();
-    reviewsQ.refetch();
-    declinedQ.refetch();
-  }, [enabled, reportsQ, completedQ, reviewsQ, declinedQ]);
+    if (isParent) {
+      reportsQ.refetch();
+      completedQ.refetch();
+      reviewsQ.refetch();
+      declinedQ.refetch();
+    }
+    if (isNanny) {
+      pendingBookingsQ.refetch();
+      recentReviewsQ.refetch();
+    }
+  }, [enabled, isParent, isNanny, reportsQ, completedQ, reviewsQ, declinedQ, pendingBookingsQ, recentReviewsQ]);
 
   useEffect(() => {
     if (!enabled) return undefined;
@@ -143,67 +179,105 @@ export default function useNotifications() {
 
   // Build the full list of currently-eligible notifications (before dismissal filtering).
   const allItems = useMemo(() => {
-    if (!isParent) return [];
+    if (isParent) {
+      const myReports = reportsQ.data || [];
+      const myCompletedBookings = completedQ.data || [];
+      const myReviews = reviewsQ.data || [];
+      const myDeclinedBookings = declinedQ.data || [];
 
-    const myReports = reportsQ.data || [];
-    const myCompletedBookings = completedQ.data || [];
-    const myReviews = reviewsQ.data || [];
-    const myDeclinedBookings = declinedQ.data || [];
+      const out = [];
 
-    const out = [];
+      // 1. Open reports
+      for (const r of myReports) {
+        if (r.status === 'open' || r.status === 'investigating') {
+          out.push({
+            id: `report-${r.id}`,
+            icon: AlertTriangle,
+            iconBg: 'bg-amber-100',
+            iconFg: 'text-amber-700',
+            label: 'Vaša prijava se obrađuje',
+            sublabel: formatHrDate(r.created_date),
+            to: r.booking_id ? `/BookingDetail?id=${r.booking_id}` : '/Messages',
+          });
+        }
+      }
 
-    // 1. Open reports
-    for (const r of myReports) {
-      if (r.status === 'open' || r.status === 'investigating') {
+      // 2. Unreviewed Završeno bookings within 7 days
+      const reviewedBookingIds = new Set(myReviews.map(rv => rv.booking_id).filter(Boolean));
+      const now = Date.now();
+      for (const b of myCompletedBookings) {
+        if (reviewedBookingIds.has(b.id)) continue;
+        if (!b.date) continue;
+        const ageDays = (now - Date.parse(b.date)) / (1000 * 60 * 60 * 24);
+        if (ageDays < 0 || ageDays > 7) continue;
         out.push({
-          id: `report-${r.id}`,
-          icon: AlertTriangle,
-          iconBg: 'bg-amber-100',
-          iconFg: 'text-amber-700',
-          label: 'Vaša prijava se obrađuje',
-          sublabel: formatHrDate(r.created_date),
-          to: r.booking_id ? `/BookingDetail?id=${r.booking_id}` : '/Messages',
+          id: `review-${b.id}`,
+          icon: Star,
+          iconBg: 'bg-amber-50',
+          iconFg: 'text-amber-600',
+          label: `Ostavite recenziju za ${b.nanny_name || 'dadilju'}`,
+          sublabel: formatHrDate(b.date),
+          to: `/LeaveReview?booking_id=${b.id}`,
         });
       }
+
+      // 3. Recently declined bookings (within 14 days)
+      for (const b of myDeclinedBookings) {
+        if (!b.date) continue;
+        const ageDays = (now - Date.parse(b.date)) / (1000 * 60 * 60 * 24);
+        if (ageDays < 0 || ageDays > 14) continue;
+        out.push({
+          id: `declined-${b.id}`,
+          icon: Search,
+          iconBg: 'bg-rose-light',
+          iconFg: 'text-primary',
+          label: `${b.nanny_name || 'Dadilja'} nije mogla — pronađite drugu`,
+          sublabel: formatHrDate(b.date),
+          to: '/FindNannies',
+        });
+      }
+
+      return out;
     }
 
-    // 2. Unreviewed Završeno bookings within 7 days
-    const reviewedBookingIds = new Set(myReviews.map(rv => rv.booking_id).filter(Boolean));
-    const now = Date.now();
-    for (const b of myCompletedBookings) {
-      if (reviewedBookingIds.has(b.id)) continue;
-      if (!b.date) continue;
-      const ageDays = (now - Date.parse(b.date)) / (1000 * 60 * 60 * 24);
-      if (ageDays < 0 || ageDays > 7) continue;
-      out.push({
-        id: `review-${b.id}`,
-        icon: Star,
-        iconBg: 'bg-amber-50',
-        iconFg: 'text-amber-600',
-        label: `Ostavite recenziju za ${b.nanny_name || 'dadilju'}`,
-        sublabel: formatHrDate(b.date),
-        to: `/LeaveReview?booking_id=${b.id}`,
-      });
+    if (isNanny) {
+      const out = [];
+
+      // 1. Pending booking requests (no age cap — pending stays surfaced until acted on)
+      for (const b of pendingBookingsQ.data || []) {
+        out.push({
+          id: `pending-${b.id}`,
+          icon: Calendar,
+          iconBg: 'bg-peach/40',
+          iconFg: 'text-peach-dark',
+          label: `Nova rezervacija od ${b.family_display_name || b.family_name || 'obitelji'}`,
+          sublabel: formatHrDate(b.date),
+          to: `/BookingDetail?id=${b.id}`,
+        });
+      }
+
+      // 2. New reviews received within last 14 days
+      const now = Date.now();
+      for (const r of recentReviewsQ.data || []) {
+        if (!r.created_date) continue;
+        const ageDays = (now - Date.parse(normalizeIso(r.created_date))) / (1000 * 60 * 60 * 24);
+        if (ageDays < 0 || ageDays > 14) continue;
+        out.push({
+          id: `review-received-${r.id}`,
+          icon: Star,
+          iconBg: 'bg-amber-50',
+          iconFg: 'text-amber-600',
+          label: `${r.parent_name || 'Obitelj'} vam je ostavio recenziju`,
+          sublabel: formatHrDate(r.created_date),
+          to: '/NannyReviews',
+        });
+      }
+
+      return out;
     }
 
-    // 3. Recently declined bookings (within 14 days)
-    for (const b of myDeclinedBookings) {
-      if (!b.date) continue;
-      const ageDays = (now - Date.parse(b.date)) / (1000 * 60 * 60 * 24);
-      if (ageDays < 0 || ageDays > 14) continue;
-      out.push({
-        id: `declined-${b.id}`,
-        icon: Search,
-        iconBg: 'bg-rose-light',
-        iconFg: 'text-primary',
-        label: `${b.nanny_name || 'Dadilja'} nije mogla — pronađite drugu`,
-        sublabel: formatHrDate(b.date),
-        to: '/FindNannies',
-      });
-    }
-
-    return out;
-  }, [isParent, reportsQ.data, completedQ.data, reviewsQ.data, declinedQ.data]);
+    return [];
+  }, [isParent, isNanny, reportsQ.data, completedQ.data, reviewsQ.data, declinedQ.data, pendingBookingsQ.data, recentReviewsQ.data]);
 
   // Active = currently eligible AND not dismissed.
   const items = useMemo(
@@ -214,7 +288,7 @@ export default function useNotifications() {
   // Previous = anything in localStorage, joined back to its render shape if
   // we still have an "eligible" entry; otherwise we render a minimal stub.
   const previousItems = useMemo(() => {
-    if (!isParent) return [];
+    if (!isParent && !isNanny) return [];
     const eligibleById = new Map(allItems.map(i => [i.id, i]));
     const out = [];
     for (const [id, entry] of Object.entries(dismissals)) {
@@ -237,7 +311,7 @@ export default function useNotifications() {
     }
     out.sort((a, b) => Date.parse(b.dismissedAt || 0) - Date.parse(a.dismissedAt || 0));
     return out;
-  }, [isParent, allItems, dismissals]);
+  }, [isParent, isNanny, allItems, dismissals]);
 
   const dismiss = useCallback(
     (id) => {
@@ -261,7 +335,10 @@ export default function useNotifications() {
     });
   }, [enabled, items, user?.email]);
 
-  const isLoading = enabled && (reportsQ.isLoading || completedQ.isLoading || reviewsQ.isLoading || declinedQ.isLoading);
+  const isLoading = enabled && (
+    (isParent && (reportsQ.isLoading || completedQ.isLoading || reviewsQ.isLoading || declinedQ.isLoading)) ||
+    (isNanny && (pendingBookingsQ.isLoading || recentReviewsQ.isLoading))
+  );
 
   return {
     items,

@@ -36,6 +36,7 @@ const navItems = {
   { path: '/Home', icon: Home, label: 'Početna' },
   { path: '/NannyBookings', icon: Calendar, label: 'Moje rezervacije' },
   { path: '/Messages', icon: MessageCircle, label: 'Poruke' },
+  { path: '/Inbox', icon: Bell, label: 'Obavijesti' },
   { path: '/Earnings', icon: Euro, label: 'Zarada' },
   { path: '/NannyProfile', icon: User, label: 'Moj profil' }],
 
@@ -196,7 +197,7 @@ export default function AppLayout() {
         <div className="h-14 flex items-center justify-between px-4">
           <Logo />
           <div className="flex items-center gap-1">
-            {isAuthenticated && role === 'parent' && (
+            {isAuthenticated && (role === 'parent' || role === 'nanny') && (
               <Link
                 to="/Inbox"
                 className="relative inline-flex items-center justify-center h-9 w-9 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"

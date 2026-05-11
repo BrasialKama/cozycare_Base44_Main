@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Bell, ChevronRight, X, CheckCheck } from 'lucide-react';
 import useNotifications from '@/hooks/useNotifications';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
-function NotificationRow({ item, onClick, onDismiss, muted = false }) {
+function NotificationRow({ item, onDismiss, muted = false }) {
   return (
     <div
       className={`flex items-center gap-3 bg-card border border-border/50 rounded-2xl px-4 py-3 transition-all duration-200 ${
@@ -14,7 +14,6 @@ function NotificationRow({ item, onClick, onDismiss, muted = false }) {
     >
       <Link
         to={item.to}
-        onClick={onClick}
         className="flex items-center gap-3 flex-1 min-w-0"
         style={{ touchAction: 'manipulation' }}
       >
@@ -47,12 +46,6 @@ function NotificationRow({ item, onClick, onDismiss, muted = false }) {
 export default function Inbox() {
   const { items, previousItems, isLoading, dismiss, dismissAll } = useNotifications();
   const [tab, setTab] = useState('active');
-  const navigate = useNavigate();
-
-  const handleItemClick = (item) => (e) => {
-    // Dismiss before letting <Link> navigate.
-    dismiss(item.id);
-  };
 
   return (
     <div className="space-y-6 pb-8">
@@ -111,7 +104,6 @@ export default function Inbox() {
                 <NotificationRow
                   key={item.id}
                   item={item}
-                  onClick={handleItemClick(item)}
                   onDismiss={() => dismiss(item.id)}
                 />
               ))}
