@@ -196,16 +196,16 @@ export default function AppLayout() {
       <div className="lg:hidden fixed top-0 inset-x-0 bg-card/95 backdrop-blur-md border-b border-border/60 z-30">
         <div className="h-14 flex items-center justify-between px-4">
           <Logo />
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             {isAuthenticated && (role === 'parent' || role === 'nanny') && (
               <Link
                 to="/Inbox"
-                className="relative inline-flex items-center justify-center h-9 w-9 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                className="relative inline-flex items-center justify-center h-11 w-11 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
                 aria-label="Obavijesti"
                 style={{ touchAction: 'manipulation' }}>
-                <Bell className="w-4 h-4" />
+                <Bell className="w-5 h-5" />
                 {notificationsCount > 0 && (
-                  <span className="absolute top-1 right-1 min-w-[16px] h-4 px-1 flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold leading-none">
+                  <span className="absolute top-1.5 right-1.5 min-w-[16px] h-4 px-1 flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold leading-none">
                     {notificationsCount > 99 ? '99+' : notificationsCount}
                   </span>
                 )}
@@ -214,7 +214,7 @@ export default function AppLayout() {
             {isAuthenticated ?
               <Button
                 variant="ghost"
-                className="text-xs text-muted-foreground hover:text-foreground gap-1.5 h-9 px-3"
+                className="text-xs text-muted-foreground hover:text-foreground gap-1.5 h-11 px-4"
                 onClick={() => logout()}
                 style={{ touchAction: 'manipulation' }}>
                 <LogOut className="w-4 h-4" />
@@ -222,7 +222,7 @@ export default function AppLayout() {
               </Button> :
               <Button
                 variant="ghost"
-                className="text-xs text-muted-foreground hover:text-foreground h-9 px-3"
+                className="text-xs text-muted-foreground hover:text-foreground h-11 px-4"
                 onClick={() => navigateToLogin()}
                 style={{ touchAction: 'manipulation' }}>
                 Prijava
