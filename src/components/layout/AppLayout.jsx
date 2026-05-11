@@ -193,8 +193,9 @@ export default function AppLayout() {
       </aside>
 
       {/* ── Mobile header ── */}
-      <div className="lg:hidden fixed top-0 inset-x-0 bg-card/95 backdrop-blur-md border-b border-border/60 z-30">
-        <div className="h-14 flex items-center justify-between px-4">
+      <div className="lg:hidden fixed top-0 inset-x-0 z-30 border-b border-border/60">
+        <div className="absolute inset-0 bg-card/95 backdrop-blur-md pointer-events-none" aria-hidden="true" />
+        <div className="relative h-14 flex items-center justify-between px-4">
           <Logo />
           <div className="flex items-center gap-2">
             {isAuthenticated && (role === 'parent' || role === 'nanny') && (
@@ -231,7 +232,7 @@ export default function AppLayout() {
           </div>
         </div>
         {(user?.app_role === 'admin' || user?.role === 'admin') && (
-          <div className="px-4 pb-3">
+          <div className="relative px-4 pb-3">
             <AdminRoleSwitcher />
           </div>
         )}
