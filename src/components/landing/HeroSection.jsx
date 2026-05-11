@@ -139,7 +139,7 @@ export default function HeroSection() {
               className="bg-primary text-primary-foreground h-14 px-10 text-lg hover:bg-primary/90 group"
             >
               <Link to="/FindNannies">
-                Pronađi dadilju kojoj vjeruješ
+                Pronađite dadilju kojoj vjerujete
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-0.5" />
               </Link>
             </Button>

@@ -267,7 +267,7 @@ export default function useNotifications() {
           icon: Star,
           iconBg: 'bg-amber-50',
           iconFg: 'text-amber-600',
-          label: `Nova recenzija od ${r.parent_name || 'obitelji'}`,
+          label: `Nova recenzija od obitelji ${r.parent_name || ''}`.trim(),
           sublabel: formatHrDate(r.created_date),
           to: '/NannyReviews',
         });

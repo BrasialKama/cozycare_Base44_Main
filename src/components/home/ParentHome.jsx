@@ -68,7 +68,7 @@ export default function ParentHome() {
             <span className="text-foreground/60 font-medium">Vaša obitelj zaslužuje samo najbolje.</span>
           </h1>
           <p className="mt-5 text-base text-muted-foreground max-w-md leading-relaxed">
-            Otkrijte tople, provjerene dadilje koje se osjećaju kao obitelj — odabrane za povjerenje, ljubav i pouzdanost.
+            Provjerene dadilje koje se brinu o vašoj djeci s pažnjom kao da su njihova vlastita.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link to="/FindNannies">
@@ -93,7 +93,7 @@ export default function ParentHome() {
           {[
             { icon: Shield, label: 'Provjera pozadine', desc: 'Svaka dadilja prolazi kompletnu provjeru prije pridruživanja' },
             { icon: Star, label: 'Provjerene reference', desc: 'Reference osobno pregledava naš tim za kvalitetu skrbi' },
-            { icon: Heart, label: 'Ocjene obitelji', desc: 'Stvarne recenzije stvarnih obitelji — iskrene, detaljne i provjerene' },
+            { icon: Heart, label: 'Ocjene obitelji', desc: 'Iskrene recenzije pravih obitelji — detaljne i provjerene' },
           ].map(({ icon: Icon, label, desc }) => (
             <div key={label} className="flex items-start gap-4 bg-card border border-border/50 rounded-2xl p-5 shadow-sm">
               <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -170,7 +170,7 @@ export default function ParentHome() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="font-display text-2xl font-semibold text-foreground">Najbolje ocijenjene dadilje</h2>
-              <p className="text-sm text-muted-foreground mt-1">Omiljene među obiteljima — provjerene, ocijenjene i spremne pomoći</p>
+              <p className="text-sm text-muted-foreground mt-1">Omiljene među obiteljima — provjerene, ocijenjene i spremne za vašu obitelj</p>
             </div>
             <Link to="/FindNannies" className="text-sm text-primary font-medium flex items-center gap-1 hover:underline flex-shrink-0 ml-4">
               Prikaži sve <ArrowRight className="w-3.5 h-3.5" />
@@ -190,9 +190,9 @@ export default function ParentHome() {
           <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
             <Heart className="w-8 h-8 text-primary/60" />
           </div>
-          <h3 className="font-display text-xl font-semibold text-foreground mb-2">Vaša savršena dadilja čeka</h3>
+          <h3 className="font-display text-xl font-semibold text-foreground mb-2">Vaša dadilja je ovdje negdje</h3>
           <p className="text-muted-foreground text-sm max-w-xs mx-auto mb-6">
-            Biramo dadilje u vašem području. Pregledajte dostupne dadilje za početak.
+            Pregledajte dostupne dadilje u vašem području i pronađite osobu koja vam odgovara.
           </p>
           <Link to="/FindNannies">
             <Button className="rounded-full px-8">Pretraži dadilje</Button>

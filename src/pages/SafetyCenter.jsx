@@ -22,7 +22,7 @@ const trustExplainers = [
   {
     icon: FileCheck,
     title: 'Provjera pozadine',
-    description: 'Kompletna provjera pozadine uključujući kaznenu evidenciju i relevantne sudske zapise. Ažurira se godišnje.',
+    description: 'Potpuna provjera koja uključuje kaznenu evidenciju i relevantne sudske zapise. Obnavlja se jednom godišnje.',
     color: 'bg-secondary/60 text-secondary-foreground',
   },
   {
@@ -33,8 +33,8 @@ const trustExplainers = [
   },
   {
     icon: Camera,
-    title: 'Video verifikacija',
-    description: 'Svaka dadilja završava video intervju s našim timom, potvrđujući identitet i procjenjujući komunikaciju i ponašanje.',
+    title: 'Video provjera',
+    description: 'Svaka dadilja prolazi video razgovor s našim timom u kojem potvrđujemo identitet i upoznajemo se osobno.',
     color: 'bg-peach text-peach-dark',
   },
   {
@@ -181,7 +181,7 @@ export default function SafetyCenter() {
           </li>
           <li className="flex items-start gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />
-            Koristite funkciju prijave tijekom termina za mir uma
+            Koristite funkciju prijave tijekom termina kako biste bili mirni
           </li>
           <li className="flex items-start gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 flex-shrink-0" />

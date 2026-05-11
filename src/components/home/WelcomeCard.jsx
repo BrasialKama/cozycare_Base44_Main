@@ -41,9 +41,9 @@ export default function WelcomeCard({ role }) {
 
   const nannyContent = {
     headline: 'Dobrodo\u0161li u CozyCare tim',
-    body: 'Hvala \u0161to ste se pridru\u017eili. Brinemo o tome da svaka dadilja u na\u0161em timu ima dostojan tretman, obitelji koje je cijene, i platformu koja radi za nju \u2014 a ne obrnuto.',
+    body: 'Hvala \u0161to ste se pridru\u017eili. Trudimo se da svaka dadilja u na\u0161em timu ima dostojan tretman, obitelji koje je po\u0161tuju i platformu koja radi za nju \u2014 a ne obrnuto.',
     tips: [
-      { icon: Camera, title: 'Dovr\u0161ite profil', body: 'Topla fotografija, iskren bio i par rije\u010di o va\u0161em stilu skrbi \u010dine veliku razliku.', href: '/NannyProfile' },
+      { icon: Camera, title: 'Dovr\u0161ite profil', body: 'Topla fotografija, iskren opis i par rije\u010di o va\u0161em pristupu skrbi \u010dine veliku razliku.', href: '/NannyProfile' },
       { icon: Calendar, title: 'Čekajte odobrenje', body: 'Na\u0161 tim pregledava va\u0161 profil unutar 24\u201348 sati. Javit \u0107emo vam \u010dim bude spreman.', href: null },
       { icon: MessageCircle, title: 'Prva rezervacija', body: 'Kad vam stigne rezervacija, dobit \u0107ete obavijest. Obitelji mo\u017eete poslati poruku izravno iz termina.', href: null },
     ],
