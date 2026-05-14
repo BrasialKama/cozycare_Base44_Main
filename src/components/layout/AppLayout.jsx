@@ -3,7 +3,7 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 import {
   Home, Search, Calendar, MessageCircle, User,
-  Shield, Heart, LogOut, Euro, ClipboardList, ChevronRight, Settings, Bell } from
+  Shield, Heart, LogOut, Euro, ClipboardList, ChevronRight, Settings, Bell, BookOpen } from
 'lucide-react';
 import { Button } from '@/components/ui/button';
 import useUnreadMessages from '@/hooks/useUnreadMessages';
@@ -44,7 +44,8 @@ const navItems = {
   { path: '/AdminDashboard', icon: Home, label: 'Nadzorna ploča' },
   { path: '/AdminApplications', icon: ClipboardList, label: 'Prijave' },
   { path: '/AdminBookings', icon: Calendar, label: 'Rezervacije' },
-  { path: '/AdminReports', icon: Shield, label: 'Prijave problema' }]
+  { path: '/AdminReports', icon: Shield, label: 'Prijave problema' },
+  { path: '/AdminKB', icon: BookOpen, label: 'Baza znanja' }]
 
 };
 
@@ -140,6 +141,8 @@ export default function AppLayout() {
           {items.map((item) => {
             const active = item.path === '/Home' ?
             location.pathname === '/' || location.pathname === '/Home' :
+            item.path === '/AdminKB' ?
+            location.pathname === '/AdminKB' || location.pathname.startsWith('/AdminKB/') :
             location.pathname === item.path;
             return (
               <NavLink

@@ -1,0 +1,129 @@
+{
+  "name": "PolicyDocument",
+  "type": "object",
+  "properties": {
+    "slug": {
+      "type": "string",
+      "description": "URL-safe identifier, e.g. 'principles', 'scenario-01-child-abuse'"
+    },
+    "doc_type": {
+      "type": "string",
+      "enum": [
+        "principles",
+        "scenario",
+        "glossary",
+        "decision_index"
+      ],
+      "description": "Document type"
+    },
+    "display_number": {
+      "type": "integer",
+      "description": "For scenarios: 1-15. Null otherwise."
+    },
+    "title": {
+      "type": "string",
+      "description": "Full display title"
+    },
+    "subtitle": {
+      "type": "string",
+      "description": "Short descriptive sentence under the title"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "highest",
+        "high",
+        "medium",
+        "low",
+        "procedural",
+        "none"
+      ],
+      "description": "Controls severity badge color. 'none' for non-scenario documents."
+    },
+    "owner_role": {
+      "type": "string",
+      "description": "e.g. 'Founder', 'Trust & Safety Lead'"
+    },
+    "response_time_summary": {
+      "type": "string",
+      "description": "Short response-time string for the header card"
+    },
+    "legal_signoff_status": {
+      "type": "string",
+      "enum": [
+        "required_extensive",
+        "required",
+        "recommended",
+        "not_required"
+      ],
+      "description": "Legal review status"
+    },
+    "related_slugs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [],
+      "description": "Slugs of related documents"
+    },
+    "body_markdown": {
+      "type": "string",
+      "description": "Full content in markdown, supports ::: callout directives"
+    },
+    "display_order": {
+      "type": "integer",
+      "description": "For sidebar ordering. Principles=0, scenarios=100+display_number*10, glossary=9000, decision_index=9100."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "published"
+      ],
+      "default": "draft",
+      "description": "Lifecycle status. Phase 1: all docs draft."
+    },
+    "last_reviewed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Phase 2 placeholder"
+    },
+    "version": {
+      "type": "integer",
+      "default": 1,
+      "description": "Phase 2 placeholder"
+    }
+  },
+  "required": [
+    "slug",
+    "doc_type",
+    "title",
+    "severity",
+    "legal_signoff_status",
+    "body_markdown",
+    "display_order",
+    "status"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

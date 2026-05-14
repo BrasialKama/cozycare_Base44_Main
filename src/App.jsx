@@ -28,6 +28,8 @@ import AdminDashboard from '@/pages/AdminDashboard';
 import AdminApplications from '@/pages/AdminApplications';
 import AdminBookings from '@/pages/AdminBookings';
 import AdminReports from '@/pages/AdminReports';
+import AdminKB from '@/pages/AdminKB';
+import AdminKBDocument from '@/pages/AdminKBDocument';
 import Join from '@/pages/Join';
 import Landing from '@/pages/Landing';
 import Inbox from '@/pages/Inbox';
@@ -91,6 +93,8 @@ const AuthenticatedApp = () => {
           <Route path="/AdminApplications" element={<AdminApplications />} />
           <Route path="/AdminBookings" element={<AdminBookings />} />
           <Route path="/AdminReports" element={<AdminReports />} />
+          <Route path="/AdminKB" element={<AdminKB />} />
+          <Route path="/AdminKB/:slug" element={<AdminKBDocument />} />
         </Route>
 
         {/* Nanny-only routes */}
