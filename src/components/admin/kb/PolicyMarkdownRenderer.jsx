@@ -117,9 +117,17 @@ const mdComponents = {
       {...props}
     />
   ),
-  a: ({ node, ...props }) => (
-    <a className="text-primary underline-offset-2 hover:underline" target="_blank" rel="noopener noreferrer" {...props} />
-  ),
+  a: ({ node, href, ...props }) => {
+    const isExternal = href && /^https?:\/\//.test(href);
+    return (
+      <a
+        href={href}
+        className="text-primary underline-offset-2 hover:underline"
+        {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+        {...props}
+      />
+    );
+  },
   strong: ({ node, ...props }) => <strong className="font-semibold text-foreground" {...props} />,
   em: ({ node, ...props }) => <em className="italic" {...props} />,
   code: ({ node, inline, ...props }) =>
