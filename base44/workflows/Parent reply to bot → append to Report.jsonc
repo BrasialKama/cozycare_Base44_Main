@@ -1,0 +1,37 @@
+{
+  "name": "Parent reply to bot \u2192 append to Report",
+  "description": "When a parent sends a message to bot@cozycare.hr, find the matching open early-completion Report and append the reply to its admin_notes so admins see it on the Prijave problema page.",
+  "trigger": {
+    "condition": "${ ((.trigger.data.receiver_email == \"bot@cozycare.hr\") and (.trigger.data.sender_email != \"bot@cozycare.hr\")) }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create"
+      ],
+      "entity_name": "Message"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "parent_reply_to_bot_append_to_report",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "onParentReplyToBot",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  },
+  "x-base44-migrated-from-automation": {
+    "legacy_payload_function": "onParentReplyToBot"
+  }
+}
